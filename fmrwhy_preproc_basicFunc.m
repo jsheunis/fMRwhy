@@ -17,14 +17,6 @@ function fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, echo)
 % INPUT:
 
 % OUTPUT:
-motion_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_desc-confounds_motion.tsv']);
-afunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-apreproc_bold.nii']);
-rfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rpreproc_bold.nii']);
-rafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii']);
-sfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-spreproc_bold.nii']);
-srfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srpreproc_bold.nii']);
-srafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
-basic_func_out_fns = {motion_fn, afunctional_fn, rfunctional_fn, rafunctional_fn, sfunctional_fn, srfunctional_fn, srafunctional_fn};
 
 %--------------------------------------------------------------------------
 
@@ -36,15 +28,15 @@ disp('---')
 
 
 % Load/create required defaults
-bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
-sub = '001';
-ses = '';
-task = 'rest';
-run = '1';
-echo = '2';
+% bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
+% sub = '001';
+% ses = '';
+% task = 'motor'; % changed for fingertapping experiment. TODO: change back. and update functioning.
+% run = '1';
+% echo = '2';
 
 disp('Loading BIDS directory and files')
-template_task = 'rest';
+template_task = 'motor'; % changed for fingertapping experiment. TODO: change back. and update functioning.
 template_run = '1';
 template_echo = '2';
 defaults.TR = 2;
@@ -68,6 +60,16 @@ functional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_ru
 
 % Grab template filename
 template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_space-individual_bold.nii']);
+
+% Grab standard output filenames
+motion_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_desc-confounds_motion.tsv']);
+afunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-apreproc_bold.nii']);
+rfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rpreproc_bold.nii']);
+rafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii']);
+sfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-spreproc_bold.nii']);
+srfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srpreproc_bold.nii']);
+srafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
+basic_func_out_fns = {motion_fn, afunctional_fn, rfunctional_fn, rafunctional_fn, sfunctional_fn, srfunctional_fn, srafunctional_fn};
 
 disp('Complete!')
 disp('---')
@@ -184,4 +186,4 @@ end
 % STEP 5: Generate multiple regressors for GLM analysis and QC
 % Includes: 3D realignment parameters, framewise displacement, FD censoring, tissue compartment signals, retroicor and HRV+RVT
 % -------
-fmrwhy_qc_generateMultRegr(bids_dir, sub, ses, task, run)
+fmrwhy_preproc_generateMultRegr(bids_dir, sub, ses, task, run, echo)

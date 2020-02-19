@@ -1,4 +1,4 @@
-function fmrwhy_qc_run(bids_dir, sub, ses, task, run)
+function fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo)
 
 % Software dependences:
 % - Matlab vX
@@ -29,7 +29,7 @@ function fmrwhy_qc_run(bids_dir, sub, ses, task, run)
 
 % Load/create required defaults
 spm_dir = '/Users/jheunis/Documents/MATLAB/spm12';
-template_task = 'rest';
+template_task = 'motor'; % changed for fingertapping experiment. TODO: change back. and update functioning.
 template_run = '1';
 template_echo = '2';
 
@@ -39,7 +39,11 @@ preproc_dir = fullfile(deriv_dir, 'fmrwhy-preproc');
 qc_dir = fullfile(deriv_dir, 'fmrwhy-qc');
 sub_dir_preproc = fullfile(preproc_dir, ['sub-' sub]);
 sub_dir_qc = fullfile(qc_dir, ['sub-' sub]);
+anat_dir_qc = fullfile(sub_dir_qc, 'anat');
 func_dir_qc = fullfile(sub_dir_qc, 'func');
+if ~exist(anat_dir_qc, 'dir')
+    mkdir(anat_dir_qc)
+end
 if ~exist(func_dir_qc, 'dir')
     mkdir(func_dir_qc)
 end
@@ -61,7 +65,29 @@ template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_ta
 % -------
 % STEP 1: Contours of tissue masks on mean EPI / template EPI (/ anatomical image?)
 % -------
-montage_data = fmrwhy_qc_createMaskMontages(bids_dir, sub, 1)
+% TODO: this should hid figures and only print them to png. currently
+% figures are popping up.
+
+mask_montage_fns = {'_GM_mask_montage', '_WM_mask_montage', '_CSF_mask_montage', '_brain_mask_montage'};
+for i = 1:numel(mask_montage_fns)
+    mask_montage_fns{i} = fullfile(anat_dir_qc, ['sub-' sub mask_montage_fns{i} '.png']);
+end
+run_montage = 0;
+for i = 1:numel(mask_montage_fns)
+    if ~exist(mask_montage_fns{i}, 'file')
+        disp(['Mask overlay montage does not exist yet: ' mask_montage_fns{i}]);
+        run_montage = 1;
+    end
+end
+if run_montage
+    disp('Creating mask overlay montages')
+    montage_data = fmrwhy_qc_createMaskMontages(bids_dir, sub, 1);
+    disp('Complete!')
+    disp('---')
+else
+    disp('All mask overlay montages exist.')
+    disp('---')
+end
 % -------
 % STEP 2: Contours of anatomical ROIs on mean EPI / template EPI (/ anatomical image?)
 % -------
@@ -83,9 +109,9 @@ confounds_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run
 % -------
 % STEP 2: Calculate and generate statistical measures / images (tsnr, variance, std, psc, DVARS)
 % -------
-stats = fmrwhy_qc_calculateStats(bids_dir, sub, ses, task, run)
+stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, ses, task, run, echo);
 
 % -------
 % STEP 3: Plot The Plot
 % -------
-output = fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run)
+fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo);

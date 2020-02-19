@@ -19,7 +19,7 @@ function out_data = fmrwhy_util_detrend(data, order)
 if order == 1
     X = (1:r)';
 else
-    X = [(1:r)' ((1:r)').^2]
+    X = [(1:r)' ((1:r)').^2];
 end
 % Remove mean from design matrix
 X = X - repmat(mean(X, 1), r, 1);

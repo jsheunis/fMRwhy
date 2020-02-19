@@ -17,7 +17,7 @@ spm('defaults','fmri');
 spm_jobman('initcfg');
 smooth = struct;
 smooth.matlabbatch{1}.spm.spatial.smooth.data = scans';
-smooth.matlabbatch{1}.spm.spatial.smooth.fwhm = fwhm;
+smooth.matlabbatch{1}.spm.spatial.smooth.fwhm = [fwhm fwhm fwhm];
 smooth.matlabbatch{1}.spm.spatial.smooth.dtype = 0;
 smooth.matlabbatch{1}.spm.spatial.smooth.im = 0;
 smooth.matlabbatch{1}.spm.spatial.smooth.prefix = 's';

@@ -37,7 +37,7 @@ disp('---')
 
 % Load/create required defaults
 spm_dir = '/Users/jheunis/Documents/MATLAB/spm12';
-template_task = 'rest';
+template_task = 'motor'; % changed for fingertapping experiment. TODO: change back. and update functioning.
 template_run = '1';
 template_echo = '2';
 
@@ -66,7 +66,7 @@ end
 anatomical_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_T1w.nii']);
 
 % Get functional template
-template_fn = fullfile(sub_dir, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_space-individual_bold.nii']);
+template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_space-individual_bold.nii']);
 
 % Initialise output filenames
 % Outputs after coregistering T1w image

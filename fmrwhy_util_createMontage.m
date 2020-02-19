@@ -1,4 +1,4 @@
-function montage = fmrwhy_util_createMontage(img, columns, rotate, str, clrmp, visibility)
+function montage = fmrwhy_util_createMontage(img, columns, rotate, str, clrmp, visibility, shape)
 
 % Simple function to create a montage / mosaic of multiple slices from a single 3D
 % image matrix. TODO: Needs improvement i.t.o RAS/LAS orientation specification
@@ -72,18 +72,26 @@ else
     montage.whole_img = whole;
 end
 
-% Create figure
-f = figure('visible', visibility);
+% Get screen size for plotting - [1 1 w h]
+scr_size = get(0,'ScreenSize');
+dist = scr_size(4);
+if scr_size(3) < dist
+    dist = scr_size(3);
+end
+
+% Create figure - outerposition = [left bottom width height]
+if strcmp(shape, 'max')
+    f = figure('visible', visibility, 'units','normalized','outerposition',[0 0 1 1]);
+elseif strcmp(shape, 'square')
+    f = figure('visible', visibility, 'units','pixels','outerposition',[0 0 dist dist]);
+else
+    f = figure('visible', visibility, 'units','pixels','outerposition',[0 0 dist dist]);
+end
 ax = subplot(1,1,1);
 im = imagesc(ax, montage.whole_img); colormap(clrmp); colorbar;
 title(str);
 montage.im = im;
-if strcmp(visibility, 'on')
-    montage.f = f;
-else
-    close(f)
-    montage.f = nan;
-end
+montage.f = f;
 
 
 

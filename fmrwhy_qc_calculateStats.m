@@ -6,17 +6,19 @@ function stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional_fn)
 
 % First access and reshape the functional data: 4D to 2D
 vols = spm_vol(functional_fn);
-[Ni, Nj, Nk] = vols(1).dim;
+Ni = vols(1).dim(1);
+Nj = vols(1).dim(2);
+Nk = vols(1).dim(3);
 Nt = numel(vols);
 data_4D = spm_read_vols(vols);
 data_2D = reshape(data_4D, Ni*Nj*Nk, Nt); %[voxels, time]
 data_2D = data_2D'; %[time, voxels]
 
 % Get masks
-masks = fmrwhy_util_loadMasks(bids_dir, sub)
+masks = fmrwhy_util_loadMasks(bids_dir, sub);
 
-% Remove linear trend per voxel
-data_2D_detrended = fmrwhy_util_detrend(data_2D, 1); %[time, voxels]
+% Remove linear and quadratic trend per voxel
+data_2D_detrended = fmrwhy_util_detrend(data_2D, 2); %[time, voxels]
 
 % Calculate mean
 data_2D_mean = nanmean(data_2D_detrended); %[1, voxels]
@@ -31,14 +33,14 @@ data_2D_stddev = std(data_2D_detrended); %[1, voxels]
 data_2D_zstat = data_2D_demeaned./data_2D_stddev;
 data_2D_zstat(isnan(data_2D_zstat)) = 0;
 data_2D_zstat_ts = mean(abs(data_2D_zstat), 2); % perhaps this should only be done within brain mask?
-Zstat_mean = mean(data_2D_zstat_mean); % perhaps this should only be done within brain mask?
+Zstat_mean = mean(data_2D_zstat_ts); % perhaps this should only be done within brain mask?
 
 % Calculate variance
 data_2D_var = var(data_2D_detrended);
 
 % Calculate percentage signal change: [I(t) - mean(I)]/mean(I)*100
 data_2D_psc = 100*(data_2D_detrended./data_2D_mean) - 100;
-data_2D_psc(isnan(data_2D_psc))=0;
+data_2D_psc(isnan(data_2D_psc)) = 0;
 
 %% Calculate global correlation (GCOR) - TODO: double check algorithm and dimensions of matrices
 %% Steps according to https://doi.org/10.1089/brain.2013.0156:
@@ -66,9 +68,9 @@ data_3D_var = reshape(data_2D_var, Ni, Nj, Nk);
 data_3D_stddev = reshape(data_2D_stddev, Ni, Nj, Nk);
 tSNR_3D = reshape(tSNR_2D, Ni, Nj, Nk);
 
-data_4D_psc = reshape(data_2D_pcs, Ni, Nj, Nk, Nt);
-data_4D_detrended = reshape(data_2D_detrended, Ni, Nj, Nk, Nt);
-data_4D_demeaned = reshape(data_2D_demeaned, Ni, Nj, Nk, Nt);
+data_4D_psc = reshape(data_2D_psc', Ni, Nj, Nk, Nt);
+data_4D_detrended = reshape(data_2D_detrended', Ni, Nj, Nk, Nt);
+data_4D_demeaned = reshape(data_2D_demeaned', Ni, Nj, Nk, Nt);
 
 stats = struct;
 % Single values
