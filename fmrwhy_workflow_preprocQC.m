@@ -7,112 +7,51 @@
 
 %--------------------------------------------------------------------------
 
-% Load/create required defaults
-spm_dir = '/Users/jheunis/Documents/MATLAB/spm12';
+% Load/create required parameters
 bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
+
+% Setup fmrwhy bids directories on workflow level
+fmrwhy_defaults_setupDerivDirs(bids_dir);
+
+% Grab default workflow params
+wf_params = fmrwhy_defaults_workflow(bids_dir)
+
+% Loop through subjects, sessions, tasks, runs, etc
 sub = '001';
+
+% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
+fmrwhy_defaults_setupSubDirs(bids_dir, sub)
+
+% Update workflow params with subject anatomical derivative filenames
+wf_params = fmrwhy_defaults_subAnat(bids_dir, sub, wf_params)
+
+% Loop through sessions, tasks, runs, etc
 ses = '';
-template_task = 'rest';
-template_run = '1';
-template_echo = '2';
 task = 'rest';
 run = '1';
 echo = '2';
 
-% BIDS structure values
-% BIDS = spm_BIDS(bids_dir);
-% subjects = spm_BIDS(BIDS,'subjects');
-% sessions = spm_BIDS(BIDS,'sessions');
-% runs = spm_BIDS(BIDS,'runs');
-% tasks = spm_BIDS(BIDS,'tasks');
-% types = spm_BIDS(BIDS,'types');
-% modalities = spm_BIDS(BIDS,'modalities');
-
-% Directory and content setup
-deriv_dir = fullfile(bids_dir, 'derivatives');
-preproc_dir = fullfile(deriv_dir, 'fmrwhy-preproc');
-qc_dir = fullfile(deriv_dir, 'fmrwhy-qc');
-sub_dir_preproc = fullfile(preproc_dir, ['sub-' sub]);
-sub_dir_qc = fullfile(qc_dir, ['sub-' sub]);
-if ~exist(sub_dir_preproc, 'dir')
-    mkdir(sub_dir_preproc)
-    sub_dir_BIDS = fullfile(bids_dir, ['sub-' sub]);
-    copyfile(sub_dir_BIDS, sub_dir_preproc)
-end
-if ~exist(sub_dir_qc, 'dir')
-    mkdir(sub_dir_qc)
-end
-
-% Get anatomical file
-anatomical_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_T1w.nii']);
-
-% -------
-% Get structfunc preproc filenames
-% -------
-% Outputs after coregistering T1w image
-coregest_anatomical_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-coregEst_T1w.nii']);
-% Outputs after segmenting coregistered T1w image
-gm_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-GM_probseg.nii']);
-wm_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-WM_probseg.nii']);
-csf_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-CSF_probseg.nii']);
-bone_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-bone_probseg.nii']);
-soft_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-soft_probseg.nii']);
-air_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-air_probseg.nii']);
-indiv_to_mni_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_desc-IndivToMNI_transform.nii']); % forward transform
-mni_to_indiv_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_desc-MNItoIndiv_transform.nii']); % inverse transform
-probseg_fns = {gm_probseg_fn, wm_probseg_fn, csf_probseg_fn, bone_probseg_fn, soft_probseg_fn, air_probseg_fn};
-transform_fns = {indiv_to_mni_fn, mni_to_indiv_fn};
-% Outputs after reslicing segments and coregistered T1w image
-rcoregest_anatomical_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-coregEstResl_T1w.nii']);
-rgm_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-rGM_probseg.nii']);
-rwm_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-rWM_probseg.nii']);
-rcsf_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-rCSF_probseg.nii']);
-rbone_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-rbone_probseg.nii']);
-rsoft_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-rsoft_probseg.nii']);
-rair_probseg_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-rair_probseg.nii']);
-rprobseg_fns = {rgm_probseg_fn, rwm_probseg_fn, rcsf_probseg_fn, rbone_probseg_fn, rsoft_probseg_fn, rair_probseg_fn};
-rall_fns = {rcoregest_anatomical_fn, rgm_probseg_fn, rwm_probseg_fn, rcsf_probseg_fn, rbone_probseg_fn, rsoft_probseg_fn, rair_probseg_fn};
-% Outputs after creating masks
-gm_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-GM_mask.nii']);
-wm_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-WM_mask.nii']);
-csf_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-CSF_mask.nii']);
-brain_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-brain_mask.nii']);
-mask_fns = {gm_mask_fn, wm_mask_fn, csf_mask_fn, brain_mask_fn};
-% -------
-% Get basicfunc preproc filenames
-% -------
-motion_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_desc-confounds_motion.tsv']);
-afunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-apreproc_bold.nii']);
-rfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rpreproc_bold.nii']);
-rafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii']);
-sfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-spreproc_bold.nii']);
-srfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srpreproc_bold.nii']);
-srafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
-framewise_displacement_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_fd.tsv']);
-tissue_regr_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_tissue.tsv']);
-physio_regr_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_physio.tsv']);
-confounds_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_regressors.tsv']);
+% Update workflow params with subject functional derivative filenames
+wf_params = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, wf_params)
 
 %%
 % -------
 % STEP 0 -- Create functional template
 % -------
-% Define template filename
-template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_space-individual_bold.nii']);
 % Create, if it does not exist
-if ~exist(template_fn, 'file')
-    disp(['Template funcional image does not exist yet. Creating now: ' template_fn]);
-    functional0_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_echo-' template_echo '_bold.nii,1']);
-    fmrwhy_util_saveNifti(template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn, 'Template functional volume', 0)
+if ~exist(wf_params.template_fn, 'file')
+    disp(['Template funcional image does not exist yet. Creating now: ' wf_params.template_fn]);
+    functional0_fn = fullfile(wf_params.func_dir_preproc, ['sub-' sub '_task-' wf_params.template_task '_run-' wf_params.template_run '_echo-' wf_params.template_echo '_bold.nii,1']);
+    fmrwhy_util_saveNifti(wf_params.template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn, 'Template functional volume', 0)
 else
-    disp(['Template funcional image exists: ' template_fn]);
+    disp(['Template funcional image exists: ' wf_params.template_fn]);
 end
 
 %%
 % -------
 % STEP 1 -- Structural-functional preprocessing: fmrwhy_preproc_structFunc.m
 % -------
-struct_func_out_fns = [{coregest_anatomical_fn} probseg_fns transform_fns rall_fns mask_fns];
+struct_func_out_fns = [{wf_params.coregest_anatomical_fn} wf_params.probseg_fns wf_params.transform_fns wf_params.rall_fns wf_params.mask_fns];
 run_structFunc = 0;
 for i = 1:numel(struct_func_out_fns)
     if ~exist(struct_func_out_fns{i}, 'file')
@@ -122,7 +61,7 @@ for i = 1:numel(struct_func_out_fns)
 end
 if run_structFunc
     disp('Running complete structural-funcional preprocessing pipeline')
-    fmrwhy_preproc_structFunc(bids_dir, sub, ses, template_task, template_run, template_echo);
+    fmrwhy_preproc_structFunc(bids_dir, sub, ses, wf_params.template_task, wf_params.template_run, wf_params.template_echo);
     disp('Complete!')
     disp('---')
 else
@@ -134,7 +73,7 @@ end
 % -------
 % STEP 2 -- Basic functional preprocessing: fmrwhy_preproc_basicFunc.m
 % -------
-basic_func_out_fns = {motion_fn, afunctional_fn, rfunctional_fn, rafunctional_fn, sfunctional_fn, srfunctional_fn, srafunctional_fn};
+basic_func_out_fns = {wf_params.motion_fn, wf_params.afunctional_fn, wf_params.rfunctional_fn, wf_params.rafunctional_fn, wf_params.sfunctional_fn, wf_params.srfunctional_fn, wf_params.srafunctional_fn};
 run_basicFunc = 0;
 for i = 1:numel(basic_func_out_fns)
     if ~exist(basic_func_out_fns{i}, 'file')
@@ -143,7 +82,7 @@ for i = 1:numel(basic_func_out_fns)
     end
 end
 if run_basicFunc
-    fmrwhy_preproc_basicFunc(bids_dir, sub, ses, template_task, template_run, template_echo);
+    fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, echo);
     disp('Complete!')
     disp('---')
 else
@@ -167,7 +106,7 @@ for i = 1:numel(qc_out_fns)
 end
 
 if run_qc
-    fmrwhy_qc_run(bids_dir, sub, ses, template_task, template_run, template_echo);
+    fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo);
     disp('Complete!')
     disp('---')
 else
@@ -178,7 +117,7 @@ end
 
 %
 %% Step 3: anatomical-localizer-preproc:     - rtme_preproc_anatLocaliser.m
-%fmrwhy_preproc_anatLocaliser(sub, defaults);
+%fmrwhy_preproc_anatLocaliser(sub, wf_params);
 
 % Step 3: functional-localizer-preproc:     - rtme_preproc_funcLocaliser.m
 %                                           - rtme_preproc_generateRegressors.m
@@ -190,8 +129,8 @@ end
 
 %
 %for t = 1:numel(defaults.tasks)
-%%    disp(['Performing 3D volume realignment for: ' sub '_task-' tasks(t) '_run-' template_run])
-%    rtme_preproc_funcLocaliser(sub, task, template_run, template_echo, defaults)
+%%    disp(['Performing 3D volume realignment for: ' sub '_task-' tasks(t) '_run-' defaults.template_run])
+%    rtme_preproc_funcLocaliser(sub, task, defaults.template_run, wf_params.template_echo, defaults)
 %end
 
 

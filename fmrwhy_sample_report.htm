@@ -1,0 +1,239 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="fmrwhy_reports.css">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="fmrwhy_reports.js"></script>
+        <script>
+        window.onload = function() {
+            document.getElementById("button1").click();
+            document.getElementById("button2").click();
+            document.getElementById("button3").click();
+        };
+        </script>
+    </head>
+
+    <body>
+        <div class="topnav">
+          <a class="active" href="#summary">Summary</a>
+          <a href="#anat">Anatomical</a>
+          <a href="#func">Functional</a>
+          <div class="topnav-centered">
+<!--              <a href="#home">Home</a>-->
+            <img src="img/logo_jsheunis_3.jpeg" alt="Avatar" class="avatar">
+          </div>
+          <div class="topnav-right">
+              <a href="#home">fMRwhy Quality Report</a>
+          </div>
+<!--          <div class="dropdown">-->
+<!--            <button class="dropbtn">Functional-->
+<!--              <i class="fa fa-caret-down"></i>-->
+<!--            </button>-->
+<!--            <div class="dropdown-content">-->
+<!--              <a href="#rest1">Rest 1</a>-->
+<!--              <a href="#motor1">Motor 1</a>-->
+<!--              <a href="#emotion1">Emotion 1</a>-->
+<!--            </div>-->
+<!--          </div>-->
+        </div>
+        <br>
+        <div id="summary">
+            <h2>Summary</h2>
+            <br>
+            <table class="qcsummary">
+<!--              <tr>-->
+<!--                <th>Company</th>-->
+<!--                <th>Contact</th>-->
+<!--                <th>Country</th>-->
+<!--              </tr>-->
+              <tr>
+                <td>Subject ID</td>
+                <td>001</td>
+              </tr>
+              <tr>
+                <td>Date/time</td>
+                <td>17-May-2019 17:11:26</td>
+              </tr>
+              <tr>
+                <td>Anat resolution</td>
+                <td>1x1x1 mm (100x100x100 voxels)</td>
+              </tr>
+              <tr>
+                <td>Func resolution</td>
+                <td>3.5x3.5x3.5 mm (64x64x34 voxels)</td>
+              </tr>
+              <tr>
+                <td>Func acquisition</td>
+                <td>Multi-echo (TE = 14,28,42 ms)</td>
+              </tr>
+              <tr>
+                <td>Func tasks</td>
+                <td>3 (rest, motor, emotion)</td>
+              </tr>
+              <tr>
+                <td>Func runs</td>
+                <td>6 (2 per task)</td>
+              </tr>
+            </table>
+
+            <br>
+
+        </div>
+
+        <br>
+        <div id="anat">
+            <h2>Anatomical QC</h2>
+
+            <p>
+                The T1w image was coregistered to the template functional image (task-rest_run-1_echo_2, volume 1)
+                using SPM12 coregister/estimate functionality. Before resampling to the functional resolution, this
+                coregistered T1w image was segmented using tissue probability maps and SPM12's unified segmentation
+                algorithm. This yielded subject-specific probability maps for gray matter, white matter, csf, soft tissue,
+                bone and air in the functional space. All of the segmentations where then resampled (coregister/write)
+                to the functional resolution. Masks were generated for gray matter, white matter, csf, and the whole brain
+                (a combination - logical OR after thresholding - of the previous three masks). These are overlaid on the
+                template functional image below, to allow visual inspection of segmentation and registration quality.
+
+            </p>
+
+            <h4>T1w coregistration and segmentation</h4>
+            <div class="tab3">
+              <button id="button3" class="tablinks3 active" onclick="openTab3(event, 'brain')">Brain mask</button>
+              <button class="tablinks3" onclick="openTab3(event, 'gm')">Gray matter mask</button>
+              <button class="tablinks3" onclick="openTab3(event, 'wm')">White matter mask</button>
+              <button class="tablinks3" onclick="openTab3(event, 'csf')">CSF mask</button>
+
+            </div>
+
+            <br>
+            <!-- Tab content -->
+            <div id="brain" class="tabcontent3">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_brain_mask_montage.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="gm" class="tabcontent3">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_GM_mask_montage.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="wm" class="tabcontent3">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_WM_mask_montage.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="csf" class="tabcontent3">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_CSF_mask_montage.png" alt="no picture" style="width:95%;">
+            </div>
+
+        </div>
+
+        <br>
+        <div id="func">
+            <h2>Functional QC</h2>
+            <p>
+                For functional quality reporting, several processing steps are completed and a variety of data sources,
+                including the functional time series, head movement parameters and physiology data. Statistical measures
+                are calculated from the time series data, yielding spatial QC measure plots (e.g. standard deviation and
+                temporal signal to noise ratio) and timeseries visualisations (e.g. framewise displacement, grayplots, etc).
+                If physiology data are available, quality metrics for these will be extracted from the PhysIO pipeline
+                included as a dependency in this toolbox.
+
+                QC information is available for:
+                <ul>
+                    <li><a href="#funcsummary">A summary of functional QC metrics</a></li>
+                    <li><a href="#spatialqcplots">Spatial QC plots of statistical measures</a></li>
+                    <li><a href="#tempqcplots">Time series QC plots</a></li>
+                    <li><a href="#physqcplots">QC plots of physiology data</a></li>
+                </ul>
+
+            </p>
+            <br>
+            <h4 id="funcsummary">Functional QC metrics summary</h4>
+                <table class="qcsummary">
+                  <tr>
+                    <td>Framewise displacement threshold</td>
+                    <td>0.25 mm</td>
+                  </tr>
+                  <tr>
+                    <td>Framewise displacement outliers</td>
+                    <td>21</td>
+                  </tr>
+                  <tr>
+                    <td>Total framewise displacement</td>
+                    <td>20.1367</td>
+                  </tr>
+                  <tr>
+                    <td>Mean framewise displacement</td>
+                    <td>20.1367</td>
+                  </tr>
+                  <tr>
+                    <td>Mean Zscore</td>
+                    <td>0.76807</td>
+                  </tr>
+                  <tr>
+                    <td>Global correlation</td>
+                    <td>0.025621</td>
+                  </tr>
+                  <tr>
+                    <td>Mean tSNR (GM)</td>
+                    <td>61.2908</td>
+                  </tr>
+                  <tr>
+                    <td>Mean tSNR (WM)</td>
+                    <td>81.2157</td>
+                  </tr>
+                  <tr>
+                    <td>Mean tSNR (CSF)</td>
+                    <td>31.6234</td>
+                  </tr>
+                  <tr>
+                    <td>Mean tSNR (brain)</td>
+                    <td>62.3282</td>
+                  </tr>
+                </table>
+
+            <br>
+            <h4 id="spatialqcplots">Spatial QC plots</h4>
+            <div class="tab1">
+              <button id="button1" class="tablinks1 active" onclick="openTab1(event, 'mean')">Mean EPI</button>
+              <button class="tablinks1" onclick="openTab1(event, 'std')">Standard deviation</button>
+              <button class="tablinks1" onclick="openTab1(event, 'tsnr')">Temporal SNR</button>
+            </div>
+
+            <br>
+            <!-- Tab content -->
+            <div id="mean" class="tabcontent1">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_mean.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="std" class="tabcontent1">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_std.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="tsnr" class="tabcontent1">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_tsnr.png" alt="no picture" style="width:95%;">
+            </div>
+
+            <br>
+            <h4 id="tempqcplots">Temporal QC plots</h4>
+            <div class="tab2">
+              <button id="button2" class="tablinks2 active" onclick="openTab2(event, 'grayplot_ro')">Grayplot (compartment ordered)</button>
+              <button class="tablinks2" onclick="openTab2(event, 'grayplot_gso')">Grayplot (global signal ordered)</button>
+                <button class="tablinks2" onclick="openTab2(event, 'tsplot')">Time series plots</button>
+            </div>
+
+            <!-- Tab content -->
+            <div id="grayplot_ro" class="tabcontent2">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-RO_grayplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="grayplot_gso" class="tabcontent2">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-GSO_grayplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="tsplot" class="tabcontent2">
+              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-GSO_grayplot.png" alt="no picture" style="width:95%;">
+            </div>
+
+            <br>
+            <h4 id="physqcplots">Physiology QC plots (from PhysIO)</h4>
+            <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/PhysIO_output_level2_04.jpg" alt="no picture" style="width:50%;">
+
+        </div>
+
+
+
+    </body>
+</html>

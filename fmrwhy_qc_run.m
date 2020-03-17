@@ -1,4 +1,4 @@
-function fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo)
+function fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo, opts)
 
 % Software dependences:
 % - Matlab vX
@@ -27,36 +27,23 @@ function fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo)
 % - flag to generate nii images or not
 
 
-% Load/create required defaults
-spm_dir = '/Users/jheunis/Documents/MATLAB/spm12';
-template_task = 'motor'; % changed for fingertapping experiment. TODO: change back. and update functioning.
-template_run = '1';
-template_echo = '2';
+% Setup fmrwhy bids directories on workflow level
+fmrwhy_defaults_setupDerivDirs(bids_dir);
 
-% Directory and content setup
-deriv_dir = fullfile(bids_dir, 'derivatives');
-preproc_dir = fullfile(deriv_dir, 'fmrwhy-preproc');
-qc_dir = fullfile(deriv_dir, 'fmrwhy-qc');
-sub_dir_preproc = fullfile(preproc_dir, ['sub-' sub]);
-sub_dir_qc = fullfile(qc_dir, ['sub-' sub]);
-anat_dir_qc = fullfile(sub_dir_qc, 'anat');
-func_dir_qc = fullfile(sub_dir_qc, 'func');
-if ~exist(anat_dir_qc, 'dir')
-    mkdir(anat_dir_qc)
+% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
+fmrwhy_defaults_setupSubDirs(bids_dir, sub);
+
+% Update workflow params with subject anatomical derivative filenames
+opts = fmrwhy_defaults_subAnat(bids_dir, sub, opts);
+
+% Update workflow params with subject functional derivative filenames
+opts = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, opts);
+if ~exist(opts.anat_dir_qc, 'dir')
+    mkdir(opts.anat_dir_qc)
 end
-if ~exist(func_dir_qc, 'dir')
-    mkdir(func_dir_qc)
+if ~exist(opts.func_dir_qc, 'dir')
+    mkdir(opts.func_dir_qc)
 end
-
-% Grab anatomical image
-anatomical_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_T1w.nii']);
-
-% Grab functional timeseries filename,
-functional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_bold.nii']);
-
-% Grab template filename
-template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_space-individual_bold.nii']);
-
 
 % ------------------------
 % SECTION A: ANATOMICAL QC
@@ -65,12 +52,11 @@ template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_ta
 % -------
 % STEP 1: Contours of tissue masks on mean EPI / template EPI (/ anatomical image?)
 % -------
-% TODO: this should hid figures and only print them to png. currently
-% figures are popping up.
+% TODO: this should hide figures and only print them to png. currently figures are popping up.
 
 mask_montage_fns = {'_GM_mask_montage', '_WM_mask_montage', '_CSF_mask_montage', '_brain_mask_montage'};
 for i = 1:numel(mask_montage_fns)
-    mask_montage_fns{i} = fullfile(anat_dir_qc, ['sub-' sub mask_montage_fns{i} '.png']);
+    mask_montage_fns{i} = fullfile(opts.anat_dir_qc, ['sub-' sub mask_montage_fns{i} '.png']);
 end
 run_montage = 0;
 for i = 1:numel(mask_montage_fns)
@@ -100,18 +86,18 @@ end
 % -------
 % STEP 1: Grab multiple regressors
 % -------
-motion_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_motion.tsv']);
-framewise_displacement_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_fd.tsv']);
-tissue_regr_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_tissue.tsv']);
-physio_regr_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_physio.tsv']);
-confounds_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_regressors.tsv']);
+%motion_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_motion.tsv']);
+%framewise_displacement_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_fd.tsv']);
+%tissue_regr_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_tissue.tsv']);
+%physio_regr_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_physio.tsv']);
+%confounds_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_regressors.tsv']);
 
 % -------
 % STEP 2: Calculate and generate statistical measures / images (tsnr, variance, std, psc, DVARS)
 % -------
-stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, ses, task, run, echo);
+stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, ses, task, run, echo, opts);
 
 % -------
 % STEP 3: Plot The Plot
 % -------
-fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo);
+fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, opts);

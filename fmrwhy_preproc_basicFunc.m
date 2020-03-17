@@ -1,4 +1,4 @@
-function fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, echo)
+function fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, echo, opts)
 %--------------------------------------------------------------------------
 
 % Copyright statement....
@@ -27,74 +27,42 @@ disp('---')
 disp('---')
 
 
-% Load/create required defaults
-% bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
-% sub = '001';
-% ses = '';
-% task = 'motor'; % changed for fingertapping experiment. TODO: change back. and update functioning.
-% run = '1';
-% echo = '2';
+% Setup fmrwhy bids directories on workflow level
+fmrwhy_defaults_setupDerivDirs(bids_dir);
 
-disp('Loading BIDS directory and files')
-template_task = 'motor'; % changed for fingertapping experiment. TODO: change back. and update functioning.
-template_run = '1';
-template_echo = '2';
-defaults.TR = 2;
-defaults.N_slices = 34;
-fwhm = 7;
+% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
+fmrwhy_defaults_setupSubDirs(bids_dir, sub);
+
+% Update workflow params with subject anatomical derivative filenames
+opts = fmrwhy_defaults_subAnat(bids_dir, sub, opts);
+
+% Update workflow params with subject functional derivative filenames
+opts = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, opts);
+
+% Filler text
 stre_txt = ['sub-' sub '_task-' task '_run-' run '_echo-' echo];
 str_txt = ['sub-' sub '_task-' task '_run-' run];
-
-% Directory and content setup
-deriv_dir = fullfile(bids_dir, 'derivatives');
-preproc_dir = fullfile(deriv_dir, 'fmrwhy-preproc');
-sub_dir_preproc = fullfile(preproc_dir, ['sub-' sub]);
-if ~exist(sub_dir_preproc, 'dir')
-    mkdir(sub_dir_preproc)
-    sub_dir_BIDS = fullfile(bids_dir, ['sub-' sub]);
-    copyfile(sub_dir_BIDS, sub_dir_preproc)
-end
-
-% Grab functional timeseries filename,
-functional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_bold.nii']);
-
-% Grab template filename
-template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_space-individual_bold.nii']);
-
-% Grab standard output filenames
-motion_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_desc-confounds_motion.tsv']);
-afunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-apreproc_bold.nii']);
-rfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rpreproc_bold.nii']);
-rafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii']);
-sfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-spreproc_bold.nii']);
-srfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srpreproc_bold.nii']);
-srafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
-basic_func_out_fns = {motion_fn, afunctional_fn, rfunctional_fn, rafunctional_fn, sfunctional_fn, srfunctional_fn, srafunctional_fn};
-
-disp('Complete!')
-disp('---')
 
 
 % -------
 % STEP 1: Estimate 3D volume realignment parameters from raw data
 % -------
 % Check if this has already been done by seeing if the tsv file with head movement parameters exist
-motion_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_desc-confounds_motion.tsv']);
-[d, f, e] = fileparts(motion_fn);
-if ~exist(motion_fn, 'file')
+[d, f, e] = fileparts(opts.motion_fn);
+if ~exist(opts.motion_fn, 'file')
     % If it does not exist estimate MPs
     disp(['Estimating 3D realignment parameters for: ' stre_txt]);
-    realign_measures = fmrwhy_batch_realignEst(functional_fn, template_fn);
+    realign_measures = fmrwhy_batch_realignEst(opts.functional_fn, opts.template_fn);
     temp_txt_fn = fullfile(d, [f '.txt']);
     col_names = {'trans_x','trans_y','trans_z','rot_x','rot_y','rot_z'};
     data = load(realign_measures.mp_fn);
     data_table = array2table(data,'VariableNames', col_names);
     writetable(data_table, temp_txt_fn, 'Delimiter','\t');
-    [status, msg, msgID] = movefile(temp_txt_fn, motion_fn);
+    [status, msg, msgID] = movefile(temp_txt_fn, opts.motion_fn);
     disp('Complete!')
     disp('---')
 else
-    disp(['3D realignment parameters already estimated: ' motion_fn])
+    disp(['3D realignment parameters already estimated: ' opts.motion_fn])
     disp('---')
 end
 
@@ -103,10 +71,9 @@ end
 % STEP 2: Slice timing correction
 % TODO: implement automatic multi-echo processing
 % -------
-afunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-apreproc_bold.nii']);
-if ~exist(afunctional_fn, 'file')
+if ~exist(opts.afunctional_fn, 'file')
     disp(['Performing slice timing correction on: ' stre_txt])
-    fmrwhy_batch_sliceTiming(functional_fn, afunctional_fn, defaults);
+    fmrwhy_batch_sliceTiming(opts.functional_fn, opts.afunctional_fn, opts);
     disp('Complete!')
     disp('---')
 else
@@ -120,10 +87,9 @@ end
 % TODO: implement automatic multi-echo processing
 % -------
 % Realign raw timeseries data
-rfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rpreproc_bold.nii']);
-if ~exist(rfunctional_fn, 'file')
+if ~exist(opts.rfunctional_fn, 'file')
     disp(['Performing 3D realignment on raw timeseries: ' stre_txt])
-    fmrwhy_batch_realignEstResl(functional_fn, template_fn, rfunctional_fn);
+    fmrwhy_batch_realignEstResl(opts.functional_fn, opts.template_fn, opts.rfunctional_fn);
     disp('Complete!')
     disp('---')
 else
@@ -131,10 +97,9 @@ else
     disp('---')
 end
 % Realign slice time corrected timeseries data
-rafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii']);
-if ~exist(rafunctional_fn, 'file')
+if ~exist(opts.rafunctional_fn, 'file')
     disp(['Performing 3D realignment on raw timeseries: ' stre_txt])
-    fmrwhy_batch_realignEstResl(afunctional_fn, template_fn, rafunctional_fn);
+    fmrwhy_batch_realignEstResl(opts.afunctional_fn, opts.template_fn, opts.rafunctional_fn);
     disp('Complete!')
     disp('---')
 else
@@ -148,10 +113,9 @@ end
 % TODO: implement automatic multi-echo processing
 % -------
 % Smooth raw timeseries data
-sfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-spreproc_bold.nii']);
-if ~exist(sfunctional_fn, 'file')
+if ~exist(opts.sfunctional_fn, 'file')
     disp(['Performing spatial smoothing on raw timeseries: ' stre_txt])
-    fmrwhy_batch_smooth(functional_fn, sfunctional_fn, fwhm);
+    fmrwhy_batch_smooth(opts.functional_fn, opts.sfunctional_fn, opts.fwhm);
     disp('Complete!')
     disp('---')
 else
@@ -159,10 +123,9 @@ else
     disp('---')
 end
 % Smooth realigned timeseries data
-srfunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srpreproc_bold.nii']);
-if ~exist(srfunctional_fn, 'file')
+if ~exist(opts.srfunctional_fn, 'file')
     disp(['Performing spatial smoothing on realigned timeseries: ' stre_txt])
-    fmrwhy_batch_smooth(rfunctional_fn, srfunctional_fn, fwhm);
+    fmrwhy_batch_smooth(opts.rfunctional_fn, opts.srfunctional_fn, opts.fwhm);
     disp('Complete!')
     disp('---')
 else
@@ -170,10 +133,9 @@ else
     disp('---')
 end
 % Smooth realigned and slice time corrected timeseries data
-srafunctional_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
-if ~exist(srafunctional_fn, 'file')
+if ~exist(opts.srafunctional_fn, 'file')
     disp(['Performing spatial smoothing on realigned and slice time corrected timeseries: ' stre_txt])
-    fmrwhy_batch_smooth(rafunctional_fn, srafunctional_fn, fwhm);
+    fmrwhy_batch_smooth(opts.rafunctional_fn, opts.srafunctional_fn, opts.fwhm);
     disp('Complete!')
     disp('---')
 else
@@ -186,4 +148,4 @@ end
 % STEP 5: Generate multiple regressors for GLM analysis and QC
 % Includes: 3D realignment parameters, framewise displacement, FD censoring, tissue compartment signals, retroicor and HRV+RVT
 % -------
-fmrwhy_preproc_generateMultRegr(bids_dir, sub, ses, task, run, echo)
+fmrwhy_preproc_generateMultRegr(bids_dir, sub, ses, task, run, echo, opts)

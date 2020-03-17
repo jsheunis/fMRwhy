@@ -4,7 +4,7 @@ function output = fmrwhy_qc_createMaskMontages(bids_dir, sub, savefigs)
 % assumes fmrwhy_preproc_structFunc.m has been run successfully
 
 % Template values
-template_task = 'motor'; % TODO: updated for fingertapping experiment, change!!!
+template_task = 'rest'; % TODO: updated for fingertapping experiment, change!!!
 template_run = 1;
 
 % BIDS structure values
@@ -44,7 +44,7 @@ end
 output = struct;
 
 % Create background montage
-montage_EPI = fmrwhy_util_createMontage(template_img, 7, 1, 'Template volume', 'gray', 'off', 'max');
+montage_EPI = fmrwhy_util_createMontage(template_img, 9, 1, 'Template volume', 'gray', 'off', 'max');
 
 % Get screen size for plotting
 scr_size = get(0,'ScreenSize');
@@ -56,18 +56,25 @@ end
 % Create figures with background montage and overlaid masks
 % TODO: create a sub function for this, i.e. overlaying montages
 for i = 1:numel(mask_images)
-    if ~exist(mask_montage_fns{i}, 'file')
-        f(i) = figure('units','pixels','outerposition',[0 0 dist dist]);
+    %if ~exist(mask_montage_fns{i}, 'file')
+        %f(i) = figure('units','pixels','outerposition',[0 0 dist dist]);
+        f(i) = figure('units','normalized','outerposition',[0 0 1 1]);
         im1 = imagesc(montage_EPI.whole_img);
         colormap('gray');
-        colorbar;
         ax = gca;
+        outerpos = ax.OuterPosition;
+        ti = ax.TightInset; 
+        left = outerpos(1) + ti(1);
+        bottom = outerpos(2) + ti(2);
+        ax_width = outerpos(3) - ti(1) - ti(3);
+        ax_height = outerpos(4) - ti(2) - ti(4);
+        ax.Position = [left bottom ax_width ax_height];
         hold(ax, 'on')
         [Nimx, Nimy] = size(montage_EPI.whole_img);
         oo = ones(Nimx, Nimy);
         zz = zeros(Nimx, Nimy);
         red = cat(3, oo, zz, zz);
-        montage_mask = fmrwhy_util_createMontage(mask_images{i}, 7, 1, mask_names{i}, 'gray', 'off', 'max');
+        montage_mask = fmrwhy_util_createMontage(mask_images{i}, 9, 1, mask_names{i}, 'gray', 'off', 'max');
         bound_whole_bin = bwboundaries(montage_mask.whole_img);
         Nblobs_bin = numel(bound_whole_bin);
         for b = 1:Nblobs_bin
@@ -76,9 +83,18 @@ for i = 1:numel(mask_images)
         imC = imagesc(ax, red);
         set(imC, 'AlphaData', 0.2*montage_mask.whole_img);
         hold(ax, 'off');
-        print(f(i),mask_montage_fns{i},'-dpng')
-    end
+        set(ax,'xtick',[])
+        set(ax,'xticklabel',[])
+        set(ax,'ytick',[])
+        set(ax,'yticklabel',[])
+        set(ax,'ztick',[])
+        set(ax,'zticklabel',[])
+        print(f(i),mask_montage_fns{i},'-dpng', '-r0')
+    %end
 end
+
+
+
 
 % TODO: incorporate a better way to show/hide figures and to save images or not, using function arguments
 

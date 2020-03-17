@@ -88,10 +88,11 @@ else
     f = figure('visible', visibility, 'units','pixels','outerposition',[0 0 dist dist]);
 end
 ax = subplot(1,1,1);
-im = imagesc(ax, montage.whole_img); colormap(clrmp); colorbar;
-title(str);
+im = imagesc(ax, montage.whole_img); colormap(clrmp); %colorbar;
+% title(str);
 montage.im = im;
 montage.f = f;
+montage.ax = ax;
 
 
 

@@ -20,5 +20,3 @@ results.matlabbatch{1}.spm.stats.results.units = 1;
 results.matlabbatch{1}.spm.stats.results.export{1}.ps = 1;
 % RUN BATCH JOB
 spm_jobman('run',results.matlabbatch);
-% Save xSPM structure - has info on t-maps and clusters, etc
-save(fullfile(stats_dir, 'xSPM.mat'), 'xSPM')
