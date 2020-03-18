@@ -46,6 +46,7 @@ str_txt = ['sub-' sub '_task-' task '_run-' run];
 
 % -------
 % STEP 1: Estimate 3D volume realignment parameters from raw data
+% TODO: implement automatic multi-echo processing
 % -------
 % Check if this has already been done by seeing if the tsv file with head movement parameters exist
 [d, f, e] = fileparts(opts.motion_fn);

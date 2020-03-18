@@ -1,11 +1,49 @@
-% STEPS TO RUN FOR PREPROCESSING AND QC
-% ALSO SHOWS CORRESPONDING OUTPUT FILENAMES
+# Stephan
+
+% STEPS TO RUN FOR PREPROCESSING AND QC AND ANALYSIS
+
+% ----------------------------------------------------------------
+% STEP -24: We hold these truths to be completely non-self-evident
+% ----------------------------------------------------------------
+
+% rest-run-1 is used as the mother of all templates for various reasons:
+% - Necessary to calculate baseline estimates of T2*, S0, tSNR and other values (not)
+% - Need a motion alignment and template before real-time is started
 
 
-% fmrwhy_preproc_structFunc(bids_dir, sub, ses, task, run, echo, defaults)
-%       -
+
+% -----------------------------------
+% STEP 0: Data
+% -----------------------------------
+% FUNCTION: describe data
+% -----------------------------------
+
+% 1. T1w
+% 2. Rest1
+% 3. Motor1
+% 4. Emotion1
+% 5. Rest2
+% 6. Motor2
+% 7. Emotion2
 
 
+
+
+
+% -----------------------------------
+% STEP 1: Pre-processing: anatomical
+% -----------------------------------
+% FUNCTION: fmrwhy_preproc_structFunc
+% -----------------------------------
+
+% 1. Anatomical to functional space coregistration, use middle echo first volume as template - SPM12 coregister estimate
+% 2. Segment coregistered anatomical image into tissue components - SPM12 unified segmentation
+%     1. Saves inverse transform from subject functional to MNI space
+% 3. Coregister relevant regions of interest (from atlases in MNI space) to subject functional space using inverse transfromations
+% 4. Reslice all to functional space grid (SPM reslice)
+
+%% Workflow comments:
+% -
 
 
 
