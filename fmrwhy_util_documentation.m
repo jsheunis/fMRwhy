@@ -16,3 +16,58 @@
 %Y = Xb + e
 %b_hat = pinv(X)*Y
 %Y_hat = Y - X*b_hat
+
+
+
+
+% ---------------------------------------
+% ORIENTATION WHEN PLOTTING BRAIN  SLICES
+% ---------------------------------------
+% IMPORTANT: NEED TO FIGURE THIS OUT
+
+% Info from https://brainder.org/2012/09/23/the-nifti-file-format/
+% The most visible improvement of the nifti format over the previous analyze format is the ability
+% to unambiguously store information orientation. The file standard assumes that the voxel coordinates
+% refer to the center of each voxel, rather than at any of its corners. The world coordinate system is
+% assumed to be ras: +x is Right, +y is Anterior and +z is Superior, which is precisely different than
+% the coordinate system used in analyze, which is las. The format provides three different methods to map
+% the voxel coordinates (i,j,k) to the world coordinates (x,y,z). The first method exists only to allow
+% compatibility with the analyze format. The other two methods may coexist, and convey different coordinate
+% systems. These systems are specified in the fields short qform_code and short sform_code, which can
+% assume the values specified in the table:
+
+% RAS+ = +Right +Anterior +Superior = +X +Y +Z
+
+% Links:
+% Useful description of everything: https://nipy.org/nibabel/nifti_images.html
+% https://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=SPM;eb275f02.1908:
+%   - says spm.mat reflects sform rows, which spm gives precedence to. Look at spm.private.mat0 for qform.
+
+
+% Important note 21 March 2020:
+% nii = nifti(func_fn) gives the same info as func_spm.private; e.g. nii.hdr = func_spm.private.hdr.
+
+% Issue where qform and sform codes change after creating template 3d image from 4d timeseries:
+% https://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=ind1808&L=SPM&P=R42327&K=2&X=E96B8262A335059C28&Y=j.s.heunis%40tue.nl
+
+
+% func_spm.private:
+% NIFTI object: 1-by-1
+%            dat: [64×64×34 file_array]
+%            mat: [4×4 double]
+%     mat_intent: 'Aligned'
+%           mat0: [4×4 double]
+%    mat0_intent: 'Aligned'
+%         timing: [1×1 struct]
+%        descrip: 'Template functional volume'
+% Stephan interpretation: mat0 = qform rows; intent = code.
+
+
+% Decision on 23 March 2020: use code from https://github.com/xiangruili/dicm2nii in fmrwhy_util_readNifti:
+% This reorients the nifti image in voxel space such that it is RAS+. For imagesc, this image then has to be
+% rotated with 90 degrees, because for some reason (as of yet unknown to me) imagesc swops the x and y axes;
+% or interprets these axes differently when provided in a matrix format.
+
+% IMPORTANT: NEED TO CHECK WHEREVER spm_read_vols and spm_vol ARE USED AND REPLACE IF REQUIRED!!!!!!!
+
+

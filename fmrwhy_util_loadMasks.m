@@ -14,15 +14,16 @@ masks.WM_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individ
 masks.CSF_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-CSF_mask.nii']);
 masks.brain_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-brain_mask.nii']);
 
-masks.GM_mask_3D = spm_read_vols(spm_vol(masks.GM_mask_fn)); % [Ni x Nj x Nk]
-masks.WM_mask_3D = spm_read_vols(spm_vol(masks.WM_mask_fn)); % [Ni x Nj x Nk]
-masks.CSF_mask_3D = spm_read_vols(spm_vol(masks.CSF_mask_fn)); % [Ni x Nj x Nk]
-masks.brain_mask_3D = spm_read_vols(spm_vol(masks.brain_mask_fn)); % [Ni x Nj x Nk]
+[p, frm, rg, dim] = fmrwhy_util_readNifti(masks.GM_mask_fn);
+masks.GM_mask_3D = p.nii.img; % [Ni x Nj x Nk]
+[p, frm, rg, dim] = fmrwhy_util_readNifti(masks.WM_mask_fn);
+masks.WM_mask_3D = p.nii.img; % [Ni x Nj x Nk]
+[p, frm, rg, dim] = fmrwhy_util_readNifti(masks.CSF_mask_fn);
+masks.CSF_mask_3D = p.nii.img; % [Ni x Nj x Nk]
+[p, frm, rg, dim] = fmrwhy_util_readNifti(masks.brain_mask_fn);
+masks.brain_mask_3D = p.nii.img; % [Ni x Nj x Nk]
 
-vol = spm_vol(masks.brain_mask_fn);
-Ni = vol.dim(1);
-Nj = vol.dim(2);
-Nk = vol.dim(3);
+[Ni, Nj, Nk] = size(p.nii.img);
 
 masks.GM_mask_2D = reshape(masks.GM_mask_3D, Ni*Nj*Nk, 1); % [Ni*Nj*Nk x 1]
 masks.WM_mask_2D = reshape(masks.WM_mask_3D, Ni*Nj*Nk, 1); % [Ni*Nj*Nk x 1]

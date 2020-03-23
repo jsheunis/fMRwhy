@@ -2,11 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="daecd958-bb39-4ba3-be2e-342fd82ae97c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/fMRwhy.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/fMRwhy.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmrwhy_preproc_basicFunc.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_preproc_basicFunc.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmrwhy_util_processDescription.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_util_neufepProcessDescription.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmrwhy_defaults_workflow.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_defaults_workflow.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmrwhy_preproc_anatLocaliser.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_preproc_anatLocaliser.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmrwhy_qc_createMaskMontages.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_qc_createMaskMontages.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmrwhy_util_createMontage.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_util_createMontage.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmrwhy_util_documentation.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_util_documentation.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmrwhy_util_loadMasks.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_util_loadMasks.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmrwhy_util_neufepProcessDescription.m" beforeDir="false" afterPath="$PROJECT_DIR$/fmrwhy_util_neufepProcessDescription.m" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,44 +22,25 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fmrwhy_util_neufepProcessDescription.m">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="213" column="37" selection-start-line="213" selection-start-column="37" selection-end-line="213" selection-end-column="37" />
+            <state relative-caret-position="-295">
+              <caret line="12" column="22" selection-start-line="12" selection-end-line="13" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fmrwhy_workflow_fingerTappingME.m">
+        <entry file="file://$PROJECT_DIR$/fmrwhy_util_documentation.m">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="482">
-              <caret line="152" column="30" selection-start-line="152" selection-end-line="152" selection-end-column="30" />
+            <state relative-caret-position="810">
+              <caret line="54" column="22" lean-forward="true" selection-start-line="54" selection-start-column="22" selection-end-line="54" selection-end-column="22" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fmrwhy_qc_run.m">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="393">
-              <caret line="69" column="47" selection-start-line="69" selection-start-column="19" selection-end-line="69" selection-end-column="47" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_anatLocaliser.m">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>calculateFD</find>
-      <find>dlmwr</find>
-      <find>if numel</find>
-      <find>num2str(run)</find>
-      <find>precision</find>
       <find>copyfile(sub_dir_BIDS</find>
       <find>normalize_wri</find>
       <find>generatePhys</find>
@@ -82,6 +66,11 @@
       <find>grey</find>
       <find>dtype</find>
       <find>logo</find>
+      <find>normali</find>
+      <find>createBinary</find>
+      <find>spm</find>
+      <find>spm_read</find>
+      <find>spm_read_vols</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -90,27 +79,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/fmrwhy_util_loadTSVtoArray.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_util_saveArrayAsTSV.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_qc_generatePhysRegr.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_batch_PhysIO.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_util_saveAsTSV.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_qc_calculateFD.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_batch_realignEst.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_batch_realignEstResl.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_batch_sliceTiming.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_util_processDescription.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_batch_coregEst.m" />
         <option value="$PROJECT_DIR$/fmrwhy_batch_segment.m" />
         <option value="$PROJECT_DIR$/fmrwhy_batch_coregResl.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_util_createBinaryMasks.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_util_loadMasks.m" />
         <option value="$PROJECT_DIR$/fmrwhy_qc_generateMultRegr.m" />
         <option value="$PROJECT_DIR$/fmrwhy_qc_createStatsImages.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_util_createMontage.m" />
         <option value="$PROJECT_DIR$/todo/calculateQCmeasures.m" />
         <option value="$PROJECT_DIR$/fmrwhy_qc_calculateStats.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_qc_createMaskMontages.m" />
         <option value="$PROJECT_DIR$/fmrwhy_batch_specify1stlevel.m" />
         <option value="$PROJECT_DIR$/fmrwhy_workflow_fingertapping.m" />
         <option value="$PROJECT_DIR$/fmrwhy_batch_smooth.m" />
@@ -129,7 +103,6 @@
         <option value="$PROJECT_DIR$/fmrwhy_workflow_fingerTappingME.m" />
         <option value="$PROJECT_DIR$/fmrwhy_batch_threshold1stlevel.m" />
         <option value="$PROJECT_DIR$/fmrwhy_qc_createSubReport.m" />
-        <option value="$PROJECT_DIR$/fmrwhy_defaults_workflow.m" />
         <option value="$PROJECT_DIR$/fmrwhy_util_stretchAx.m" />
         <option value="$PROJECT_DIR$/fmrwhy_util_scale.m" />
         <option value="$PROJECT_DIR$/fmrwhy_qc_createThePlot.m" />
@@ -140,6 +113,22 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/fmrwhy_util_neufepProcessDescription.md" />
         <option value="$PROJECT_DIR$/fmrwhy_preproc_basicFunc.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_preproc_anatLocaliser.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_defaults_workflow.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_batch_normaliseWrite.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_util_createOverlayMontage.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_util_createBinaryMasks.m" />
+        <option value="$PROJECT_DIR$/tests/fmrwhy_test_ROIstruct2func.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_util_gridPlot.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_util_readNifti.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_util_createBinaryImg.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_util_createMontage.m" />
+        <option value="$PROJECT_DIR$/tests/fmrwhy_test_voxelWorldSpaceOrientation.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_util_documentation.m" />
+        <option value="$PROJECT_DIR$/tests/fmrwhy_test_createMontage.m" />
+        <option value="$PROJECT_DIR$/tests/fmrwhy_test_createMaskMontages.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_qc_createMaskMontages.m" />
+        <option value="$PROJECT_DIR$/fmrwhy_util_loadMasks.m" />
         <option value="$PROJECT_DIR$/fmrwhy_util_neufepProcessDescription.m" />
       </list>
     </option>
@@ -168,13 +157,51 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="fMRwhy" type="b2602c69:ProjectViewProjectNode" />
               <item name="fMRwhy" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="fMRwhy" type="b2602c69:ProjectViewProjectNode" />
+              <item name="fMRwhy" type="462c0819:PsiDirectoryNode" />
+              <item name="tests" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope">
+        <subPane subId="Scope 'Default Changelist'; set:Default Changelist; class com.intellij.packageDependencies.ChangeListScope">
+          <expand>
+            <path>
+              <item name="fMRwhy" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="~/Documents/MATLAB/fMRwhy" type="442cc68d:ScopeViewTreeModel$RootNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+        <subPane subId="Scope 'Changed Files'; set:Changed Files; ALL; class com.intellij.packageDependencies.ChangeListScope">
+          <expand>
+            <path>
+              <item name="fMRwhy" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="~/Documents/MATLAB/fMRwhy" type="442cc68d:ScopeViewTreeModel$RootNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+        <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
+          <expand>
+            <path>
+              <item name="fMRwhy" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="~/Documents/MATLAB/fMRwhy" type="442cc68d:ScopeViewTreeModel$RootNode" />
+            </path>
+            <path>
+              <item name="fMRwhy" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="~/Documents/MATLAB/fMRwhy" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="todo" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
           </expand>
           <select />
@@ -186,17 +213,18 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/todo" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -226,12 +254,13 @@
       <workItem from="1582642100737" duration="7444000" />
       <workItem from="1583237620291" duration="18000" />
       <workItem from="1583237655124" duration="42415000" />
-      <workItem from="1583758475885" duration="23831000" />
+      <workItem from="1583758475885" duration="34351000" />
+      <workItem from="1584705295335" duration="19866000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="252228000" />
+    <option name="totallyTimeSpent" value="282614000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -243,11 +272,11 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1280" height="719" extended-state="6" />
+    <frame x="0" y="23" width="1280" height="719" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.24071082" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.24474959" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" order="0" />
       <window_info anchor="bottom" id="Terminal" order="1" />
@@ -275,126 +304,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/todo/spm_batchScripting_fingertappingROI.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1006" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_workflow_fingertapping.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="564">
-          <caret line="218" column="42" lean-forward="true" selection-start-line="218" selection-start-column="42" selection-end-line="218" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_util_saveNifti.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="54" lean-forward="true" selection-start-line="17" selection-start-column="54" selection-end-line="17" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_qc_calculateStats.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="55" selection-start-column="52" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_workflow_preprocQC.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="108" column="54" lean-forward="true" selection-start-line="108" selection-start-column="54" selection-end-line="108" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_qc_createStatsOutput.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="74" selection-start-line="14" selection-start-column="74" selection-end-line="14" selection-end-column="74" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_defaults_subAnat.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" selection-start-line="7" selection-end-line="7" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_sub.m">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_batch_threshold1stlevel.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="38" selection-start-line="21" selection-start-column="38" selection-end-line="21" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_qc_createSubReport.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="38" selection-start-line="13" selection-start-column="38" selection-end-line="13" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmriprep_sample_report.htm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="34" column="24" lean-forward="true" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_qc_sub.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="507">
-          <caret line="57" selection-start-line="57" selection-end-line="57" selection-end-column="61" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_qc_createHTML.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="53" column="93" lean-forward="true" selection-start-line="53" selection-start-column="31" selection-end-line="53" selection-end-column="93" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_defaults_setupSubDirs.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" selection-start-line="11" selection-end-line="11" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_defaults_setupDerivDirs.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="40" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_util_detrend.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="39" selection-start-column="20" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_util_stretchAx.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="19" selection-start-line="4" selection-start-column="5" selection-end-line="4" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_util_scale.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="37" selection-start-column="20" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fmrwhy_qc_createThePlot.m">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="317">
@@ -442,9 +351,7 @@
     <entry file="file://$PROJECT_DIR$/../../PYTHON/8db00-imaging-private/notebooks/BZ1_IP1.ipynb">
       <provider selected="true" editor-type-id="jupyter-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/motion.tsv">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/motion.tsv" />
     <entry file="file://$PROJECT_DIR$/fmrwhy_reports.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="276">
@@ -488,31 +395,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_batch_coregResl.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="3" selection-start-line="23" selection-start-column="3" selection-end-line="23" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fmrwhy_batch_estimate1stlevel.m">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/fmrwhy_batch_PhysIO.m">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_util_documentation.m">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_realignME.m">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_defaults_workflow.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-69">
-          <caret column="47" lean-forward="true" selection-start-column="47" selection-end-column="47" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fmrwhy_batch_realignEstResl.m">
       <provider selected="true" editor-type-id="text-editor">
@@ -543,16 +430,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_defaults_subFunc.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="23" selection-start-line="16" selection-start-column="9" selection-end-line="16" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_anatLocaliser.m">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_generateMultRegr.m">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -560,10 +437,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_structFunc.m">
+    <entry file="file://$PROJECT_DIR$/todo/spm_applyTransformBnS_jsh.m">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo/spm_batchScriptingExample_jsh.m">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="693">
-          <caret line="76" column="45" selection-start-line="76" selection-start-column="45" selection-end-line="76" selection-end-column="45" />
+        <state relative-caret-position="-1018" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_batch_coregResl.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="3" selection-start-line="23" selection-start-column="3" selection-end-line="23" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_workflow_fingerTappingME.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
         </state>
       </provider>
     </entry>
@@ -574,17 +466,152 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fmrwhy_workflow_fingerTappingME.m">
+    <entry file="file://$PROJECT_DIR$/fmrwhy_defaults_subFunc.m">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="482">
-          <caret line="152" column="30" selection-start-line="152" selection-end-line="152" selection-end-column="30" />
+        <state relative-caret-position="45">
+          <caret line="3" column="39" selection-start-line="3" selection-start-column="15" selection-end-line="3" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_anatLocaliser.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="40" column="25" selection-start-line="40" selection-start-column="17" selection-end-line="40" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_batch_normaliseWrite.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="91" selection-start-line="10" selection-start-column="91" selection-end-line="10" selection-end-column="91" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_util_createBinaryMasks.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="38" selection-start-line="5" selection-start-column="38" selection-end-line="5" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_structFunc.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="84" selection-start-line="84" selection-end-line="108" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_defaults_workflow.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="287">
+          <caret line="80" selection-start-line="80" selection-start-column="1" selection-end-line="94" selection-end-column="93" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_util_createOverlayMontage.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="50" selection-start-column="18" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/testy_overlay.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/fmrwhy_test_createOverlayMontage.m">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/fmrwhy_test_voxelWorldSpaceOrientation.m">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_util_gridPlot.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="32" lean-forward="true" selection-start-line="32" selection-end-line="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_util_createBinaryImg.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="20" selection-start-line="8" selection-start-column="20" selection-end-line="8" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_util_createMontage.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-170">
+          <caret line="9" column="58" selection-start-line="9" selection-start-column="58" selection-end-line="9" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/fmrwhy_test_createMontage.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_preproc_realignME.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="945">
+          <caret line="63" column="21" selection-start-line="63" selection-start-column="21" selection-end-line="63" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_defaults_subAnat.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="11" selection-start-line="11" selection-end-line="11" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/fmrwhy_test_ROIstruct2func.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" selection-start-line="5" selection-end-line="30" selection-end-column="84" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_util_loadMasks.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="326">
+          <caret line="23" column="19" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/fmrwhy_test_createMaskMontages.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="24" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_util_readNifti.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-629">
+          <caret column="74" lean-forward="true" selection-start-column="9" selection-end-column="74" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_qc_createMaskMontages.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-498">
+          <caret line="10" column="1" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fmrwhy_util_documentation.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="810">
+          <caret line="54" column="22" lean-forward="true" selection-start-line="54" selection-start-column="22" selection-end-line="54" selection-end-column="22" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fmrwhy_util_neufepProcessDescription.m">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="213" column="37" selection-start-line="213" selection-start-column="37" selection-end-line="213" selection-end-column="37" />
+        <state relative-caret-position="-295">
+          <caret line="12" column="22" selection-start-line="12" selection-end-line="13" />
         </state>
       </provider>
     </entry>

@@ -8,13 +8,13 @@ template_task = 'rest'; % TODO: updated for fingertapping experiment, change!!!
 template_run = 1;
 
 % BIDS structure values
-BIDS = spm_BIDS(bids_dir);
-subjects = spm_BIDS(BIDS,'subjects');
-sessions = spm_BIDS(BIDS,'sessions');
-runs = spm_BIDS(BIDS,'runs');
-tasks = spm_BIDS(BIDS,'tasks');
-types = spm_BIDS(BIDS,'types');
-modalities = spm_BIDS(BIDS,'modalities');
+%BIDS = spm_BIDS(bids_dir);
+%subjects = spm_BIDS(BIDS,'subjects');
+%sessions = spm_BIDS(BIDS,'sessions');
+%runs = spm_BIDS(BIDS,'runs');
+%tasks = spm_BIDS(BIDS,'tasks');
+%types = spm_BIDS(BIDS,'types');
+%modalities = spm_BIDS(BIDS,'modalities');
 
 % Directory and content setup
 deriv_dir = fullfile(bids_dir, 'derivatives');
@@ -29,7 +29,8 @@ end
 
 % Get functional template
 template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' num2str(template_run) '_space-individual_bold.nii']);
-template_img = spm_read_vols(spm_vol(template_fn));
+[p, frm, rg, dim] = fmrwhy_util_readNifti(template_fn)
+template_img = p.nii.img;
 
 % Get anatomical masks in individual functional space
 masks = fmrwhy_util_loadMasks(bids_dir, sub);

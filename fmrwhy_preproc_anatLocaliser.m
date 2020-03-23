@@ -27,7 +27,7 @@
 
 %--------------------------------------------------------------------------
 
-function output = rtme_preproc_anatLocaliser(sub, defaults)
+function output = fmrwhy_preproc_anatLocaliser(sub, defaults)
 
 % Load required defaults
 spm_dir = defaults.spm_dir;

@@ -20,20 +20,28 @@ montage = struct;
 
 % Rotate image slices if required
 if rotate
+    img_orig = img;
+    clear img;
     for p = 1:Nk
-        img(:,:,p) = rot90(img(:,:,p));
+        img(:,:,p) = rot90(img_orig(:,:,p));
     end
 end
 
 % Determine amount of rows and filler slices
 rows = floor(Nk/columns);
 fill = mod(Nk, columns);
-filler = zeros(Ni, Nj);
 if fill == 0
     N_fill = 0;
 else
     N_fill = columns - mod(Nk, columns);
 end
+if rotate
+    filler = zeros(Nj, Ni);
+else
+    filler = zeros(Ni, Nj);
+end
+
+
 montage.rows = rows;
 montage.columns = columns;
 montage.N_fill = N_fill;

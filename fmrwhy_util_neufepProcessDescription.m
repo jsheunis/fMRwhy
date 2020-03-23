@@ -65,8 +65,9 @@
 % 1. Anatomical to functional space coregistration to template functional volume - SPM12 coregister estimate
 % 2. Segment coregistered anatomical image into tissue components - SPM12 unified segmentation
 %   - Saves formward and inverse transforms from subject functional to MNI space
-% 3. Coregister relevant regions of interest (from Anatomy toolbox atlases in MNI space) to subject functional space using inverse transfromations
-% 4. Reslice all to functional space grid (SPM reslice)
+% 3. Construct GM, WM, CSF and whole brain (GM+WM+CSF) masks
+% 4. Coregister relevant regions of interest (from Anatomy toolbox atlases in MNI space) to subject functional space using inverse transfromations
+% 5. Reslice all to functional space grid (SPM reslice)
 
 % ------------------
 % COMMENTS and TODOs
@@ -108,7 +109,7 @@
 %   - of raw data (==> 'sfunctional')
 %   - of slice timing corrected data (==> 'safunctional')
 %   - of realigned data (==> 'srfunctional')
-%   - of slice timing corrected and realigned data (==> 'sfaunctional')
+%   - of slice timing corrected and realigned data (==> 'srafunctional')
 % 5. Generate multiple regressors for GLM analysis and QC (all outputs to individual tsv files, and one combined tsv file)
 %   - 3D realignment parameters (using run timeseries and template volume)
 %   - framewise displacement (FD) and FD censoring (using realignment parameters and threshold defaults)
@@ -196,9 +197,8 @@
 % 5. Specify and run contrasts (fmrwhy_batch_contrast1stlevel)
 % 6. Threshold the results (fmrwhy_batch_threshold1stlevel)
 % 7. Save xSPM.mat file which enables accessing the thresholded clusters
-
-% 6. Select t-stat peak within anatomically bound mask (from anatomy toolbox ROI)
-% 7. Select N amount of voxels neighbouring peak voxel ==> ROI for real-time use
+% 8. Thresholding and selection criteria???
+%   - N amount of voxels neighbouring peak voxel
 
 % ------------------
 % COMMENTS and TODOs
@@ -207,19 +207,33 @@
 % - need an intuitive way to automate generation of task design and contrast from defaults to GLM
 % - need an intuitive way of including/excluding nuisance regressors in task-specific analysis workflow
 
+
+
 % ---------------------------------------- %
 % ---------------------------------------- %
 % STEP x: Combine localisations and select %
 % ---------------------------------------- %
 % ---------------------------------------- %
-% FUNCTION: ?                         %
-% -------------------------------------- %
-% -------------------------------------- %
+% FUNCTION: ?                              %
+% ---------------------------------------- %
+% ---------------------------------------- %
+
+%   - Select t-stat peak within anatomically bound mask (from anatomy toolbox ROI)
+%   - Select N amount of voxels neighbouring peak voxel ==> ROI for real-time use
 
 
 
-%
-% 2. T2*, S0, tSNR calculation from `run1_BOLD_rest` dataset (*is this sensible, as opposed to using RUN 1 task data?*):
+
+% ------------------------------------------ %
+% ------------------------------------------ %
+% STEP x: Multi-echo quantitative processing %
+% ------------------------------------------ %
+% ------------------------------------------ %
+% FUNCTION: ?                                %
+% ------------------------------------------ %
+% ------------------------------------------ %
+
+% 2. T2*, S0, tSNR calculation from `run1_BOLD_rest` dataset
 %     1. Slice time correction on all three echo timeseries
 %     2. 3D volume realignment on middle echo timeseries
 %     3. Apply rigid body transformations from middle echo realignment parameters to echo 1 and echo 3 timeseries
