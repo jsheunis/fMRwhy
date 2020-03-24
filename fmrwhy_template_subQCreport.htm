@@ -2,9 +2,9 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link rel="stylesheet" href="assets/fmrwhy_reports.css">
+        <link rel="stylesheet" type="text/css" href="param_asset_css">
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <script src="assets/fmrwhy_reports.js"></script>
+        <script src="param_asset_js"></script>
         <script>
         window.onload = function() {
             document.getElementById("button1").click();
@@ -19,7 +19,7 @@
           <a href="#anat">Anatomical</a>
           <a href="#func">Functional</a>
           <div class="topnav-centered">
-            <img src="img/logo_jsheunis_3.jpeg" alt="Avatar" class="avatar">
+            <img src="param_avatar" alt="Avatar" class="avatar">
           </div>
           <div class="topnav-right">
               <a href="#home">fMRwhy Quality Report</a>
@@ -32,11 +32,11 @@
             <table class="qcsummary">
               <tr>
                 <td>Subject ID</td>
-                <td>001</td>
+                <td>param_sub</td>
               </tr>
               <tr>
                 <td>Date/time</td>
-                <td>17-May-2019 17:11:26</td>
+                <td>param_datetime</td>
               </tr>
               <tr>
                 <td>Anat resolution</td>
@@ -77,16 +77,16 @@
             <br>
             <!-- Tab content -->
             <div id="brain" class="tabcontent3">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_brain_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="param_brain_mask" alt="no picture" style="width:95%;">
             </div>
             <div id="gm" class="tabcontent3">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_GM_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="param_gm_mask" alt="no picture" style="width:95%;">
             </div>
             <div id="wm" class="tabcontent3">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_WM_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="param_wm_mask" alt="no picture" style="width:95%;">
             </div>
             <div id="csf" class="tabcontent3">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_CSF_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="param_csf_mask" alt="no picture" style="width:95%;">
             </div>
         </div>
         <br>
@@ -157,13 +157,13 @@
             <br>
             <!-- Tab content -->
             <div id="mean" class="tabcontent1">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_mean.png" alt="no picture" style="width:95%;">
+              <img src="param_mean_img" alt="no picture" style="width:95%;">
             </div>
             <div id="std" class="tabcontent1">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_std.png" alt="no picture" style="width:95%;">
+              <img src="param_std_img" alt="no picture" style="width:95%;">
             </div>
             <div id="tsnr" class="tabcontent1">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_tsnr.png" alt="no picture" style="width:95%;">
+              <img src="param_tsnr_img" alt="no picture" style="width:95%;">
             </div>
             <br>
             <h4 id="tempqcplots">Temporal QC plots</h4>
@@ -174,17 +174,17 @@
             </div>
             <!-- Tab content -->
             <div id="grayplot_ro" class="tabcontent2">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-RO_grayplot.png" alt="no picture" style="width:95%;">
+              <img src="param_rograyplot_img" alt="no picture" style="width:95%;">
             </div>
             <div id="grayplot_gso" class="tabcontent2">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-GSO_grayplot.png" alt="no picture" style="width:95%;">
+              <img src="param_gsograyplot_img" alt="no picture" style="width:95%;">
             </div>
             <div id="tsplot" class="tabcontent2">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-GSO_grayplot.png" alt="no picture" style="width:95%;">
+              <img src="param_gsograyplot_img" alt="no picture" style="width:95%;">
             </div>
             <br>
             <h4 id="physqcplots">Physiology QC plots (from PhysIO)</h4>
-            <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/PhysIO_output_level2_04.jpg" alt="no picture" style="width:50%;">
+            <img src="param_physioqc_img" alt="no picture" style="width:50%;">
         </div>
     </body>
 </html>

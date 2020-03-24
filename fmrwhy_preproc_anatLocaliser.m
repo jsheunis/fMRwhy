@@ -1,3 +1,4 @@
+function fmrwhy_preproc_anatLocaliser(bids_dir, sub, opts)
 % FUNCTION:
 %--------------------------------------------------------------------------
 
@@ -25,69 +26,101 @@
 %--------------------------------------------------------------------------
 
 
-%--------------------------------------------------------------------------
-
-function output = fmrwhy_preproc_anatLocaliser(sub, defaults)
-
-% Load required defaults
-spm_dir = defaults.spm_dir;
-preproc_dir = defaults.preproc_dir;
-template_run = defaults.template_run;
-template_task = defaults.template_task;
-template_echo = defaults.template_echo;
+disp('---')
+disp('*** Running fmrwhy_preproc_anatLocaliser ***')
+disp('---')
+disp('---')
 
 
-% Grab files for preprocessing
-functional0_fn = fullfile(preproc_dir, sub, 'func', [sub '_task-' template_task '_run-' template_run '_echo' template_echo 'bold.nii,1']);
-inverse_transformation = fullfile(preproc_dir, sub, 'anat', ['iy_' sub '_T1w.nii']);
-ROI_fns = defaults.ROI_fns;
+% Setup fmrwhy bids directories on workflow level
+fmrwhy_defaults_setupDerivDirs(bids_dir);
 
-% Structure to save outputs
-output = struct;
+% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
+fmrwhy_defaults_setupSubDirs(bids_dir, sub);
 
-% STEP 1 -- Warp MNI space rois to functional space
-disp('1 - Warp MNI space ROIs to functional space...');
-spm('defaults','fmri');
-spm_jobman('initcfg');
-normalize_write = struct;
-% Deformation field
-normalize_write.matlabbatch{1}.spm.spatial.normalise.write.subj.def = {inverse_transformation};
-% Data
-normalize_write.matlabbatch{1}.spm.spatial.normalise.write.subj.resample = ROI_fns';
-% Write options
-normalize_write.matlabbatch{1}.spm.spatial.normalise.write.woptions.bb = [-78,-112,-70;78,76,85];
-normalize_write.matlabbatch{1}.spm.spatial.normalise.write.woptions.vox = [2,2,2];
-normalize_write.matlabbatch{1}.spm.spatial.normalise.write.woptions.interp = 4;
-normalize_write.matlabbatch{1}.spm.spatial.normalise.write.woptions.prefix = 'w';
-% Run
-spm_jobman('run', normalize_write.matlabbatch);
-% Save outputs
-for roi = 1:numel(ROI_fns)
-    [droi, fnroi, extroi] = fileparts(ROI_fns{roi});
-    output.wROI_fns{roi} = [droi filesep 'w' fnroi extroi];
+% Update workflow params with subject anatomical derivative filenames
+opts = fmrwhy_defaults_subAnat(bids_dir, sub, opts);
+
+
+% -------
+% STEP 1: Grab inputs necessary for normalisation (template and transform)
+% -------
+% Template functional volume
+template_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' opts.template_task '_run-' opts.template_run '_space-individual_bold.nii']);
+% Transformation from mni to individual functional template space
+transformation_fn = opts.mni_to_indiv_fn;
+
+%%
+% -------
+% STEP 2a: Write raw roi filenames to a cell array; construct normalised output filenames in BIDS format
+% -------
+toTransform_fns = {};
+saveAs_fns = {};
+count = 0;
+% Loop through all tasks in BIDS structure
+for i = 1:numel(opts.tasks)
+    % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
+    if strcmp(opts.tasks{i}, 'rest') ~= 1
+        % Loop through all ROIs for the particular task
+        for j = 1:numel(opts.roi.(opts.tasks{i}).orig_fn)
+            count = count + 1;
+            toTransform_fns{count} = opts.roi.(opts.tasks{i}).orig_fn{j};
+            saveAs_fns{count} = fullfile(opts.anat_dir_preproc, ['sub-' sub '_space-individual_desc-' opts.roi.(opts.tasks{i}).desc{j} '_roi.nii']);
+            opts.roi.(opts.tasks{i}).roi_fn{j} = saveAs_fns{count}; % save normalised filename for future use
+        end
+    end
 end
-disp('done')
 
-% STEP 2 -- Reslice warped ROIs to functional space grid
-disp('2 - Reslice warped ROIs to functional space grid...');
-spm('defaults','fmri');
-spm_jobman('initcfg');
-reslice = struct;
-% Ref
-reslice.matlabbatch{1}.spm.spatial.coreg.write.ref = {functional0_fn};
-% Source
-source_fns = output.wROI_fns;
-reslice.matlabbatch{1}.spm.spatial.coreg.write.source = source_fns';
-% Roptions
-reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.interp = 4;
-reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.wrap = [0 0 0];
-reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = 0;
-reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.prefix = 'r';
-% Run
-spm_jobman('run',reslice.matlabbatch);
-% Save outputs
-for roi = 1:numel(ROI_fns)
-    [droi, fnroi, extroi] = fileparts(ROI_fns{roi});
-    output.rwROI_fns{roi} = [droi filesep 'rw' fnroi extroi];
+%%
+% -------
+% STEP 2b:  Normalise all rois to individual functional template space
+% -------
+fmrwhy_batch_normaliseWrite(toTransform_fns, transformation_fn, template_fn, saveAs_fns)
+
+%%
+% -------
+% STEP 3a:  Write raw roi filenames to a cell array; construct normalised output filenames in BIDS format
+% -------
+reslice_fns = {};
+count = 0;
+% Loop through all tasks in BIDS structure
+for i = 1:numel(opts.tasks)
+    % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
+    if strcmp(opts.tasks{i}, 'rest') ~= 1
+        % Loop through all ROIs for the particular task
+        for j = 1:numel(opts.roi.(opts.tasks{i}).orig_fn)
+            count = count + 1;
+            reslice_fns{count} = opts.roi.(opts.tasks{i}).roi_fn{j};
+            saveAs_fns{count} = fullfile(opts.anat_dir_preproc, ['sub-' sub '_space-individual_desc-r' opts.roi.(opts.tasks{i}).desc{j} '_roi.nii']);
+            opts.roi.(opts.tasks{i}).rroi_fn{j} = saveAs_fns{count};% save resliced normalised filename for future use
+        end
+    end
 end
-disp('done')
+
+%%
+% -------
+% STEP 3b:  Reslice to functional-resolution image grid
+% -------
+fmrwhy_batch_coregResl(reslice_fns, template_fn, saveAs_fns)
+
+%%
+% -------
+% STEP 4: Show overlays to check quality
+% TODO: should this be in a qc function/workflow?
+% -------
+count = 0;
+[p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(template_fn);
+% Loop through all tasks in BIDS structure
+for i = 1:numel(opts.tasks)
+    % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
+    if strcmp(opts.tasks{i}, 'rest') ~= 1
+        % Loop through all ROIs for the particular task
+        for j = 1:numel(opts.roi.(opts.tasks{i}).orig_fn)
+            count = count+1;
+            [p2, frm2, rg2, dim2] = fmrwhy_util_readNifti(opts.roi.(opts.tasks{i}).rroi_fn{j});
+            overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0);
+            title = opts.roi.(opts.tasks{i}).name{j}
+            fmrwhy_util_createOverlayMontage(p1.nii.img, overlay_img, 9, 1, title, 'gray', 'on', 'max');
+        end
+    end
+end

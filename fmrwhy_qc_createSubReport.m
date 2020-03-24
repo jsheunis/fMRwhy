@@ -18,22 +18,6 @@ func_dir_qc = fullfile(sub_dir_qc, 'func');
 anat_dir_qc = fullfile(sub_dir_qc, 'anat');
 
 
-% Get sample HTML file
-fid = fopen('in.txt');
-lines = textscan(fid,'%s','delimiter','\n');
-fclose(fid);
-lines = lines{1};
-%replace tags with actual values
-relevant =  find(~cellfun(@isempty,strfind(s{1},'E_FROM')));
-for i = 1:length(relevant)
-    lines{relevant(i)-14} = '<modified line>';
-end
-% Create subject report
-fid = fopen('out.txt','w');
-for i = 1:length(lines)
-    fprintf(fid,'%s\n',lines{i});
-end
-fclose(fid)
 
 
 
