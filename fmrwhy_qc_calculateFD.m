@@ -6,6 +6,7 @@ function FD_measures = fmrwhy_qc_calculateFD(MP, r, FD_threshold)
 % r                  - radius to use for displacement derived from
 %                      rotational movement parameters
 % FD_threshold       - threshold (in mm) that defines outlier volumes
+%                    - if threshold == 0, use both predefined trhesholds of 0.2 and 0.5 mm
 %
 % OUTPUT:
 % FD_measures        - structure with filenames and data
@@ -25,7 +26,16 @@ MP_mm(:,4:6) = MP_mm(:,4:6)*r; % 50mm from Power 2017; 80 mm from QAP
 % Calculate FD and related measures
 MP_diff = [zeros(1, 6); diff(MP_mm)];
 FD_measures.FD = sum(abs(MP_diff),2);
-FD_measures.FD_outliers_regr = FD_measures.FD>=FD_threshold;
-FD_measures.FD_outliers_ind = find(FD_measures.FD_outliers_regr);
+
+if FD_threshold == 0
+    FD_measures.FD_outliers_regr02 = FD_measures.FD>=0.2;
+    FD_measures.FD_outliers_ind02 = find(FD_measures.FD_outliers_regr02);
+    FD_measures.FD_outliers_regr05 = FD_measures.FD>=0.5;
+    FD_measures.FD_outliers_ind05 = find(FD_measures.FD_outliers_regr05);
+else
+    FD_measures.FD_outliers_regr = FD_measures.FD>=FD_threshold;
+    FD_measures.FD_outliers_ind = find(FD_measures.FD_outliers_regr);
+end
+
 FD_measures.FD_sum = sum(FD_measures.FD);
 FD_measures.FD_mean = mean(FD_measures.FD);

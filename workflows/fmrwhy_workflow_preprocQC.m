@@ -7,287 +7,193 @@
 
 %--------------------------------------------------------------------------
 
+
+% -------
+% STEP 0.1 -- Load defaults, filenames and parameters
+% -------
+
 % Load fMRwhy defaults
-wf_params = fmrwhy_defaults;
+options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
 bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
-wf_params = fmrwhy_defaults_setupDerivDirs(bids_dir, wf_params);
+options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
 
 % Grab parameters from workflow settings file
-wf_params = fmrwhy_settings_preprocQC(bids_dir, wf_params);
+options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
 sub = '001';
 
 % Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-wf_params = fmrwhy_defaults_setupSubDirs(bids_dir, sub, wf_params);
+options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 
 % Update workflow params with subject anatomical derivative filenames
-wf_params = fmrwhy_defaults_subAnat(bids_dir, sub, wf_params);
+options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
+
+% -------
+% STEP 0.2 -- Create functional template
+% -------
+% Create, if it does not exist
+template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
+if ~exist(template_fn, 'file')
+    disp(['Template funcional image does not exist yet. Creating now: ' template_fn]);
+    functional0_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_echo-' options.template_echo '_bold.nii,1']);
+    fmrwhy_util_saveNifti(template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn, 'Template functional volume', 0)
+else
+    disp(['Template funcional image exists: ' template_fn]);
+end
+options.template_fn = template_fn;
+
+
+
+% -------
+% PREPROCESSING PER TASK AND RUN
+% -------
 
 % Loop through sessions, tasks, runs, etc
 ses = '';
-task = 'rest';
-run = '1';
-echo = '2';
-
-% Update workflow params with subject functional derivative filenames
-wf_params = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, wf_params);
+tasks = {'rest', 'motor'};
 
 
-% -------
-% STEP 0 -- Create functional template
-% -------
-% Create, if it does not exist
-if ~exist(wf_params.template_fn, 'file')
-    disp(['Template funcional image does not exist yet. Creating now: ' wf_params.template_fn]);
-    functional0_fn = fullfile(wf_params.func_dir_preproc, ['sub-' sub '_task-' wf_params.template_task '_run-' wf_params.template_run '_echo-' wf_params.template_echo '_bold.nii,1']);
-    fmrwhy_util_saveNifti(wf_params.template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn, 'Template functional volume', 0)
-else
-    disp(['Template funcional image exists: ' wf_params.template_fn]);
-end
+for t = 1:numel(tasks)
 
+    task = tasks{t};
+    run = '1';
+    echo = '2';
 
-% -------
-% STEP 1 -- Structural-functional preprocessing: fmrwhy_preproc_structFunc.m
-% -------
-% Loop through all standard output filenames and see if these files exist
-struct_func_out_fns = [{wf_params.coregest_anatomical_fn} wf_params.probseg_fns wf_params.transform_fns wf_params.rall_fns wf_params.mask_fns];
-run_structFunc = 0;
-for i = 1:numel(struct_func_out_fns)
-    if ~exist(struct_func_out_fns{i}, 'file')
-        disp(['Structural-funcional preprocessing output file does not exist yet: ' struct_func_out_fns{i}]);
-        run_structFunc = 1;
+    % Update workflow params with subject functional derivative filenames
+    options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+
+    % -------
+    % STEP 1 -- Structural-functional preprocessing: fmrwhy_preproc_structFunc.m
+    % -------
+    % Loop through all standard output filenames and see if these files exist
+    struct_func_out_fns = [{options.coregest_anatomical_fn} options.probseg_fns options.transform_fns options.rall_fns options.mask_fns];
+    run_structFunc = 0;
+    for i = 1:numel(struct_func_out_fns)
+        if ~exist(struct_func_out_fns{i}, 'file')
+            disp(['Structural-funcional preprocessing output file does not exist yet: ' struct_func_out_fns{i}]);
+            run_structFunc = 1;
+        end
     end
-end
-% If some of the files do not exist, run the fmrwhy_preproc_structFunc processing pipeline
-if run_structFunc
-    disp('Running complete structural-funcional preprocessing pipeline')
-    fmrwhy_preproc_structFunc(bids_dir, sub, ses, wf_params.template_task, wf_params.template_run, wf_params.template_echo);
-    disp('Complete!')
-    disp('---')
-else
-    disp('Structural-funcional preprocessing already completed.')
-    disp('---')
-end
-
-
-% -------
-% STEP 2 -- Basic functional preprocessing: fmrwhy_preproc_basicFunc.m
-% -------
-% Loop through all standard output filenames and see if these files exist
-basic_func_out_fns = {wf_params.motion_fn, wf_params.afunctional_fn, wf_params.rfunctional_fn, wf_params.rafunctional_fn, wf_params.sfunctional_fn, wf_params.srfunctional_fn, wf_params.srafunctional_fn};
-run_basicFunc = 0;
-for i = 1:numel(basic_func_out_fns)
-    if ~exist(basic_func_out_fns{i}, 'file')
-        disp(['Basic funcional preprocessing output file does not exist yet: ' basic_func_out_fns{i}]);
-        run_basicFunc = 1;
+    % If some of the files do not exist, run the fmrwhy_preproc_structFunc processing pipeline
+    if run_structFunc
+        disp('Running complete structural-funcional preprocessing pipeline')
+        fmrwhy_preproc_structFunc(bids_dir, sub, ses, options.template_task, options.template_run, options.template_echo, options);
+        disp('Complete!')
+        disp('---')
+    else
+        disp('Structural-funcional preprocessing already completed.')
+        disp('---')
     end
-end
-% If some of the files do not exist, run the fmrwhy_preproc_basicFunc processing pipeline
-if run_basicFunc
-    fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, echo);
-    disp('Complete!')
-    disp('---')
-else
-    disp('Basic funcional preprocessing already completed.')
-    disp('---')
-end
 
 
-% -------
-% STEP 3 -- Anatomical localiser
-% TODO: add more checks to see if this was already done, and add logic to decide what to do
-% -------
-if wf_params.map_rois == 1
-    fmrwhy_preproc_anatLocaliser(bids_dir, sub, wf_params)
-end
-
-%%
-% -------
-% STEP 4 -- Quality control pipeline: fmrwhy_qc_run.m
-% -------
-% Step 2: quality-preproc - fmrwhy_qc_sub.m
-qc_out_fns; % some file that is generated by the qc procedure (subject level or run level?)
-run_qc = 0;
-for i = 1:numel(qc_out_fns)
-    if ~exist(qc_out_fns{i}, 'file')
-        disp(['Basic funcional preprocessing output file does not exist yet: ' qc_out_fns{i}]);
-        run_qc = 1;
+    % -------
+    % STEP 2 -- Basic functional preprocessing: fmrwhy_preproc_basicFunc.m
+    % -------
+    % Loop through all standard output filenames and see if these files exist
+    basic_func_out_fns = {options.motion_fn, options.afunctional_fn, options.rfunctional_fn, options.rafunctional_fn, options.sfunctional_fn, options.srfunctional_fn, options.srafunctional_fn, options.confounds_fn};
+    run_basicFunc = 0;
+    for i = 1:numel(basic_func_out_fns)
+        if ~exist(basic_func_out_fns{i}, 'file')
+            disp(['Basic funcional preprocessing output file does not exist yet: ' basic_func_out_fns{i}]);
+            run_basicFunc = 1;
+        end
     end
+    % If some of the files do not exist, run the fmrwhy_preproc_basicFunc processing pipeline
+    if run_basicFunc
+        fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, echo, options);
+        disp('Complete!')
+        disp('---')
+    else
+        disp('Basic funcional preprocessing already completed.')
+        disp('---')
+    end
+
+
+    % -------
+    % STEP 3 -- Anatomical localiser
+    % TODO: add more checks to see if this was already done, and add logic to decide what to do
+    % -------
+    if options.map_rois == 1
+        rrightAmygdala_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightAmygdala_roi.nii']);
+        anatLocaliser_fns = {rrightAmygdala_fn};
+        run_anatLocaliser = 0;
+        for i = 1:numel(anatLocaliser_fns)
+            if ~exist(anatLocaliser_fns{i}, 'file')
+                disp(['Anatomical localiser output file does not exist yet: ' anatLocaliser_fns{i}]);
+                run_anatLocaliser = 1;
+            end
+        end
+        % If some of the files do not exist, run the fmrwhy_preproc_basicFunc processing pipeline
+        if run_anatLocaliser
+            fmrwhy_preproc_anatLocaliser(bids_dir, sub, options)
+            disp('Complete!')
+            disp('---')
+        else
+            disp('Anatomical localiser processing already completed.')
+            disp('---')
+        end
+
+    end
+
+    %%
+    % -------
+    % STEP 4 -- Quality control pipeline: fmrwhy_qc_run.m
+    % -------
+
+    fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo, options);
+    %qc_out_fns; % some file that is generated by the qc procedure (subject level or run level?)
+    %run_qc = 0;
+    %for i = 1:numel(qc_out_fns)
+    %    if ~exist(qc_out_fns{i}, 'file')
+    %        disp(['Basic funcional preprocessing output file does not exist yet: ' qc_out_fns{i}]);
+    %        run_qc = 1;
+    %    end
+    %end
+    %if run_qc
+    %    fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo, options);
+    %    disp('Complete!')
+    %    disp('---')
+    %else
+    %    disp('Basic funcional preprocessing already completed.')
+    %    disp('---')
+    %end
+
+
+    %%
+    % -------
+    % STEP 5 -- QC report: fmrwhy_qc_generateSubRunReport.m
+    % -------
+    fmrwhy_qc_generateSubRunReport(bids_dir, sub, task, run, options)
+
+
+
+
+
+    %
+    %% Step 3: anatomical-localizer-preproc:     - rtme_preproc_anatLocaliser.m
+    %fmrwhy_preproc_anatLocaliser(sub, options);
+
+    % Step 3: functional-localizer-preproc:     - rtme_preproc_funcLocaliser.m
+    %                                           - rtme_preproc_generateRegressors.m
+    %                                           - rtme_preproc_generateRetroicor.m
+    %                                           - rtme_preproc_generateFDregr.m
+    %                                           - rtme_preproc_generateTissueSignals.m
+
+    %
+    %for t = 1:numel(defaults.tasks)
+    %%    disp(['Performing 3D volume realignment for: ' sub '_task-' tasks(t) '_run-' defaults.template_run])
+    %    rtme_preproc_funcLocaliser(sub, task, defaults.template_run, options.template_echo, defaults)
+    %end
+
+
+    % Step 4: calculate-prior-measures-preproc - rtme_preproc_estimateParams.m
+    %rtme_preproc_estimateParams(sub, defaults);
 end
 
-if run_qc
-    fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo);
-    disp('Complete!')
-    disp('---')
-else
-    disp('Basic funcional preprocessing already completed.')
-    disp('---')
-end
 
 
-%
-%% Step 3: anatomical-localizer-preproc:     - rtme_preproc_anatLocaliser.m
-%fmrwhy_preproc_anatLocaliser(sub, wf_params);
-
-% Step 3: functional-localizer-preproc:     - rtme_preproc_funcLocaliser.m
-%                                           - rtme_preproc_generateRegressors.m
-%                                           - rtme_preproc_generateRetroicor.m
-%                                           - rtme_preproc_generateFDregr.m
-%                                           - rtme_preproc_generateTissueSignals.m
-
-
-
-%
-%for t = 1:numel(defaults.tasks)
-%%    disp(['Performing 3D volume realignment for: ' sub '_task-' tasks(t) '_run-' defaults.template_run])
-%    rtme_preproc_funcLocaliser(sub, task, defaults.template_run, wf_params.template_echo, defaults)
-%end
-
-
-% Step 4: calculate-prior-measures-preproc - rtme_preproc_estimateParams.m
-%rtme_preproc_estimateParams(sub, defaults);
-
-
-
-
-
-
-
-
-
-
-%%### Pre-processing: peripheral data (RUN 1)
-%%
-%%1. Generate RETROICOR regressors from cardiac and respiratory traces of both runs (run 2 data to be used later) - PhysIO + Matlab
-%%
-%%
-%%### Pre-processing: functional (RUN 1)
-%%
-%%1. Task region localisation (using only middle echo [TE=28ms] timeseries):
-%%    1. Slice time correction
-%%    2. 3D volume realignment
-%%    3. Calculate framewise displacement from realignment params, select outliers using FD threshold (*which value or percentage?*)
-%%    4. Gaussian kernel smoothing (2*voxel size?)
-%%    5. GLM analysis incl:
-%%        1. AR(1) autoregressive filtering
-%%        2. Drift removal / high-pass (SPM cosine basis set)
-%%        3. Realignment params [+expansion?]
-%%        4. RETROICOR (+HRV, RTV?)
-%%        5. FD outlier binary regressor
-%%        6. *(global or tissue compartment signals???)*
-%%    6. Select t-stat peak within anatomically bound mask (from anatomy toolbox ROI)
-%%    7. Select N amount of voxels neighbouring peak voxel ==> ROI for real-time use
-%%
-%%2. T2*, S0, tSNR calculation from `run1_BOLD_rest` dataset (*is this sensible, as opposed to using RUN 1 task data?*):
-%%    1. Slice time correction on all three echo timeseries
-%%    2. 3D volume realignment on middle echo timeseries
-%%    3. Apply rigid body transformations from middle echo realignment parameters to echo 1 and echo 3 timeseries
-%%    6. T2* and S0 estimation (*check steps of tedana*):
-%%        1. *How to mask?*
-%%        2. Calculate timeseries average
-%%        3. Estimate T2* and S0 using log-linear fit of mono-exponential decay model
-%%        4. *Threshold?*
-%%    4. *Drift removal?*
-%%    5. tSNR calculation:
-%%        1. *How to mask?*
-%%        2. Mean / stddev
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%% Now, this step is executed once all settings are completed. We first
-%% check if the data has been preprocessed already. If so, we just load and
-%% name the variables. If not we run the standard preprocesing pipeline.
-%[d, fn, ext] = fileparts(structural_fn);
-%% We check if the data has been preprocessed by searching for the filename
-%% of one of the files that are generated during preprocessing (here, the
-%% resliced grey matter segmentation image)
-%if exist([d filesep 'rc1' fn ext], 'file')
-%    % Just load file/variable names, don't redo preprocessing
-%    disp('Preprocessing already done - loading variables')
-%    preproc_data = struct;
-%    [d, fn, ext] = fileparts(structural_fn);
-%    preproc_data.forward_transformation = [d filesep 'y_' fn ext];
-%    preproc_data.inverse_transformation = [d filesep 'iy_' fn ext];
-%    preproc_data.gm_fn = [d filesep 'c1' fn ext];
-%    preproc_data.wm_fn = [d filesep 'c2' fn ext];
-%    preproc_data.csf_fn = [d filesep 'c3' fn ext];
-%    preproc_data.bone_fn = [d filesep 'c4' fn ext];
-%    preproc_data.soft_fn = [d filesep 'c5' fn ext];
-%    preproc_data.air_fn = [d filesep 'c6' fn ext];
-%    preproc_data.rstructural_fn = [d filesep 'r' fn ext];
-%    preproc_data.rgm_fn = [d filesep 'rc1' fn ext];
-%    preproc_data.rwm_fn = [d filesep 'rc2' fn ext];
-%    preproc_data.rcsf_fn = [d filesep 'rc3' fn ext];
-%    preproc_data.rbone_fn = [d filesep 'rc4' fn ext];
-%    preproc_data.rsoft_fn = [d filesep 'rc5' fn ext];
-%    preproc_data.rair_fn = [d filesep 'rc6' fn ext];
-%
-%    % Check if ROIs are specified to be in native space and run warping or
-%    % not based on setting
-%    if ROI_native
-%        % ROIs are already in native space, no warping necessary
-%        preproc_data.ROI_fns = ROI_fns;
-%    else
-%        % This part was hardcoded for testing purposes, it doesnt actually
-%        % call the warping functionality here, which it should do. TODO
-%        for roi = 1:(N_ROIs-N_RNOIs)
-%            [droi, fnroi, extroi] = fileparts(ROI_fns{roi});
-%            preproc_data.wROI_fns{roi} = [droi filesep 'w' fnroi extroi];
-%            preproc_data.rwROI_fns{roi} = [droi filesep 'rw' fnroi extroi];
-%        end
-%        preproc_data.ROI_fns = preproc_data.rwROI_fns;
-%    end
-%else
-%    % If preproc not done, call preprocessing script
-%    preproc_data = onlineBrain_preRtPreProc(functional0_fn, structural_fn, spm_dir);
-%
-%    % Also do ROI warping to get everything in same space
-%    if ROI_native
-%        % ROIs are already in native space, no warping necessary
-%        preproc_data.ROI_fns = ROI_fns;
-%    else
-%        % ROIs are in MNI space, warping and reslicing necessary
-%        % Warp MNI space rois to functional space,...
-%        spm_normalizeWrite_jsh(preproc_data.inverse_transformation, ROI_fns(1:(end-N_RNOIs)));
-%        for roi = 1:(N_ROIs-N_RNOIs)
-%            [droi, fnroi, extroi] = fileparts(ROI_fns{roi});
-%            preproc_data.wROI_fns{roi} = [droi filesep 'w' fnroi extroi];
-%        end
-%        % ... then reslice
-%        spm('defaults','fmri');
-%        spm_jobman('initcfg');
-%        reslice = struct;
-%        % Ref
-%        reslice.matlabbatch{1}.spm.spatial.coreg.write.ref = {functional0_fn};
-%        % Source
-%        source_fns = preproc_data.wROI_fns;
-%        reslice.matlabbatch{1}.spm.spatial.coreg.write.source = source_fns';
-%        % Roptions
-%        reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.interp = 4;
-%        reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.wrap = [0 0 0];
-%        reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = 0;
-%        reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.prefix = 'r';
-%        % Run
-%        spm_jobman('run',reslice.matlabbatch);
-%        for roi = 1:(N_ROIs-N_RNOIs)
-%            [droi, fnroi, extroi] = fileparts(ROI_fns{roi});
-%            preproc_data.rwROI_fns{roi} = [droi filesep 'rw' fnroi extroi];
-%        end
-%        preproc_data.ROI_fns = preproc_data.rwROI_fns;
-%    end
-%
-%end

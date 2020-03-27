@@ -4,6 +4,7 @@ function [p, frm, rg, dim] = fmrwhy_util_readNifti(fname, ask_code, reOri)
 % From dicm2nii/nii_viewer
 
 % Load, re-orient nii, extract essential nii stuff
+
 % nifti may be re-oriented, p.hdr0 stores original nii.hdr
 if nargin<2, ask_code = []; end
 if ischar(fname), p.nii = nii_tool('load', fname);

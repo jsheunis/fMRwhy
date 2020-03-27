@@ -13,7 +13,7 @@ options.stats_dir = fullfile(options.deriv_dir, 'fmrwhy-stats');
 dirs = {options.preproc_dir, options.qc_dir, options.stats_dir};
 for i = 1:numel(dirs)
     if ~exist(dirs{i}, 'dir')
-        mkdir(dirs{i})
+        mkdir(dirs{i});
     end
 end
 

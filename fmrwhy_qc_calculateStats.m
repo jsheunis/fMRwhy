@@ -32,8 +32,8 @@ data_2D_stddev = std(data_2D_detrended); %[1, voxels]
 % Calculate Z-statistic
 data_2D_zstat = data_2D_demeaned./data_2D_stddev;
 data_2D_zstat(isnan(data_2D_zstat)) = 0;
-data_2D_zstat_ts = mean(abs(data_2D_zstat), 2); % perhaps this should only be done within brain mask?
-Zstat_mean = mean(data_2D_zstat_ts); % perhaps this should only be done within brain mask?
+data_2D_zstat_ts = nanmean(abs(data_2D_zstat), 2); % perhaps this should only be done within brain mask?
+Zstat_mean = nanmean(data_2D_zstat_ts); % perhaps this should only be done within brain mask?
 
 % Calculate variance
 data_2D_var = var(data_2D_detrended);
@@ -47,17 +47,17 @@ data_2D_psc(isnan(data_2D_psc)) = 0;
 %% (1) De-mean each voxel's time series and scale it by its Eucledian norm
 %% (2) Average scaled time series over the whole brain mask
 %% (3) GCOR is the length (L2 norm) of this averaged series
-%data_2D_norms = sqrt(sum(data_2D_demeaned.^2));
-%data_2D_scaled = data_2D_demeaned./data_2D_norms;
-%data_2D_ave_timeseries = mean(data_2D_scaled(:, I_mask));
-%GCOR = sum(data_2D_ave_timeseries.^2);
+data_2D_norms = sqrt(sum(data_2D_demeaned.^2));
+data_2D_scaled = data_2D_demeaned./data_2D_norms;
+data_2D_ave_timeseries = nanmean(data_2D_scaled(:, masks.brain_mask_I));
+GCOR = sum(data_2D_ave_timeseries.^2);
 
 % Calculate tSNR
 tSNR_2D = data_2D_mean./data_2D_stddev;
-tSNR_mean_brain = mean(tSNR_2D(masks.brain_mask_I));
-tSNR_mean_GM = mean(tSNR_2D(masks.GM_mask_I));
-tSNR_mean_WM = mean(tSNR_2D(masks.WM_mask_I));
-tSNR_mean_CSF = mean(tSNR_2D(masks.CSF_mask_I));
+tSNR_mean_brain = nanmean(tSNR_2D(masks.brain_mask_I));
+tSNR_mean_GM = nanmean(tSNR_2D(masks.GM_mask_I));
+tSNR_mean_WM = nanmean(tSNR_2D(masks.WM_mask_I));
+tSNR_mean_CSF = nanmean(tSNR_2D(masks.CSF_mask_I));
 
 % Calculate DVARS
 % TODO: look at Soroosh paper, implement
@@ -79,7 +79,7 @@ stats.tSNR_mean_GM = tSNR_mean_GM;
 stats.tSNR_mean_WM = tSNR_mean_WM;
 stats.tSNR_mean_CSF = tSNR_mean_CSF;
 stats.Zstat_mean = Zstat_mean;
-stats.GCOR = 0; % TODO: update after checking gcor calculation
+stats.GCOR = GCOR; % TODO: update after checking gcor calculation
 % Single parameter timeseries
 stats.data_2D_zstat_ts = data_2D_zstat_ts;
 % 3D images

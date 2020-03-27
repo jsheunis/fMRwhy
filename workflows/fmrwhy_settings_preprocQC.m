@@ -19,8 +19,10 @@ settings.template_echo = '2';
 % Sequence parameters
 settings.TR = 2;
 settings.N_slices = 34;
-settings.Ndummies = 5
-settings.Nscans = 210
+settings.Ndummies = 5;
+settings.Nscans = 210;
+settings.TE = [14 28 42];
+settings.Ne = numel(settings.TE);
 
 % Dataset parameters
 settings.Nsessions = 2;
@@ -40,8 +42,8 @@ settings.roi.motor.orig_fn = {fullfile(settings.roi_orig_dir, 'Left_Motor_4a_4p.
 settings.roi.motor.name = {'Left Motor', 'Right Motor'}; % For plots and strings
 settings.roi.motor.desc = {'leftMotor', 'rightMotor'}; % For BIDS file naming (after normalisation  to functional space)
 
-settings.roi.emotion.orig_fn = {fullfile(settings.roi_orig_dir, 'Left_Motor_4a_4p.nii'),
-                                fullfile(settings.roi_orig_dir, 'Right_Motor_4a_4p.nii')}; % Raw ROI filenames
+settings.roi.emotion.orig_fn = {fullfile(settings.roi_orig_dir, 'Left_Amygdala_allregions.nii'),
+                                fullfile(settings.roi_orig_dir, 'Right_Amygdala_allregions.nii')}; % Raw ROI filenames
 
 settings.roi.emotion.name = {'Left Amygdala', 'Right Amygdala'}; % For plots and strings
 settings.roi.emotion.desc = {'leftAmygdala', 'rightAmygdala'}; % For BIDS file naming (after normalisation  to functional space)
@@ -54,13 +56,14 @@ settings.roi.emotion.desc = {'leftAmygdala', 'rightAmygdala'}; % For BIDS file n
 settings.fwhm = 7;
 
 % Settings for generateMultRegr routine
+settings.confounds.include_volterra = 1;
 settings.confounds.include_fd = 1;
 settings.confounds.include_tissue = 1;
-settings.confounds.include_physio = 0;
+settings.confounds.include_physio = 1;
 
 % generateMultRegr: framewise displacement
 settings.r = 50; % mm
-settings.FD_threshold = 0.5; % mm
+settings.FD_threshold = 0; % set as 0 to calculate with both standard thresholds 0.2 and 0.5 mm.
 
 % generateMultRegr: PhysIO
 settings.physio.options.save_dir = '';

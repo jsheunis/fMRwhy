@@ -71,7 +71,7 @@ defaults.physio.options.Ndummies = defaults.Ndummies; % include, even if these a
 defaults.physio.options.Nscans = defaults.Nscans;
 defaults.physio.options.onset_slice = 1;
 defaults.physio.options.cardiac_modality = 'PPU';
-defaults.physio.options.output_multiple_regressors_fn = 'PhysIO_multiple_regressors.txt'; % text file name
+defaults.output_multiple_regressors_fn = 'PhysIO_multiple_regressors.txt'; % text file name
 
 % Settings for QC
 defaults.theplot.intensity_scale = [-6 6];

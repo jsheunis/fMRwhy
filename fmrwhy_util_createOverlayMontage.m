@@ -1,11 +1,14 @@
-function output = fmrwhy_util_createOverlayMontage(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape)
+function output = fmrwhy_util_createOverlayMontage(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, saveAs_fn)
 % Function to create montages of images/rois overlaid on a template image
 
 % Structure to save output
 output = struct;
+alpha = 0.5;
+plot_contour = 1;
+rgbcolors = [215,25,28; 253,174,97; 255,255,191; 171,217,233; 44,123,182]/255;
 
 % Create background montage
-montage_EPI = fmrwhy_util_createMontage(template_img, columns, rotate, 'Template volume', clrmp, 'off', shape);
+montage_template = fmrwhy_util_createMontage(template_img, columns, rotate, 'Template volume', clrmp, 'off', shape);
 
 % Get screen size for plotting
 scr_size = get(0,'ScreenSize');
@@ -16,8 +19,8 @@ end
 
 % Create figures with background montage and overlaid masks
 %f(i) = figure('units','pixels','outerposition',[0 0 dist dist]);
-f = figure('units','normalized','outerposition',[0 0 1 1]);
-im1 = imagesc(montage_EPI.whole_img);
+f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
+im1 = imagesc(montage_template.whole_img);
 colormap('gray');
 ax = gca;
 outerpos = ax.OuterPosition;
@@ -28,18 +31,39 @@ ax_width = outerpos(3) - ti(1) - ti(3);
 ax_height = outerpos(4) - ti(2) - ti(4);
 ax.Position = [left bottom ax_width ax_height];
 hold(ax, 'on')
-[Nimx, Nimy] = size(montage_EPI.whole_img);
+[Nimx, Nimy] = size(montage_template.whole_img);
 oo = ones(Nimx, Nimy);
 zz = zeros(Nimx, Nimy);
 red = cat(3, oo, zz, zz);
-montage_overlay = fmrwhy_util_createMontage(overlay_img, columns, rotate, 'Overlay', clrmp, 'off', shape);
-bound_whole_bin = bwboundaries(montage_overlay.whole_img);
-Nblobs_bin = numel(bound_whole_bin);
-for b = 1:Nblobs_bin
-p = plot(ax, bound_whole_bin{b,1}(:,2), bound_whole_bin{b,1}(:,1), 'r', 'LineWidth', 1);
+green = cat(3, zz, oo, zz);
+blue = cat(3, zz, oo, oo);
+
+if iscell(overlay_img)
+    for i=1:numel(overlay_img)
+        montage_overlay{i} = fmrwhy_util_createMontage(overlay_img{i}, columns, rotate, 'Overlay', clrmp, 'off', shape);
+    end
+else
+    montage_overlay = {};
+    montage_overlay{1} = fmrwhy_util_createMontage(overlay_img, columns, rotate, 'Overlay', clrmp, 'off', shape);
 end
-imC = imagesc(ax, red);
-set(imC, 'AlphaData', 0.2*montage_overlay.whole_img);
+
+
+for i=1:numel(montage_overlay)
+    rbgclr = rgbcolors(i,:);
+    clr = cat(3, rbgclr(1)*oo, rbgclr(2)*oo, rbgclr(3)*oo);
+    imC = imagesc(ax, clr);
+    set(imC, 'AlphaData', alpha*montage_overlay{i}.whole_img);
+    if plot_contour
+        bound_whole_bin = bwboundaries(montage_overlay{i}.whole_img);
+        Nblobs_bin = numel(bound_whole_bin);
+        for b = 1:Nblobs_bin
+        p = plot(ax, bound_whole_bin{b,1}(:,2), bound_whole_bin{b,1}(:,1), 'color', rbgclr, 'LineWidth', 1);
+        end
+    end
+end
+
+
+
 hold(ax, 'off');
 set(ax,'xtick',[])
 set(ax,'xticklabel',[])
@@ -47,5 +71,12 @@ set(ax,'ytick',[])
 set(ax,'yticklabel',[])
 set(ax,'ztick',[])
 set(ax,'zticklabel',[])
-print(f, 'testy_overlay','-dpng', '-r0')
-
+print(f, saveAs_fn,'-dpng', '-r0')
+% Close necessary figure handles
+close(montage_template.f)
+for i=1:numel(montage_overlay)
+    close(montage_overlay{i}.f)
+end
+if strcmp(visibility, 'off')
+    close(f);
+end

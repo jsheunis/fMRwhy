@@ -1,14 +1,14 @@
-function fmrwhy_batch_sliceTiming(functional_fn, saveAs_fn, defaults)
+function fmrwhy_batch_sliceTiming(functional_fn, saveAs_fn, options)
 
-% Load required defaults
+% Load required options
 
 [d, f, e] = fileparts(functional_fn);
 temp_functional_fn = fullfile(d, ['temp_' f e]);
 copyfile(functional_fn, temp_functional_fn)
 func_spm = spm_vol(temp_functional_fn);
 Nt = numel(func_spm);
-TR = defaults.TR;
-N_slices = defaults.N_slices;
+TR = options.TR;
+N_slices = options.N_slices;
 
 % Create cell array of scan names
 scans = {};

@@ -1,4 +1,4 @@
-function fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, opts)
+function fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, options)
 %
 % This is a Matlab script that uses custom code and spm12 routines to plot
 % a version of THE PLOT from Jonathan Power. See:
@@ -19,20 +19,23 @@ function fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, opts)
 % methods in: https://www.biorxiv.org/content/10.1101/662726v1.full
 
 % Load/create required defaults
-% Setup fmrwhy bids directories on workflow level
-fmrwhy_defaults_setupDerivDirs(bids_dir);
+% Setup fmrwhy BIDS-derivatuve directories on workflow level
+options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
+
+% Grab parameters from workflow settings file
+options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-fmrwhy_defaults_setupSubDirs(bids_dir, sub);
+options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 
 % Update workflow params with subject anatomical derivative filenames
-opts = fmrwhy_defaults_subAnat(bids_dir, sub, opts);
+options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
 % Update workflow params with subject functional derivative filenames
-opts = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, opts);
+options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
 
 % ThePlot settings:
-intensity_scale = opts.theplot.intensity_scale; % scaling for plot image intensity, see what works
+intensity_scale = options.theplot.intensity_scale; % scaling for plot image intensity, see what works
 fontsizeL = 15;
 fontsizeM = 13;
 
@@ -43,7 +46,7 @@ fontsizeM = 13;
 % roi = ''; % figure generated for voxels in supplied ROI - NOT IMPLEMENTED YET
 
 % Timeseries to use for ThePlot
-functional4D_fn = opts.sfunctional_fn;
+functional4D_fn = options.sfunctional_fn;
 
 % Get image information from
 func_spm = spm_vol(functional4D_fn);
@@ -54,7 +57,7 @@ Nj= func_spm(1).dim(2);
 Nk= func_spm(1).dim(3);
 
 % Load multiple confound regressors
-confounds_struct = tdfread(opts.confounds_fn);
+confounds_struct = tdfread(options.confounds_fn);
 confounds_mat = struct2array(confounds_struct);
 
 % Load mask data
@@ -84,7 +87,7 @@ csf = 1+fmrwhy_util_scale(csf,-scale_f,scale_f);
 %csf = 1+zscore(confounds_struct.csf);
 %csf = fmrwhy_util_detrend(csf, 1);
 
-physmat_fn = fullfile(opts.func_dir_qc, 'physio.mat');
+physmat_fn = fullfile(options.func_dir_qc, ['PhysIO_task-' task '_run-' run], 'physio.mat');
 physio = load(physmat_fn);
 card = physio.physio.ons_secs.c;
 resp = 2+physio.physio.ons_secs.r;
@@ -195,7 +198,7 @@ for i = 1:6
     end
 end
 % Save figure
-theplot_fn = fullfile(opts.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-RO_grayplot.png']);
+theplot_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-RO_grayplot.png']);
 %if ~exist(theplot_fn, 'file')
     print(f,theplot_fn,'-dpng')
 %end
@@ -280,7 +283,7 @@ for i = 1:6
     end
 end
 % Save figure
-theplot_fn = fullfile(opts.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GSO_grayplot.png']);
+theplot_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GSO_grayplot.png']);
 %if ~exist(theplot_fn, 'file')
     print(f,theplot_fn,'-dpng')
 %end

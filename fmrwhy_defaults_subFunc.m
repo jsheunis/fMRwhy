@@ -1,17 +1,13 @@
 function options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options)
 
 if isempty(options)
-    options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options)
+    options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 end
-
-% Subject level directories
-options.func_dir_preproc = fullfile(options.sub_dir_preproc, 'func');
-options.func_dir_qc = fullfile(options.sub_dir_qc, 'func');
 
 % Template filename
 options.template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
 % Outputs from basicFunc processing
-options.motion_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_desc-confounds_motion.tsv']);
+options.motion_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_echo-' options.template_echo '_desc-confounds_motion.tsv']);
 options.functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_bold.nii']);
 options.afunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-apreproc_bold.nii']);
 options.rfunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rpreproc_bold.nii']);

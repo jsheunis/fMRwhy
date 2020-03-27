@@ -6,9 +6,8 @@
 
 % 1. QC pipeline:
 %   - include task paradigm plots
-%   - include anatLocalisation output
 % 2. Functional localisation pipeline:
-%   -
+% 3. VERY IMPORTANT INVESTIGATE USE OF DICM2NII EVERYWHERE WHEN LOADING NIFTI (AS OPPOSED TO SPMREADVOLS), DOES THIS INFLUENCE RESULTS?
 %   -
 %   -
 
@@ -22,9 +21,9 @@
 % -----------------
 % -----------------
 
-% ---------------------------------------
-% 1. ORIENTATION WHEN PLOTTING BRAIN  SLICES
-% ---------------------------------------
+% --------------------------------------------------
+% 1. ORIENTATION WHEN PLOTTING/loading BRAIN  SLICES
+% --------------------------------------------------
 % IMPORTANT: NEED TO FIGURE THIS OUT
 
 % Info from https://brainder.org/2012/09/23/the-nifti-file-format/
@@ -65,12 +64,14 @@
 % Stephan interpretation: mat0 = qform rows; intent = code.
 
 
-% Decision on 23 March 2020: use code from https://github.com/xiangruili/dicm2nii in fmrwhy_util_readNifti:
+% IMPORTANT: Decision on 23 March 2020: use code from https://github.com/xiangruili/dicm2nii in fmrwhy_util_readNifti:
 % This reorients the nifti image in voxel space such that it is RAS+. For imagesc, this image then has to be
 % rotated with 90 degrees, because for some reason (as of yet unknown to me) imagesc swops the x and y axes;
 % or interprets these axes differently when provided in a matrix format.
 
-% IMPORTANT: NEED TO CHECK WHEREVER spm_read_vols and spm_vol ARE USED AND REPLACE IF REQUIRED!!!!!!!
+% IMPORTANT: For now, only use nii_tools to load image data *for viewing*. Can expand later to viewing and processing and saving once I understand it better.
+
+% IMPORTANT: NEED TO CHECK WHEREVER spm_read_vols and spm_vol ARE USED for viewing AND REPLACE IF REQUIRED!!!!!!!
 
 
 % ---------------------------------------

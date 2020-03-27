@@ -1,4 +1,4 @@
-function fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo, opts)
+function fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo, options)
 
 % Software dependences:
 % - Matlab vX
@@ -27,23 +27,18 @@ function fmrwhy_qc_run(bids_dir, sub, ses, task, run, echo, opts)
 % - flag to generate nii images or not
 
 
-% Setup fmrwhy bids directories on workflow level
-fmrwhy_defaults_setupDerivDirs(bids_dir);
+% Setup fmrwhy BIDS-derivatuve directories on workflow level
+options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
+
+% Grab parameters from workflow settings file
+options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-fmrwhy_defaults_setupSubDirs(bids_dir, sub);
+options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 
 % Update workflow params with subject anatomical derivative filenames
-opts = fmrwhy_defaults_subAnat(bids_dir, sub, opts);
+options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
-% Update workflow params with subject functional derivative filenames
-opts = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, opts);
-if ~exist(opts.anat_dir_qc, 'dir')
-    mkdir(opts.anat_dir_qc)
-end
-if ~exist(opts.func_dir_qc, 'dir')
-    mkdir(opts.func_dir_qc)
-end
 
 % ------------------------
 % SECTION A: ANATOMICAL QC
@@ -56,7 +51,7 @@ end
 
 mask_montage_fns = {'_GM_mask_montage', '_WM_mask_montage', '_CSF_mask_montage', '_brain_mask_montage'};
 for i = 1:numel(mask_montage_fns)
-    mask_montage_fns{i} = fullfile(opts.anat_dir_qc, ['sub-' sub mask_montage_fns{i} '.png']);
+    mask_montage_fns{i} = fullfile(options.anat_dir_qc, ['sub-' sub mask_montage_fns{i} '.png']);
 end
 run_montage = 0;
 for i = 1:numel(mask_montage_fns)
@@ -74,9 +69,31 @@ else
     disp('All mask overlay montages exist.')
     disp('---')
 end
+
 % -------
 % STEP 2: Contours of anatomical ROIs on mean EPI / template EPI (/ anatomical image?)
 % -------
+count = 0;
+[p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(options.template_fn);
+% Loop through all tasks in BIDS structure
+for i = 1:numel(options.tasks)
+    % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
+    if strcmp(options.tasks{i}, 'rest') ~= 1
+        % Loop through all ROIs for the particular task
+        for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
+            count = count+1;
+            [p2, frm2, rg2, dim2] = fmrwhy_util_readNifti(options.roi.(options.tasks{i}).rroi_fn{j});
+            overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0);
+            title = options.roi.(options.tasks{i}).name{j}
+            saveAs_fn = fullfile(options.anat_dir_qc, ['sub-' sub '_space-individual_desc-' options.roi.(options.tasks{i}).desc{j} '_roi_montage.png']);
+            if ~exist(saveAs_fn, 'file')
+                fmrwhy_util_createOverlayMontage(p1.nii.img, overlay_img, 9, 1, title, 'gray', 'off', 'max', saveAs_fn);
+            else
+                disp(['File already exists: ' saveAs_fn])
+            end
+        end
+    end
+end
 
 
 % ------------------------
@@ -86,18 +103,18 @@ end
 % -------
 % STEP 1: Grab multiple regressors
 % -------
-%motion_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_motion.tsv']);
-%framewise_displacement_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_fd.tsv']);
-%tissue_regr_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_tissue.tsv']);
-%physio_regr_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_physio.tsv']);
-%confounds_fn = fullfile(opts.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_regressors.tsv']);
+%motion_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_motion.tsv']);
+%framewise_displacement_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_fd.tsv']);
+%tissue_regr_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_tissue.tsv']);
+%physio_regr_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_physio.tsv']);
+%confounds_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_regressors.tsv']);
 
 % -------
 % STEP 2: Calculate and generate statistical measures / images (tsnr, variance, std, psc, DVARS)
 % -------
-stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, ses, task, run, echo, opts);
+stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, ses, task, run, echo, options);
 
 % -------
 % STEP 3: Plot The Plot
 % -------
-fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, opts);
+fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, options);

@@ -159,7 +159,9 @@
 % ------------------
 % COMMENTS and TODOs
 % ------------------
-% - exclusion criteria ?
+% - How to define exclusion criteria based on QC outputs? FD? DVARS
+% - Stil need to incorporate DVARS, stdDVARS, GCOR, (what else)?
+% - Which timeseries should be used for calculating statistical measures like tSNR, etc?
 
 
 
@@ -237,12 +239,25 @@
 %     1. Slice time correction on all three echo timeseries
 %     2. 3D volume realignment on middle echo timeseries
 %     3. Apply rigid body transformations from middle echo realignment parameters to echo 1 and echo 3 timeseries
-%     6. T2* and S0 estimation (*check steps of tedana*):
+%     4. T2* and S0 estimation (*check steps of tedana*):
 %         1. *How to mask?*
 %         2. Calculate timeseries average
 %         3. Estimate T2* and S0 using log-linear fit of mono-exponential decay model
 %         4. *Threshold?*
-%     4. *Drift removal?*
-%     5. tSNR calculation:
+%     5. *Drift removal?*
+%     6. tSNR calculation:
 %         1. *How to mask?*
-%         2. Mean / stddev
+%         2. Which timeseries to use?
+%         3. Mean / stddev
+
+
+
+% ------------------------------------------ %
+% ------------------------------------------ %
+% IMPORTANT PROBLEMS THAT STILL NEED SOLVING %
+% ------------------------------------------ %
+% ------------------------------------------ %
+
+% 1.    In quality report, montages of timeseries average images saved to file, then read from file and then plotted
+%       seem to look different than montage of template volume. Investigate if saving nifti changes voxel positions.
+%       This important to check when using masks and precalculated quantitative maps and comparing with real-time data.

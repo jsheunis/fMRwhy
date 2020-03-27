@@ -1,4 +1,4 @@
-function fmrwhy_preproc_structFunc(bids_dir, sub, ses, task, run, echo, opts)
+function fmrwhy_preproc_structFunc(bids_dir, sub, ses, task, run, echo, options)
 %--------------------------------------------------------------------------
 
 % Copyright statement....
@@ -35,25 +35,31 @@ disp('*** Running fmrwhy_preproc_structFunc ***')
 disp('---')
 disp('---')
 
-% Setup fmrwhy bids directories on workflow level
-fmrwhy_defaults_setupDerivDirs(bids_dir);
+
+% Setup fmrwhy BIDS-derivatuve directories on workflow level
+options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
+
+% Grab parameters from workflow settings file
+options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-fmrwhy_defaults_setupSubDirs(bids_dir, sub);
+options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 
 % Update workflow params with subject anatomical derivative filenames
-opts = fmrwhy_defaults_subAnat(bids_dir, sub, opts);
+options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
 % Update workflow params with subject functional derivative filenames
-opts = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, opts);
+options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+
+
 
 
 % -------
 % STEP 1 -- Coregister (estimate) structural image to template functional image
 % -------
-if ~exist(opts.coregest_anatomical_fn, 'file')
+if ~exist(options.coregest_anatomical_fn, 'file')
     disp('Coregistering T1w image to functional template')
-    fmrwhy_batch_coregEst(opts.anatomical_fn, opts.template_fn, opts.coregest_anatomical_fn);
+    fmrwhy_batch_coregEst(options.anatomical_fn, options.template_fn, options.coregest_anatomical_fn);
     disp('Complete!')
     disp('---')
 else
@@ -66,15 +72,15 @@ end
 % STEP 2 -- Segmentation of coregistered anatomical image into GM, WM, CSF, etc
 % -------
 run_seg = 0;
-for i = 1:numel(opts.probseg_fns)
-    if ~exist(opts.probseg_fns{i}, 'file')
-        disp(['Segmentation file does not exist yet: ' opts.probseg_fns{i}]);
+for i = 1:numel(options.probseg_fns)
+    if ~exist(options.probseg_fns{i}, 'file')
+        disp(['Segmentation file does not exist yet: ' options.probseg_fns{i}]);
         run_seg = 1;
     end
 end
 if run_seg
     disp('Segmenting the coregistered T1w image into tissue compartments')
-    fmrwhy_batch_segment(opts.coregest_anatomical_fn, opts.spm_dir, opts.probseg_fns, opts.transform_fns);
+    fmrwhy_batch_segment(options.coregest_anatomical_fn, options.spm_dir, options.probseg_fns, options.transform_fns);
     disp('Complete!')
     disp('---')
 else
@@ -87,20 +93,20 @@ end
 % TODO: check if it is necessary to copy files to temporary filenames before reslicing, or not
 % -------
 run_resl = 0;
-for i = 1:numel(opts.rall_fns)
-    if ~exist(opts.rall_fns{i}, 'file')
-        disp(['Resliced file does not exist yet: ' opts.rall_fns{i}]);
+for i = 1:numel(options.rall_fns)
+    if ~exist(options.rall_fns{i}, 'file')
+        disp(['Resliced file does not exist yet: ' options.rall_fns{i}]);
         run_resl = 1;
     end
 end
 if run_resl
     disp('Resampling the coregistered T1w image and tissue compartments into template functional space')
     reslice_fns = {};
-    reslice_fns{1} = opts.coregest_anatomical_fn;
+    reslice_fns{1} = options.coregest_anatomical_fn;
     for i = 2:7
-        reslice_fns{i} = opts.probseg_fns{i-1};
+        reslice_fns{i} = options.probseg_fns{i-1};
     end
-    fmrwhy_batch_coregResl(reslice_fns, opts.template_fn, opts.rall_fns)
+    fmrwhy_batch_coregResl(reslice_fns, options.template_fn, options.rall_fns)
     disp('Complete!')
     disp('---')
 else
@@ -112,9 +118,9 @@ end
 % STEP 4 -- Construct GM, WM, CSF and whole brain (GM+WM+CSF) masks
 % ------
 run_masks = 0;
-for i = 1:numel(opts.mask_fns)
-    if ~exist(opts.mask_fns{i}, 'file')
-        disp(['Mask does not exist yet: ' opts.mask_fns{i}]);
+for i = 1:numel(options.mask_fns)
+    if ~exist(options.mask_fns{i}, 'file')
+        disp(['Mask does not exist yet: ' options.mask_fns{i}]);
         run_masks = 1;
     end
 end
@@ -123,12 +129,12 @@ if run_masks
     % Get binary 3D images for each tissue type, based on a comparison of
     % the probability value for each tissue type per voxel (after applying
     % a treshold on the probability values). Also combined GM, WM and CSF to get brain mask.
-    [GM_img_bin, WM_img_bin, CSF_img_bin, brain_img_bin] = fmrwhy_util_createBinaryMasks(opts.rgm_probseg_fn, opts.rwm_probseg_fn, opts.rcsf_probseg_fn, 0.5);
+    [GM_img_bin, WM_img_bin, CSF_img_bin, brain_img_bin] = fmrwhy_util_createBinaryMasks(options.rgm_probseg_fn, options.rwm_probseg_fn, options.rcsf_probseg_fn, 0.5);
     % save masks to file: rtme_util_saveNifti(template_fn, img, new_fn, descrip)
-    fmrwhy_util_saveNifti(opts.gm_mask_fn, GM_img_bin, opts.template_fn, 'GM mask', 1)
-    fmrwhy_util_saveNifti(opts.wm_mask_fn, WM_img_bin, opts.template_fn, 'WM mask', 1)
-    fmrwhy_util_saveNifti(opts.csf_mask_fn, CSF_img_bin, opts.template_fn, 'CSF mask', 1)
-    fmrwhy_util_saveNifti(opts.brain_mask_fn, brain_img_bin, opts.template_fn, 'Brain mask', 1)
+    fmrwhy_util_saveNifti(options.gm_mask_fn, GM_img_bin, options.template_fn, 'GM mask', 1)
+    fmrwhy_util_saveNifti(options.wm_mask_fn, WM_img_bin, options.template_fn, 'WM mask', 1)
+    fmrwhy_util_saveNifti(options.csf_mask_fn, CSF_img_bin, options.template_fn, 'CSF mask', 1)
+    fmrwhy_util_saveNifti(options.brain_mask_fn, brain_img_bin, options.template_fn, 'Brain mask', 1)
     disp('Complete!')
     disp('---')
 else

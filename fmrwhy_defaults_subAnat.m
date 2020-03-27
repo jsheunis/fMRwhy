@@ -1,12 +1,8 @@
 function options = fmrwhy_defaults_subAnat(bids_dir, sub, options)
 
 if isempty(options)
-    options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options)
+    options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 end
-
-% Subject level directories
-options.anat_dir_preproc = fullfile(options.sub_dir_preproc, 'anat');
-options.anat_dir_qc = fullfile(options.sub_dir_qc, 'anat');
 
 % T1w filename
 options.anatomical_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_T1w.nii']);
@@ -39,3 +35,16 @@ options.wm_mask_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-indi
 options.csf_mask_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-CSF_mask.nii']);
 options.brain_mask_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-brain_mask.nii']);
 options.mask_fns = {options.gm_mask_fn, options.wm_mask_fn, options.csf_mask_fn, options.brain_mask_fn};
+% Outputs after anatomical localisation
+if options.map_rois == 1
+    for i = 1:numel(options.tasks)
+        % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
+        if strcmp(options.tasks{i}, 'rest') ~= 1
+            % Loop through all ROIs for the particular task
+            for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
+                options.roi.(options.tasks{i}).roi_fn{j} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-' options.roi.(options.tasks{i}).desc{j} '_roi.nii']);
+                options.roi.(options.tasks{i}).rroi_fn{j} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-r' options.roi.(options.tasks{i}).desc{j} '_roi.nii']);
+            end
+        end
+    end
+end

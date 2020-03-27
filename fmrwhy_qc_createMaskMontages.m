@@ -29,7 +29,8 @@ end
 
 % Get functional template
 template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' num2str(template_run) '_space-individual_bold.nii']);
-[p, frm, rg, dim] = fmrwhy_util_readNifti(template_fn)
+template_anat_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-coregEstResl_T1w.nii']);
+[p, frm, rg, dim] = fmrwhy_util_readNifti(template_anat_fn)
 template_img = p.nii.img;
 
 % Get anatomical masks in individual functional space
@@ -90,7 +91,9 @@ for i = 1:numel(mask_images)
         set(ax,'yticklabel',[])
         set(ax,'ztick',[])
         set(ax,'zticklabel',[])
-        print(f(i),mask_montage_fns{i},'-dpng', '-r0')
+        if savefigs
+            print(f(i),mask_montage_fns{i},'-dpng', '-r0')
+        end
     %end
 end
 
