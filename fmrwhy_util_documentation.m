@@ -120,5 +120,28 @@
 
 
 
+% FORMULA FOR ESTIMATING T2star AND SO:
+
+% S = S0*exp(-t/T2star) = S0*exp(-t*R2star)
+% log(S) = ln(S0*exp(-t/T2star)) = ln(S0) - t*R2star
+
+% [log(S(TE1))]        = [log(S0) - TE1*R2star]
+% [log(S(TE2))]          [log(S0) - TE2*R2star]
+% [log(S(TE3))]          [log(S0) - TE3*R2star]
+%                     = [1 - TE1]     [log(S0)]
+%                       [1 - TE2]  *  [R2star]
+%                       [1 - TE3]
+
+% Y = X*b (+ e) ==> [log(S(TE))] = [1 - TE]  *  [log(S0)]
+%                                               [R2star ]
+
+% b_hat = pinv(X)*Y ==> [log(S0)] = pinv([1 - TE]) * [log(S(TE))]
+%                       [R2star ]
+
+
+
+
+
+
 
 

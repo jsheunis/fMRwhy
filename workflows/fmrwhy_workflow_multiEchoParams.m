@@ -157,33 +157,62 @@ for e = 1:options.Ne
     disp('---')
     % Update workflow params with subject functional derivative filenames
     options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
-
-
-    mean_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_mean.nii']);
-    std_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_std.nii']);
     tsnr_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_tsnr.nii']);
 
-    if ~exist(options.rafunctional_fn, 'file')
+    if ~exist(tsnr_fn, 'file')
         disp('---')
-        disp(['Realigned + slice time corrected file does not exist yet: ' options.rafunctional_fn]);
-        fmrwhy_util_applyTransform(options.afunctional_fn, motion_params, options.template_fn, options.rafunctional_fn)
+        disp(['Temporal SNR file does not exist yet. Calculating now...']);
+        tsnr_output = fmrwhy_util_calculateTSNR(options.rafunctional_fn, 0, tsnr_fn, options.template_fn)
         disp('Complete!')
         disp('---')
     else
-        disp(['Realignment + slice time correction already completed: ' options.rafunctional_fn])
+        disp(['Temporal SNR already calculated. Loading now...'])
+        tsnr_output = struct;
+        tsnr_output.data_3D_tsnr = spm_read_vols(spm_vol(tsnr_fn));
         disp('---')
     end
 end
 
 
-for e = 1:N_e
-    disp(['tSNR for echo ' num2str(e)])
-    F{e} = spm_read_vols(spm_vol(rf_me_fn{e}));
-    F_ave2D{e} = mean(reshape(F{e},Ni*Nj*Nk, N_vol), 2);
-    F_ave{e} = reshape(F_ave2D{e}, Ni, Nj, Nk);
-    F_tSNR2D{e} = F_ave2D{e}./std(reshape(F{e},Ni*Nj*Nk, N_vol), 0, 2);
-    F_tSNR{e} = reshape(F_tSNR2D{e}, Ni, Nj, Nk);
+% -------
+% STEP 7: Calculate/estimate T2star and S0 maps
+% -------
+disp('---')
+disp('STEP 7: Calculate T2star and S0 maps')
+disp('---')
+
+t2star_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_t2star.nii']);
+s0_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.nii']);
+if ~exist(t2star_fn, 'file')
+    disp('---')
+    disp(['T2star map file does not exist yet. Calculating now...']);
+    me_fns = {};
+    for e = 1:options.Ne
+        echo = num2str(e);
+        % Update workflow params with subject functional derivative filenames
+        options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+        me_fns{e} = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii']);
+    end
+    mask_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-brain_mask.nii']);
+    MEparams = fmrwhy_util_estimateMEparams(me_fns, options.TE, mask_fn, options.template_fn, t2star_fn, s0_fn);
+    disp('Complete!')
+    disp('---')
+else
+    disp(['T2star map already calculated. Loading now...'])
+    MEparams = struct;
+    MEparams.T2star_3D_thresholded = spm_read_vols(spm_vol(tsnr_fn));
+    MEparams.S0_3D_thresholded = spm_read_vols(spm_vol(s0_fn));
+    disp('---')
 end
 
+[p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(t2star_fn);
+[p2, frm2, rg2, dim2] = fmrwhy_util_readNifti(s0_fn);
+
+t2star_montage = fmrwhy_util_createMontage(MEparams.T2star_3D_thresholded, 9, rotate, 'T2star', 'hot', 'on', 'max');
+colorbar;
+s0_montage = fmrwhy_util_createMontage(MEparams.S0_3D_thresholded, 9, rotate, 'S0', 'parula', 'on', 'max');
+colorbar;
+%t2star_montage = fmrwhy_util_createMontage(p1.nii.img, 9, rotate, 'T2star', 'gray', 'on', 'max');
+%s0_montage = fmrwhy_util_createMontage(p2.nii.img, 9, rotate, 'S0', 'gray', 'on', 'max');
 
 
