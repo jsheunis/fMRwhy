@@ -73,6 +73,14 @@
 
 % IMPORTANT: NEED TO CHECK WHEREVER spm_read_vols and spm_vol ARE USED for viewing AND REPLACE IF REQUIRED!!!!!!!
 
+% UPDATE 28 MARCH 2020: while working on code to generate T2star and S0 images, it seems that montages created
+% by loading data in two different ways (one with spm_read_vols and other with dim2nii) actually look the same
+% except for data flip/rotation. This means the starting slice looks similar. However, looking at the T2star and S0 images where
+% different parameters were used to save the niftis (specifically the scaling parameter when using frmwhy_util_saveNifti, 0 or 1)
+% and plotting both on montages after loading both files using dicm2nii, it seems that there is a difference in the first slice.
+
+
+
 
 % ---------------------------------------
 % 2. HOW DEPENDENCIES ARE HANDLED

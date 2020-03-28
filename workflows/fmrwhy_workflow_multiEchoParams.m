@@ -2,8 +2,12 @@
 
 % Code steps:
 % 1. Define template/default variables, directories and filenames
-% 2. Specify
-
+% 2. Create functional template, if it does not exist
+% 3. Estimate 3D volume realignment parameters from raw template echo timeseries (given supplied template volume)
+% 4. Run slice time correction for each echo timeseries
+% 5. Realign each echo timeseries by applying rigid body transormation estimated from template echo realignment parameters
+% 6. Calculate tSNR per echo, using the slice time corrected and realigned functional timeseries as inputs
+% 7. Estimate T2star and S0 maps from minimally preprocessed multi-echo data
 
 %--------------------------------------------------------------------------
 
@@ -205,14 +209,12 @@ else
     disp('---')
 end
 
+% Method 3 from file dicm2nii
 [p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(t2star_fn);
 [p2, frm2, rg2, dim2] = fmrwhy_util_readNifti(s0_fn);
-
-t2star_montage = fmrwhy_util_createMontage(MEparams.T2star_3D_thresholded, 9, rotate, 'T2star', 'hot', 'on', 'max');
+t2star_montage = fmrwhy_util_createMontage(p1.nii.img, 9, 1, 'T2star', 'hot', 'on', 'max');
+colorbar; % caxis([0 200]);
+s0_montage = fmrwhy_util_createMontage(p2.nii.img, 9, 1, 'S0', 'parula', 'on', 'max');
 colorbar;
-s0_montage = fmrwhy_util_createMontage(MEparams.S0_3D_thresholded, 9, rotate, 'S0', 'parula', 'on', 'max');
-colorbar;
-%t2star_montage = fmrwhy_util_createMontage(p1.nii.img, 9, rotate, 'T2star', 'gray', 'on', 'max');
-%s0_montage = fmrwhy_util_createMontage(p2.nii.img, 9, rotate, 'S0', 'gray', 'on', 'max');
 
 
