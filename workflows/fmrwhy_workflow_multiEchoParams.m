@@ -1,4 +1,4 @@
-% A custom workflow that does structFunc and basicFunc preprocessing and QC for a single subject in the NEUFEP study
+% A custom workflow that does ...
 
 % Code steps:
 % 1. Define template/default variables, directories and filenames
@@ -204,7 +204,7 @@ if ~exist(t2star_fn, 'file')
 else
     disp(['T2star map already calculated. Loading now...'])
     MEparams = struct;
-    MEparams.T2star_3D_thresholded = spm_read_vols(spm_vol(tsnr_fn));
+    MEparams.T2star_3D_thresholded = spm_read_vols(spm_vol(t2star_fn));
     MEparams.S0_3D_thresholded = spm_read_vols(spm_vol(s0_fn));
     disp('---')
 end

@@ -240,10 +240,10 @@
 %     2. 3D volume realignment on middle echo timeseries
 %     3. Apply rigid body transformations from middle echo realignment parameters to echo 1 and echo 3 timeseries
 %     4. T2* and S0 estimation (*check steps of tedana*):
-%         1. *How to mask?*
+%         1. *How to mask?* - TODO: investigate adaptive masking of tedana, also the way in which they select a voxel with enough signal across echoes
 %         2. Calculate timeseries average
 %         3. Estimate T2* and S0 using log-linear fit of mono-exponential decay model
-%         4. *Threshold?*
+%         4. *Threshold?* - TODO: investigate thresholding of tedana
 %     5. *Drift removal?*
 %     6. tSNR calculation:
 %         1. *How to mask?*
@@ -258,6 +258,7 @@
 % ------------------------------------------ %
 % ------------------------------------------ %
 
+% 0.    See everything in the fmrwhy_util_documentation.m file
 % 1.    In quality report, montages of timeseries average images saved to file, then read from file and then plotted
 %       seem to look different than montage of template volume. Investigate if saving nifti changes voxel positions.
 %       This important to check when using masks and precalculated quantitative maps and comparing with real-time data.
