@@ -22,8 +22,6 @@ Ndyn = Nt - N_skip;
 N_start = N_skip+1;
 e_ref = 2;
 
-spm_deface
-
 % SPM motion correction settings
 flagsSpmRealign = struct('quality',.9,'fwhm',5,'sep',4,...
     'interp',4,'wrap',[0 0 0],'rtm',0,'PW','','lkp',1:6);
@@ -194,6 +192,9 @@ subplot(3,3,6); imagesc(squeeze(rF{3}(slice,:,:, 49)))
 subplot(3,3,7); imagesc(squeeze(rF{1}(slice,:,:, 50)))
 subplot(3,3,8); imagesc(squeeze(rF{2}(slice,:,:, 50)))
 subplot(3,3,9); imagesc(squeeze(rF{3}(slice,:,:, 50)))
+
+%%
+
 
 
 

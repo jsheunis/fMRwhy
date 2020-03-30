@@ -79,6 +79,10 @@
 % different parameters were used to save the niftis (specifically the scaling parameter when using frmwhy_util_saveNifti, 0 or 1)
 % and plotting both on montages after loading both files using dicm2nii, it seems that there is a difference in the first slice.
 
+% UPDATE 30 MARCH 2020: noticed that dicm2nii read nifti is used inside fmrwhy_util_loadMasks. This is in contrast
+% to most other occurrences where data is loaded: most use spm_read_vols. This can/will lead to inconsistencies.
+% Proposed plan is to use dicm2nii EVERYWHERE TO LOAD AND SAVE NIFTI IMAGES. TODO!!!!
+
 
 
 
@@ -97,6 +101,20 @@
 % - embed images in html base64
 % -
 
+% ---------------------------------------
+% 4. SPM BATCH VS CORE FUNCTIONS
+% ---------------------------------------
+
+% - Core functions are faster. See where/if it makes sense to relace current batch functionality.
+% - E.g. slice_timing for real-time processing. Can we change spm function to make it faster?
+
+
+% ---------------------------------------
+% 5. FMRWHY DEFAULT FILENAMES AND HOW THEY ARE INITIALISED
+% ---------------------------------------
+
+% - The current setup with calling each function at the beginning of many functions is a but sluggish
+% - Specifically look at where motion_fn is used to see if it is initialised correctly each time (wrt template echo)
 
 
 

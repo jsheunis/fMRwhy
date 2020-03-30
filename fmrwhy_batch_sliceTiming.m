@@ -2,9 +2,10 @@ function fmrwhy_batch_sliceTiming(functional_fn, saveAs_fn, options)
 
 % Load required options
 
-[d, f, e] = fileparts(functional_fn);
-temp_functional_fn = fullfile(d, ['temp_' f e]);
-copyfile(functional_fn, temp_functional_fn)
+%[d, f, e] = fileparts(functional_fn);
+%temp_functional_fn = fullfile(d, ['temp_' f e]);
+%copyfile(functional_fn, temp_functional_fn)
+temp_functional_fn = functional_fn;
 func_spm = spm_vol(temp_functional_fn);
 Nt = numel(func_spm);
 TR = options.TR;
@@ -29,7 +30,10 @@ slice_timing.matlabbatch{1}.spm.temporal.st.refslice = 1; % if 'to' is provided 
 slice_timing.matlabbatch{1}.spm.temporal.st.prefix = 'a';
 % Run
 spm_jobman('run',slice_timing.matlabbatch);
-[d, f, e] = fileparts(temp_functional_fn);
-atemp_functional_fn = fullfile(d, ['a' f e]);
-[status, msg, msgID] = movefile(atemp_functional_fn, saveAs_fn);
-delete(temp_functional_fn);
+
+if saveAs_fn ~= 0
+    [d, f, e] = fileparts(temp_functional_fn);
+    atemp_functional_fn = fullfile(d, ['a' f e]);
+    [status, msg, msgID] = movefile(atemp_functional_fn, saveAs_fn);
+    delete(temp_functional_fn);
+end

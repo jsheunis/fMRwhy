@@ -251,6 +251,49 @@
 %         3. Mean / stddev
 
 
+% ------------------------------------------ %
+% ------------------------------------------ %
+% STEP x: Multi-echo offline workflow        %
+% ------------------------------------------ %
+% ------------------------------------------ %
+% FUNCTION: fmrwhy_workflow_offlineME        %
+% ------------------------------------------ %
+% ------------------------------------------ %
+
+% 0. Assumes structFunc and anatLocaliser functions have been run
+% 1. Define template/default variables, directories and filenames
+% 2. Create functional template, if it does not exist
+% 3. Minimal multi-echo processing on all tasks and runs for a subject:
+%    - Estimate 3D volume realignment parameters from raw template echo timeseries (given supplied template volume)
+%    - Run slice time correction for each echo timeseries
+%    - Realign each echo timeseries by applying rigid body transormation estimated from template echo realignment parameters
+% 4. From template run: Calculate tSNR per echo of the minimally preprocessed multi-echo data
+% 5. From template run: Estimate T2star and S0 maps from minimally preprocessed multi-echo data
+
+%% For motor and emotion tasks, run 1 and run 2:
+% 6. Multi-echo combination using different methods:
+%    - T2star map
+%    - tSNR map
+%    - TE
+% 7. Calculate tSNR of combined echo timeseries (i.e. 4 timeseries)
+% 8. Spatial smoothing of template echo and combined echo timeseries (i.e. 4 timeseries) (for the plot and )
+% 9. Masked task region info for template echo vs combined echo timeseries (i.e. 4 datasets)
+%    - Signal dropout/intensity comparison (histogram?)
+%    - The plot (without CSF / WM), with convolved task paradigm
+%    - Task region trace (spatial average over time) with convolved task paradigm
+%    - tSNR average comparison and dotplot / raincloud
+%    - Percentage signal change comparison (from voxel timeseries or average)
+%    -
+% (10. tStats comparison)
+% REMEMBER BRAIN FLIP ISSUES
+
+
+
+
+
+
+
+
 
 % ------------------------------------------ %
 % ------------------------------------------ %

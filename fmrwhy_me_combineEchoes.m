@@ -6,7 +6,7 @@ function combined_data = fmrwhy_me_combineEchoes(func_data, TE, mask, method, we
 % a weighted summation if weights are normalised.
 
 % INPUTS:
-% data      - 5D [4D x E] timeseries or 4D [3D x E] volume data to be combined_data
+% func_data - 5D [4D x E] timeseries or 4D [3D x E] volume data to be combined_data
 % TE        - vector of echo times (ms) in order of acquisition, e.g. [14 28 42]
 % mask      -
 % method    - method used for combination of echoes:
@@ -21,7 +21,7 @@ function combined_data = fmrwhy_me_combineEchoes(func_data, TE, mask, method, we
 % Weighted average = (x1w1 + x2w2 + ... + xnwn)/(w1+w2+...+wn)
 
 
-sz = size(data);
+sz = size(func_data);
 Ne = numel(TE);
 
 % Check if dimensions agree for number of echos in data and TE vector
@@ -71,15 +71,18 @@ end
 data = {};
 weights = {};
 weighted_data = {};
-sum_weights = zeros(sz(1:3));
-sum_weighted_data = zeros(sz(1:4));
+%sum_weights = zeros(sz(1:3));
+%sum_weighted_data = zeros(sz(1:4));
+sum_weights = 0;
+sum_weighted_data = 0;
 
 for e = 1:Ne
     if numel(sz) == 4
-        data{e} = data(:,:,:,e);
+        data{e} = func_data(:,:,:,e);
     else % numel(sz) = 5
-        data{e} = data(:,:,:,:,e);
+        data{e} = func_data(:,:,:,:,e);
     end
+
     switch(method)
         case 1
             % Posse T2*-weighted
@@ -95,7 +98,7 @@ for e = 1:Ne
             %
             weights{e} = weight_data(e);
         otherwise
-            disp('error '); % TODO: raise error
+            disp('Unknown combinaion method'); % TODO: raise error
     end
     % x1w1, x2w2, ..., xnwn
     weighted_data{e} = data{e} .* weights{e};
@@ -105,7 +108,9 @@ for e = 1:Ne
     sum_weighted_data = sum_weighted_data + weighted_data{e};
 end
 % (x1w1 + x2w2 + ... + xnwn)/(w1+w2+...+wn)
-combined_data = sum_weighted_data ./ sum_weights;
+combined_data = sum_weighted_data ./ sum_weights; % a 4D timeseries [3D x t] or a 3D image
+
+
 
 % Mask data
 
