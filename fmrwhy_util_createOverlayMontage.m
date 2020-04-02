@@ -1,15 +1,16 @@
-function output = fmrwhy_util_createOverlayMontage(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, saveAs_fn)
+function output = fmrwhy_util_createOverlayMontage(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, cxs, saveAs_fn)
 % Function to create montages of images/rois overlaid on a template image
 
 % Structure to save output
 output = struct;
-alpha = 0.5;
+alpha = 0.1;
 plot_contour = 1;
-rgbcolors = [215,25,28; 253,174,97; 255,255,191; 171,217,233; 44,123,182]/255;
+rgbcolors = [255,255,191; 215,25,28; 253,174,97; 171,217,233; 44,123,182]/255;
+%rgbcolors = [215,25,28; 253,174,97; 255,255,191; 171,217,233; 44,123,182]/255;
 
 % Create background montage
-montage_template = fmrwhy_util_createMontage(template_img, columns, rotate, 'Template volume', clrmp, 'off', shape);
-
+montage_template = fmrwhy_util_createMontage(template_img, columns, rotate, 'Template volume', clrmp, 'off', shape, cxs);
+%caxis(montage_template.ax, cxs);
 % Get screen size for plotting
 scr_size = get(0,'ScreenSize');
 dist = scr_size(4);
@@ -21,8 +22,13 @@ end
 %f(i) = figure('units','pixels','outerposition',[0 0 dist dist]);
 f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
 im1 = imagesc(montage_template.whole_img);
-colormap('gray');
+colormap(clrmp);
+colorbar;
+caxis(cxs);
 ax = gca;
+%if cxs ~= 0
+%    caxis(ax, cxs);
+%end
 outerpos = ax.OuterPosition;
 ti = ax.TightInset;
 left = outerpos(1) + ti(1);
@@ -40,11 +46,11 @@ blue = cat(3, zz, oo, oo);
 
 if iscell(overlay_img)
     for i=1:numel(overlay_img)
-        montage_overlay{i} = fmrwhy_util_createMontage(overlay_img{i}, columns, rotate, 'Overlay', clrmp, 'off', shape);
+        montage_overlay{i} = fmrwhy_util_createMontage(overlay_img{i}, columns, rotate, 'Overlay', clrmp, 'off', shape, 'auto');
     end
 else
     montage_overlay = {};
-    montage_overlay{1} = fmrwhy_util_createMontage(overlay_img, columns, rotate, 'Overlay', clrmp, 'off', shape);
+    montage_overlay{1} = fmrwhy_util_createMontage(overlay_img, columns, rotate, 'Overlay', clrmp, 'off', shape, 'auto');
 end
 
 
@@ -71,7 +77,13 @@ set(ax,'ytick',[])
 set(ax,'yticklabel',[])
 set(ax,'ztick',[])
 set(ax,'zticklabel',[])
-print(f, saveAs_fn,'-dpng', '-r0')
+
+output.ax = ax;
+output.f = f;
+
+if saveAs_fn ~= 0
+    print(f, saveAs_fn,'-dpng', '-r0')
+end
 % Close necessary figure handles
 close(montage_template.f)
 for i=1:numel(montage_overlay)

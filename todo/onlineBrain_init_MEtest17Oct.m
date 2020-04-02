@@ -276,7 +276,7 @@ for n = 1:length(baseline_onsets)
     end
     I_baseline = [I_baseline I_block];
 end
-% Calculate HRF-convolved tas and basline designs. The HRF (hemodynamic
+% Calculate HRF-convolved task and baseline designs. The HRF (hemodynamic
 % response function) tells us that blood (and hence oxygen level) takes
 % some seconds to respond to stimulus-driven neuronal activity. Thus when
 % we e.g. see a stimulus, the oxygen level change due to the neuronal

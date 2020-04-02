@@ -213,7 +213,7 @@ end
 [p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(t2star_fn);
 [p2, frm2, rg2, dim2] = fmrwhy_util_readNifti(s0_fn);
 t2star_montage = fmrwhy_util_createMontage(p1.nii.img, 9, 1, 'T2star', 'hot', 'on', 'max');
-colorbar; % caxis([0 200]);
+colorbar;
 s0_montage = fmrwhy_util_createMontage(p2.nii.img, 9, 1, 'S0', 'parula', 'on', 'max');
 colorbar;
 

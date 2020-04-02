@@ -83,20 +83,16 @@ settings.physio.options.output_multiple_regressors_fn = 'PhysIO_multiple_regress
 % Settings for QC
 settings.theplot.intensity_scale = [-6 6];
 
+% Settings for first level analysis: task-motor
+settings.firstlevel.motor.sess_params.timing_units = 'scans';
+settings.firstlevel.motor.sess_params.timing_RT = 2;
+settings.firstlevel.motor.sess_params.cond_name = 'Finger_tapping_rhs';
+settings.firstlevel.motor.sess_params.cond_onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
+settings.firstlevel.motor.sess_params.cond_duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
 
-
-%% Settings for first level analysis: task-motor
-%settings.tasks.motor.sess_params = struct;
-%settings.tasks.motor.sess_params.timing_units = 'scans';
-%settings.tasks.motor.sess_params.timing_RT = 2;
-%settings.tasks.motor.sess_params.cond_name = 'Finger_tapping_rhs';
-%settings.tasks.motor.sess_params.cond_onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
-%settings.tasks.motor.sess_params.cond_duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
-%
-%% Settings for first level analysis: task-emotion
-%settings.tasks.emotion.sess_params = struct;
-%settings.tasks.emotion.sess_params.timing_units = 'scans';
-%settings.tasks.emotion.sess_params.timing_RT = 2;
-%settings.tasks.emotion.sess_params.cond_name = 'Match_shapes_faces';
-%settings.tasks.emotion.sess_params.cond_onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
-%settings.tasks.emotion.sess_params.cond_duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
+% Settings for first level analysis: task-emotion
+settings.firstlevel.emotion.sess_params.timing_units = 'scans';
+settings.firstlevel.emotion.sess_params.timing_RT = 2;
+settings.firstlevel.emotion.sess_params.cond_name = 'Match_shapes_faces';
+settings.firstlevel.emotion.sess_params.cond_onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
+settings.firstlevel.emotion.sess_params.cond_duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];

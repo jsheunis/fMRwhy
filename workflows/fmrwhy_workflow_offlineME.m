@@ -123,6 +123,10 @@ end
 % -------
 % STEP 5: Calculate/estimate T2star and S0 maps
 % -------
+% Template info
+task = 'rest';
+run = '1';
+
 disp('---')
 disp('STEP 5: Calculate T2star and S0 maps')
 disp('---')
@@ -157,3 +161,158 @@ end
 %colorbar; % caxis([0 200]);
 %s0_montage = fmrwhy_util_createMontage(p2.nii.img, 9, 1, 'S0', 'parula', 'on', 'max');
 %colorbar;
+
+% -------
+% STEP 6: For all tasks and runs, complete minimal multi-echo preprocessing
+% -------
+disp('---')
+disp('STEP 6: For all tasks and runs, combine multi-echo data with various methods')
+disp('---')
+tasks = {'rest', 'motor', 'emotion'};
+%tasks = {'emotion'};
+%runs = {'1', '2'};
+%runs = {'1'};
+%t=1;
+%r=1;
+
+for t = 1:numel(tasks)
+    task = tasks{t};
+    for r = 1:numel(runs)
+        run = runs{r};
+
+        if t == 1 && r == 1
+            continue;
+        end
+
+        disp('------------')
+        disp('------------')
+        disp(['Task: ' task ';  Run: ' run])
+        disp('------------')
+        disp('------------')
+
+        combined_t2s_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEt2star_bold.nii']);
+        combined_tsnr_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEtsnr_bold.nii']);
+        combined_te_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEte_bold.nii']);
+        combined_fns = {combined_t2s_fn, combined_tsnr_fn, combined_te_fn};
+        run_combine = 0;
+        for x = numel(combined_fns)
+            if ~exist(combined_fns{x}, 'file')
+                run_combine = 1;
+            else
+                disp(['Combined timeseries exists: ' combined_fns{x}])
+            end
+        end
+
+        if run_combine
+            % Grab and construct parameters (data and weights) for multi-echo combination
+            disp('Concatenating functional data')
+            TE = options.TE;
+            template_spm = spm_vol(options.template_fn);
+            template_dim = template_spm.dim;
+            Nt = options.Nscans;
+            sz = [template_dim Nt numel(TE)];
+            func_data = zeros(sz);
+            for e = 1:numel(TE)
+                echo = num2str(e);
+                rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii'])
+                func_data(:,:,:,:,e) = spm_read_vols(spm_vol(rafunctional_fn));
+            end
+            disp('Loading weight images')
+            t2star_img = spm_read_vols(spm_vol(t2star_fn));
+            tsnr_data = zeros([template_dim numel(TE)]);
+            for e = 1:numel(TE)
+                echo = num2str(e);
+                tsnr_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_echo-' echo '_desc-rapreproc_tsnr.nii']);
+                tsnr_data(:,:,:,e) = spm_read_vols(spm_vol(tsnr_fn));
+            end
+            % Mult-echo combination
+            disp('Combining multiple echoes with different combination methods')
+            combined_dataAll_t2s = fmrwhy_me_combineEchoes(func_data, TE, 0, 1, t2star_img);
+            combined_dataAll_tsnr = fmrwhy_me_combineEchoes(func_data, TE, 0, 2, tsnr_data);
+            combined_dataAll_TE = fmrwhy_me_combineEchoes(func_data, TE, 0, 3, TE);
+
+            % Save nifti images
+            rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-rapreproc_bold.nii']);
+            new_spm_t2s = spm_vol(rafunctional_fn);
+            new_spm_tsnr = new_spm_t2s;
+            new_spm_te = new_spm_t2s;
+
+            for i = 1:numel(new_spm_t2s)
+                new_spm_t2s(i).fname = combined_t2s_fn;
+                new_spm_t2s(i).private.dat.fname = combined_t2s_fn;
+                spm_write_vol(new_spm_t2s(i), combined_dataAll_t2s(:,:,:,i));
+
+                new_spm_tsnr(i).fname = combined_tsnr_fn;
+                new_spm_tsnr(i).private.dat.fname = combined_tsnr_fn;
+                spm_write_vol(new_spm_tsnr(i), combined_dataAll_tsnr(:,:,:,i));
+
+                new_spm_te(i).fname = combined_te_fn;
+                new_spm_te(i).private.dat.fname = combined_te_fn;
+                spm_write_vol(new_spm_te(i), combined_dataAll_TE(:,:,:,i));
+            end
+        end
+
+        %---
+        %---
+
+        % Calculate tSNR for each timeseries
+        rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-rapreproc_bold.nii']);
+        combined_t2s_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEt2star_bold.nii']);
+        combined_tsnr_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEtsnr_bold.nii']);
+        combined_te_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEte_bold.nii']);
+        main_fns = {rafunctional_fn, combined_t2s_fn, combined_tsnr_fn, combined_te_fn};
+        tsnr_fns = {};
+        tsnr_output = {};
+        for i = 1:numel(main_fns)
+            tsnr_fns{i} = strrep(main_fns{i}, 'bold', 'tsnr')
+            if ~exist(tsnr_fns{i}, 'file')
+                tsnr_output{i} = fmrwhy_util_calculateTSNR(main_fns{i}, 0, tsnr_fns{i}, template_fn);
+            else
+                disp(['tSNR already computed for timeseries: ' tsnr_fns{i}])
+            end
+        end
+
+        % Smooth each timeseries
+        smooth_fns = {};
+        for i = 1:numel(main_fns)
+            smooth_fns{i} = strrep(main_fns{i}, 'desc-', 'desc-s')
+            if ~exist(smooth_fns{i}, 'file')
+                fmrwhy_batch_smooth(main_fns{i}, smooth_fns{i}, options.fwhm);
+            else
+                disp(['Spatial smoothing already completed for timeseries: ' smooth_fns{i}])
+            end
+        end
+
+    end
+end
+%
+%%%
+
+for p = 1:4
+    functional_fn = smooth_fns{p}
+%    mask_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
+%    mask_img = spm_read_vols(spm_vol(mask_fn));
+%    roi_img = fmrwhy_util_createBinaryImg(mask_img, 0.1);
+    mask_fn1 = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftAmygdala_roi.nii']);
+    mask_fn2 = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightAmygdala_roi.nii']);
+    mask_img1 = spm_read_vols(spm_vol(mask_fn1));
+    mask_img2 = spm_read_vols(spm_vol(mask_fn2));
+    roi_img1 = fmrwhy_util_createBinaryImg(mask_img1, 0.1);
+    roi_img2 = fmrwhy_util_createBinaryImg(mask_img2, 0.1);
+    roi_img = roi_img1 | roi_img2;
+    task_info.TR = options.firstlevel.(task).sess_params.timing_RT;
+    task_info.onsets = options.firstlevel.(task).sess_params.cond_onset;
+    task_info.durations = options.firstlevel.(task).sess_params.cond_duration;
+    task_info.precision = 1;
+    tsnr_fn = tsnr_fns{p};
+%    str1 = 'Finger tapping - Left motor cortex - Single echo';
+%    str2 = 'Finger tapping - Left motor cortex - Multi-echo combined (method T2star)';
+%    str3 = 'Finger tapping - Left motor cortex - Multi-echo combined (method tSNR)';
+%    str4 = 'Finger tapping - Left motor cortex - Multi-echo combined (method TE)';
+    str1 = 'Hariri task - Bilateral amygdala - Single echo';
+    str2 = 'Hariri task - Bilateral amygdala - Multi-echo combined (method T2star)';
+    str3 = 'Hariri task - Bilateral amygdala - Multi-echo combined (method tSNR)';
+    str4 = 'Hariri task - Bilateral amygdala - Multi-echo combined (method TE)';
+    title_str = {str1, str2, str3, str4};
+    fmrwhy_util_computeROImeasures(functional_fn, roi_img, task_info, tsnr_fn, title_str{p}, options)
+end
