@@ -20,6 +20,20 @@ new_spm.n = [1 1];
 % image; used when image similar to template image is created (e.g. saving
 % one volume from a time series as a singe 3D image)
 if pinfo == 1
-    new_spm.pinfo(1) = 1; 
+    new_spm.pinfo(1) = 1;
 end
 spm_write_vol(new_spm,new_img);
+
+
+%%% Code for dicm2nii version of the same function
+%
+%% Load template nii
+%template_nii = nii_tool('load', template_fn);
+%
+%% Create new nifti with hdr of template nii
+%new_nii = struct;
+%new_nii.hdr = template_nii.hdr;
+%new_nii.img = new_img;
+%new_nii.hdr.aux_file = '';
+%new_nii.hdr.file_name = new_fn;
+%nii_tool('save', new_nii, new_fn);

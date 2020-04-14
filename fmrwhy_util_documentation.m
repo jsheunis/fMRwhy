@@ -83,6 +83,12 @@
 % to most other occurrences where data is loaded: most use spm_read_vols. This can/will lead to inconsistencies.
 % Proposed plan is to use dicm2nii EVERYWHERE TO LOAD AND SAVE NIFTI IMAGES. TODO!!!!
 
+% UPDATE 15 APRIL 2020: tested nii_tool('load'), nii_tool('save') and compared to fmrwhy_util_readNifti and spm_vol
+% see: fmrwhy_test_compareSPMdicm2nii.m
+% Decision 1: use nii_tool for reading, calculations, and writing EVERYWHERE!
+% Decision 2: use fmrwhy_util_readNifti ONLY for plotting (because of the orientation aspect)
+% - update all code accordingly
+% - see if this solves L-R flip issue seen with multi-echo time-series extraction previously
 
 
 
