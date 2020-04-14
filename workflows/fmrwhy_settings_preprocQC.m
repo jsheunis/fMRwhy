@@ -66,7 +66,6 @@ settings.r = 50; % mm
 settings.FD_threshold = 0; % set as 0 to calculate with both standard thresholds 0.2 and 0.5 mm.
 
 % generateMultRegr: PhysIO
-settings.physio.options.save_dir = '';
 settings.physio.options.cardiac_fn = '';
 settings.physio.options.respiration_fn = '';
 settings.physio.options.vendor = 'BIDS';
@@ -79,6 +78,9 @@ settings.physio.options.Nscans = settings.Nscans;
 settings.physio.options.onset_slice = 1;
 settings.physio.options.cardiac_modality = 'PPU';
 settings.physio.options.output_multiple_regressors_fn = 'PhysIO_multiple_regressors.txt'; % text file name
+settings.physio.options.level = 0; % verbose.level = 0 ==> do not generate figure outputs
+settings.physio.options.fig_output_file = ''; % unnecessary if verbose.level = 0, but still initialized here
+
 
 % Settings for QC
 settings.theplot.intensity_scale = [-6 6];

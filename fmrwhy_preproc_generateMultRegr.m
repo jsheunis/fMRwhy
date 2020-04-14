@@ -172,11 +172,13 @@ if include_physio
     physio_options.save_dir = fullfile(options.sub_dir_qc, 'func', ['PhysIO_task-' task '_run-' run]);
     physio_options.cardiac_fn = log_fn;
     physio_options.respiration_fn = log_fn;
+    physio_options.level = 0; % verbose.level = 0 ==> do not generate figure outputs during batch process
 
     % Run PhysIO if required
     [d, f, e] = fileparts(options.physio_regr_fn);
     if ~exist(options.physio_regr_fn, 'file')
         disp('Physio regressors not calculated yet. Calculating now.')
+        % Run batch process without generating figures (batch calls `tapas_physio_main_create_regressors`)
         phys_data = fmrwhy_batch_PhysIO(physio_options);
         temp_txt_fn = fullfile(d, [f '.txt']);
         col_names = {'retroicor_c1','retroicor_c2','retroicor_c3','retroicor_c4','retroicor_c5','retroicor_c6','retroicor_r1','retroicor_r2','retroicor_r3','retroicor_r4','retroicor_r5','retroicor_r6','retroicor_r7','retroicor_r8','retroicor_cxr1','retroicor_cxr2','retroicor_cxr3','retroicor_cxr4','hrv','rvt'};
@@ -184,6 +186,17 @@ if include_physio
         data_table = array2table(data,'VariableNames', col_names);
         writetable(data_table, temp_txt_fn, 'Delimiter','\t');
         [status, msg, msgID] = movefile(temp_txt_fn, options.physio_regr_fn);
+        % Generate figures (by calling `tapas_physio_review` with updated physio options)
+        phys_file = fullfile(physio_options.save_dir, 'physio.mat');
+        physmat = load(phys_file);
+        physmat.physio.verbose.level = 2;
+        physmat.physio.verbose.fig_output_file = ['sub-' sub '_task-' task '_run-' run '_physioQC.jpg'];
+        physmat.physio.verbose.show_figs = false;
+        physmat.physio.verbose.save_figs = true;
+        physmat.physio.verbose.close_figs = true;
+        % Run tapas_physio_review
+        phys_data_figures = tapas_physio_review(physmat.physio);
+
     else
         disp('Physio regressors previously calculated. Loading now.')
         phys_data.physio_regr = struct2array(tdfread(options.physio_regr_fn));

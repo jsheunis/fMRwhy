@@ -58,8 +58,8 @@ phys.matlabbatch{1}.spm.tools.physio.model.hrv.yes.delays = 0;
 phys.matlabbatch{1}.spm.tools.physio.model.noise_rois.no = struct([]);
 phys.matlabbatch{1}.spm.tools.physio.model.movement.no = struct([]);
 phys.matlabbatch{1}.spm.tools.physio.model.other.no = struct([]);
-phys.matlabbatch{1}.spm.tools.physio.verbose.level = 2;
-phys.matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = 'PhysIO_output_level2.jpg';
+phys.matlabbatch{1}.spm.tools.physio.verbose.level = options.level;
+phys.matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = options.fig_output_file;
 phys.matlabbatch{1}.spm.tools.physio.verbose.use_tabs = false;
 
 spm_jobman('run',phys.matlabbatch);

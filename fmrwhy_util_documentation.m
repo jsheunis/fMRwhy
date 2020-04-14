@@ -105,7 +105,7 @@
 % 4. SPM BATCH VS CORE FUNCTIONS
 % ---------------------------------------
 
-% - Core functions are faster. See where/if it makes sense to relace current batch functionality.
+% - Core functions are faster. See where/if it makes sense to replace current batch functionality.
 % - E.g. slice_timing for real-time processing. Can we change spm function to make it faster?
 
 
@@ -116,6 +116,15 @@
 % - The current setup with calling each function at the beginning of many functions is a but sluggish
 % - Specifically look at where motion_fn is used to see if it is initialised correctly each time (wrt template echo)
 
+
+
+
+% ---------------------------
+% ---------------------------
+% INSTRUCTIONS FOR EVENTUAL USE
+% ---------------------------
+% ---------------------------
+% 1. Make sure to run tapas_physio_init() before using any PhysIO-matlab batch functionality
 
 
 % -------------------
