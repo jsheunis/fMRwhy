@@ -93,8 +93,8 @@ S0_3D = reshape(S0, Ni, Nj, Nk);
 S0_3D_thresholded = reshape(S0_thresholded, Ni, Nj, Nk);
 
 % Save to file, if required
-fmrwhy_util_saveNifti(saveAs_t2star_fn, T2star_3D_thresholded, template_fn, 'T2star map', 1);
-fmrwhy_util_saveNifti(saveAs_s0_fn, S0_3D_thresholded, template_fn, 'S0 map', 0);
+fmrwhy_util_saveNifti(saveAs_t2star_fn, T2star_3D_thresholded, template_fn);
+fmrwhy_util_saveNifti(saveAs_s0_fn, S0_3D_thresholded, template_fn);
 
 % Save output variables
 output.T2star_3D = T2star_3D;

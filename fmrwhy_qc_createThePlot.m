@@ -48,13 +48,10 @@ fontsizeM = 13;
 % Timeseries to use for ThePlot
 functional4D_fn = options.sfunctional_fn;
 
-% Get image information from
-func_spm = spm_vol(functional4D_fn);
-tsize = size(func_spm);
-Nt = tsize(1);
-Ni= func_spm(1).dim(1);
-Nj= func_spm(1).dim(2);
-Nk= func_spm(1).dim(3);
+% Get image information from functional data
+nii = nii_tool('load', functional4D_fn);
+data_4D = nii.img;
+[Ni, Nj, Nk, Nt] = size(data_4D);
 
 % Load multiple confound regressors
 confounds_struct = tdfread(options.confounds_fn);

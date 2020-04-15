@@ -134,7 +134,8 @@ if include_tissue
         % Get anatomical tissue compartment masks in individual functional space
         masks = fmrwhy_util_loadMasks(bids_dir, sub);
         % Get timeseries data
-        rafunctional_4D = spm_read_vols(spm_vol(options.rafunctional_fn));
+        nii = nii_tool('load', options.rafunctional_fn);
+        rafunctional_4D = nii.img;
         [Ni, Nj, Nk, Nt] = size(rafunctional_4D);
         rafunctional_2D = reshape(rafunctional_4D, Nj*Nj*Nk, Nt); % [Nj*Nj*Nk, Nt]
         % Get spatial mean per timepoint per tissue compartment

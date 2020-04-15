@@ -56,8 +56,8 @@ end
 % Save to file, if required
 if saveAs_fn ~= 0
     if mask_fn ~= 0
-        fmrwhy_util_saveNifti(saveAs_fn, data_3D_tsnr_masked, template_fn, 'fMRI timeseries tSNR', 1)
+        fmrwhy_util_saveNifti(saveAs_fn, data_3D_tsnr_masked, template_fn)
     else
-        fmrwhy_util_saveNifti(saveAs_fn, data_3D_tsnr, template_fn, 'fMRI timeseries tSNR', 1)
+        fmrwhy_util_saveNifti(saveAs_fn, data_3D_tsnr, template_fn)
     end
 end

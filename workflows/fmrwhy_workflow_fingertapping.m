@@ -109,7 +109,7 @@ template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_ta
 if ~exist(template_fn, 'file')
     disp(['Template funcional image does not exist yet. Creating now: ' template_fn]);
     functional0_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' template_run '_echo-' template_echo '_bold.nii,1']);
-    fmrwhy_util_saveNifti(template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn, 'Template functional volume', 0)
+    fmrwhy_util_saveNifti(template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn);
 else
     disp(['Template funcional image exists: ' template_fn]);
 end

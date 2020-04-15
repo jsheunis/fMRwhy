@@ -41,11 +41,11 @@ if run_stats
     disp('Computing and saving statistical images and files for fMRI timeseries data')
     % Get stats for fMRI timeseries
     stats = fmrwhy_qc_calculateStats(bids_dir, sub, options.rfunctional_fn); % TODO: decide which timeseries to use, processed or not
-    % save images to file: fmrwhy_util_saveNifti(template_fn, img, new_fn, descrip, pinfo)
-    fmrwhy_util_saveNifti(mean_fn, stats.data_3D_mean, options.template_fn, 'fMRI timeseries mean', 0)
-    fmrwhy_util_saveNifti(std_fn, stats.data_3D_stddev, options.template_fn, 'fMRI timeseries standard deviation', 1)
-    fmrwhy_util_saveNifti(tsnr_fn, stats.data_3D_tsnr, options.template_fn, 'fMRI timeseries tSNR', 1)
-    fmrwhy_util_saveNifti(var_fn, stats.data_3D_var, options.template_fn, 'fMRI timeseries variance', 0)
+    % save images to file: fmrwhy_util_saveNifti(template_fn, img, new_fn)
+    fmrwhy_util_saveNifti(mean_fn, stats.data_3D_mean, options.template_fn);
+    fmrwhy_util_saveNifti(std_fn, stats.data_3D_stddev, options.template_fn);
+    fmrwhy_util_saveNifti(tsnr_fn, stats.data_3D_tsnr, options.template_fn);
+    fmrwhy_util_saveNifti(var_fn, stats.data_3D_var, options.template_fn);
     % Write stats timeseries data to tsv file
     [d, f, e] = fileparts(stats_timeseries_fn);
     temp_txt_fn = fullfile(d, [f '.txt']);
@@ -68,11 +68,18 @@ if run_stats
 else
     disp('Statistical images and files already exist for fMRI timeseries data. Loading them now.')
     disp('---')
-    stats.data_3D_mean = spm_read_vols(spm_vol(mean_fn));
-    stats.data_3D_stddev = spm_read_vols(spm_vol(std_fn));
-    stats.data_3D_tsnr = spm_read_vols(spm_vol(tsnr_fn));
-    stats.data_3D_var = spm_read_vols(spm_vol(var_fn));
 end
+
+% Read in data for plotting montages
+imgs = struct;
+[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(mean_fn);
+imgs.data_3D_mean = p.nii.img;
+[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(std_fn);
+imgs.data_3D_stddev = p.nii.img;
+[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_fn);
+imgs.data_3D_tsnr = p.nii.img;
+[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(var_fn);
+imgs.data_3D_var = p.nii.img;
 
 % Get screen size for plotting
 scr_size = get(0,'ScreenSize');

@@ -1,9 +1,9 @@
-function [p, frm, rg, dim] = fmrwhy_util_readNifti(fname, ask_code, reOri)
+function [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(fname, ask_code, reOri)
 
 % NEEDS REFORMATTING AND CORRECT CITATION
 % From dicm2nii/nii_viewer
 
-% NEED TO BE UPDATED, THIS IS NOT THE REORIENT FUNCTION, SEE fmrwhy_util_readOrientNifti.
+% Load, re-orient nii, extract essential nii stuff
 
 % nifti may be re-oriented, p.hdr0 stores original nii.hdr
 if nargin<2, ask_code = []; end

@@ -23,13 +23,12 @@ function [GM_img_bin, WM_img_bin, CSF_img_bin, brain_img_bin] = fmrwhy_util_crea
 % Copyright (C) 2018 Neu3CA.org
 % Written by Stephan Heunis
 
-GM_spm = spm_vol(gm_fn);
-WM_spm = spm_vol(wm_fn);
-CSF_spm = spm_vol(csf_fn);
-
-GM_img = spm_read_vols(GM_spm);
-WM_img = spm_read_vols(WM_spm);
-CSF_img = spm_read_vols(CSF_spm);
+nii = nii_tool('load', gm_fn);
+GM_img = nii.img;
+nii = nii_tool('load', wm_fn);
+WM_img = nii.img;
+nii = nii_tool('load', csf_fn);
+CSF_img = nii.img;
 
 if threshold ~= 0
     GM_img_thresh = GM_img;

@@ -74,7 +74,7 @@ end
 % STEP 2: Contours of anatomical ROIs on mean EPI / template EPI (/ anatomical image?)
 % -------
 count = 0;
-[p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(options.template_fn);
+[p1, frm1, rg1, dim1] = fmrwhy_util_readOrientNifti(options.template_fn);
 % Loop through all tasks in BIDS structure
 for i = 1:numel(options.tasks)
     % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
@@ -82,7 +82,7 @@ for i = 1:numel(options.tasks)
         % Loop through all ROIs for the particular task
         for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
             count = count+1;
-            [p2, frm2, rg2, dim2] = fmrwhy_util_readNifti(options.roi.(options.tasks{i}).rroi_fn{j});
+            [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(options.roi.(options.tasks{i}).rroi_fn{j});
             overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0);
             title = options.roi.(options.tasks{i}).name{j}
             saveAs_fn = fullfile(options.anat_dir_qc, ['sub-' sub '_space-individual_desc-' options.roi.(options.tasks{i}).desc{j} '_roi_montage.png']);

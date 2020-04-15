@@ -30,11 +30,11 @@ end
 % Get functional template
 template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' num2str(template_run) '_space-individual_bold.nii']);
 template_anat_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-coregEstResl_T1w.nii']);
-[p, frm, rg, dim] = fmrwhy_util_readNifti(template_anat_fn)
+[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(template_anat_fn)
 template_img = p.nii.img;
 
 % Get anatomical masks in individual functional space
-masks = fmrwhy_util_loadMasks(bids_dir, sub);
+masks = fmrwhy_util_loadOrientMasks(bids_dir, sub);
 mask_images = {masks.GM_mask_3D, masks.WM_mask_3D, masks.CSF_mask_3D, masks.brain_mask_3D};
 mask_names = {'Grey matter', 'White matter', 'Cerebrospinal fluid', 'Whole brain'};
 mask_montage_fns = {'_GM_mask_montage', '_WM_mask_montage', '_CSF_mask_montage', '_brain_mask_montage'};

@@ -1,4 +1,4 @@
-function spm_specify1stlevel_jsh(stats_dir, functional_fn, multi_reg_fn, params)
+function fmrwhy_batch_specify1stlevel(stats_dir, functional_fn, multi_reg_fn, params)
 
 spm('defaults','fmri');
 spm_jobman('initcfg');

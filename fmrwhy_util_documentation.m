@@ -64,7 +64,7 @@
 % Stephan interpretation: mat0 = qform rows; intent = code.
 
 
-% IMPORTANT: Decision on 23 March 2020: use code from https://github.com/xiangruili/dicm2nii in fmrwhy_util_readNifti:
+% IMPORTANT: Decision on 23 March 2020: use code from https://github.com/xiangruili/dicm2nii in fmrwhy_util_readOrientNifti:
 % This reorients the nifti image in voxel space such that it is RAS+. For imagesc, this image then has to be
 % rotated with 90 degrees, because for some reason (as of yet unknown to me) imagesc swops the x and y axes;
 % or interprets these axes differently when provided in a matrix format.
@@ -83,12 +83,20 @@
 % to most other occurrences where data is loaded: most use spm_read_vols. This can/will lead to inconsistencies.
 % Proposed plan is to use dicm2nii EVERYWHERE TO LOAD AND SAVE NIFTI IMAGES. TODO!!!!
 
-% UPDATE 15 APRIL 2020: tested nii_tool('load'), nii_tool('save') and compared to fmrwhy_util_readNifti and spm_vol
+% UPDATE 15 APRIL 2020: tested nii_tool('load'), nii_tool('save') and compared to fmrwhy_util_readOrientNifti and spm_vol
 % see: fmrwhy_test_compareSPMdicm2nii.m
 % Decision 1: use nii_tool for reading, calculations, and writing EVERYWHERE!
-% Decision 2: use fmrwhy_util_readNifti ONLY for plotting (because of the orientation aspect)
+% Decision 2: use fmrwhy_util_readOrientNifti ONLY for plotting (because of the orientation aspect)
+% Decision 3: keep using spm_read/write_vol and their real-time variants for real-time processing, until new solution is found
+% Decision 4: keep using spm_read/write_vol for multi-echo realignment, until new solution is found (investigate how to rewrite)
 % - update all code accordingly
 % - see if this solves L-R flip issue seen with multi-echo time-series extraction previously
+
+% Progress 15 April. Still to do wrt the nifti read/write/save/load updates:
+% 1 - TODO: fmrwhy_workflow_offlineMEreport (also any other ME stuff)
+% 2 - TODO: fmrwhy_test_...
+
+
 
 
 

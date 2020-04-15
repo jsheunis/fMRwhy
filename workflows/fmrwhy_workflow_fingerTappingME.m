@@ -42,7 +42,7 @@ wf_params = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, wf_para
 if ~exist(wf_params.template_fn, 'file')
     disp(['Template funcional image does not exist yet. Creating now: ' wf_params.template_fn]);
     functional0_fn = fullfile(wf_params.func_dir_preproc, ['sub-' sub '_task-' wf_params.template_task '_run-' wf_params.template_run '_echo-' wf_params.template_echo '_bold.nii,1']);
-    fmrwhy_util_saveNifti(wf_params.template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn, 'Template functional volume', 0)
+    fmrwhy_util_saveNifti(wf_params.template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn)
 else
     disp(['Template funcional image exists: ' wf_params.template_fn]);
 end

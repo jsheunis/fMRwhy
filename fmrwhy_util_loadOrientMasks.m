@@ -1,10 +1,11 @@
-function masks = fmrwhy_util_loadMasks(bids_dir, sub)
+function masks = fmrwhy_util_loadOrientMasks(bids_dir, sub)
 % Load data for masks that were already calculated;
 % assumes standard fmrwhy-preproc directory structure
 % assumes fmrwhy_preproc_structFunc.m has been run successfully
 
-% This function loads mask data (using nii_tools from dicm2nii) purely for calculation purposes, NOT FOR PLOTTING.
-% If plotting is required, use fmrwhy_util_loadOrientMasks, which includes reorientation for RAS+ display.
+% This function loads mask data (using fmrwhy_util_readNifti derived from dicm2nii) FOR PLOTTING purposes.
+% It includes reorientation for RAS+ display.
+% If pure calculation purposes are intended, rather use fmrwhy_util_loadMasks!
 
 deriv_dir = fullfile(bids_dir, 'derivatives');
 preproc_dir = fullfile(deriv_dir, 'fmrwhy-preproc');
@@ -17,19 +18,16 @@ masks.WM_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individ
 masks.CSF_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-CSF_mask.nii']);
 masks.brain_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-brain_mask.nii']);
 
+[p, frm, rg, dim] = fmrwhy_util_readNifti(masks.GM_mask_fn);
+masks.GM_mask_3D = p.nii.img; % [Ni x Nj x Nk]
+[p, frm, rg, dim] = fmrwhy_util_readNifti(masks.WM_mask_fn);
+masks.WM_mask_3D = p.nii.img; % [Ni x Nj x Nk]
+[p, frm, rg, dim] = fmrwhy_util_readNifti(masks.CSF_mask_fn);
+masks.CSF_mask_3D = p.nii.img; % [Ni x Nj x Nk]
+[p, frm, rg, dim] = fmrwhy_util_readNifti(masks.brain_mask_fn);
+masks.brain_mask_3D = p.nii.img; % [Ni x Nj x Nk]
 
-nii4 = nii_tool('load', template_ts_fn);
-
-nii = nii_tool('load', masks.GM_mask_fn);
-masks.GM_mask_3D = nii.img; % [Ni x Nj x Nk]
-nii = nii_tool('load', masks.WM_mask_fn);
-masks.WM_mask_3D = nii.img; % [Ni x Nj x Nk]
-nii = nii_tool('load', masks.CSF_mask_fn);
-masks.CSF_mask_3D = nii.img; % [Ni x Nj x Nk]
-nii = nii_tool('load', masks.brain_mask_fn);
-masks.brain_mask_3D = nii.img; % [Ni x Nj x Nk]
-
-[Ni, Nj, Nk] = size(nii.img);
+[Ni, Nj, Nk] = size(p.nii.img);
 
 masks.GM_mask_2D = reshape(masks.GM_mask_3D, Ni*Nj*Nk, 1); % [Ni*Nj*Nk x 1]
 masks.WM_mask_2D = reshape(masks.WM_mask_3D, Ni*Nj*Nk, 1); % [Ni*Nj*Nk x 1]
