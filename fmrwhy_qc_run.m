@@ -115,6 +115,11 @@ end
 stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, ses, task, run, echo, options);
 
 % -------
-% STEP 3: Plot The Plot
+% STEP 3: Create The Plot for whole brain
 % -------
 fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, options);
+
+% -------
+% STEP 4: Create The Plot for rois
+% -------
+%fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, options);

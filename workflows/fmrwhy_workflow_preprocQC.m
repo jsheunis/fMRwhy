@@ -47,15 +47,39 @@ end
 options.template_fn = template_fn;
 
 
+% -------
+% STEP 1 -- Structural-functional preprocessing: fmrwhy_preproc_structFunc.m
+% -------
+% Loop through all standard output filenames and see if these files exist
+struct_func_out_fns = [{options.coregest_anatomical_fn} options.probseg_fns options.transform_fns options.rall_fns options.mask_fns];
+run_structFunc = 0;
+for i = 1:numel(struct_func_out_fns)
+    if ~exist(struct_func_out_fns{i}, 'file')
+        disp(['Structural-funcional preprocessing output file does not exist yet: ' struct_func_out_fns{i}]);
+        run_structFunc = 1;
+    end
+end
+% If some of the files do not exist, run the fmrwhy_preproc_structFunc processing pipeline
+if run_structFunc
+    disp('Running complete structural-funcional preprocessing pipeline')
+    fmrwhy_preproc_structFunc(bids_dir, sub, ses, options.template_task, options.template_run, options.template_echo, options);
+    disp('Complete!')
+    disp('---')
+else
+    disp('Structural-funcional preprocessing already completed.')
+    disp('---')
+end
+
+
 
 % -------
-% PREPROCESSING PER TASK AND RUN
+% PREPROCESSING PER TASK, RUN and ECHO
 % -------
 
-% Loop through sessions, tasks, runs, etc
+% Loop through sessions, tasks, runs, echoes.
 ses = '';
-tasks = {'rest', 'motor'};
-
+tasks = {'rest', 'motor', 'emotion'};
+runs = {'1', '2'};
 
 for t = 1:numel(tasks)
 
@@ -65,29 +89,6 @@ for t = 1:numel(tasks)
 
     % Update workflow params with subject functional derivative filenames
     options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
-
-    % -------
-    % STEP 1 -- Structural-functional preprocessing: fmrwhy_preproc_structFunc.m
-    % -------
-    % Loop through all standard output filenames and see if these files exist
-    struct_func_out_fns = [{options.coregest_anatomical_fn} options.probseg_fns options.transform_fns options.rall_fns options.mask_fns];
-    run_structFunc = 0;
-    for i = 1:numel(struct_func_out_fns)
-        if ~exist(struct_func_out_fns{i}, 'file')
-            disp(['Structural-funcional preprocessing output file does not exist yet: ' struct_func_out_fns{i}]);
-            run_structFunc = 1;
-        end
-    end
-    % If some of the files do not exist, run the fmrwhy_preproc_structFunc processing pipeline
-    if run_structFunc
-        disp('Running complete structural-funcional preprocessing pipeline')
-        fmrwhy_preproc_structFunc(bids_dir, sub, ses, options.template_task, options.template_run, options.template_echo, options);
-        disp('Complete!')
-        disp('---')
-    else
-        disp('Structural-funcional preprocessing already completed.')
-        disp('---')
-    end
 
 
     % -------
@@ -167,31 +168,9 @@ for t = 1:numel(tasks)
     % -------
     % STEP 5 -- QC report: fmrwhy_qc_generateSubRunReport.m
     % -------
-    fmrwhy_qc_generateSubRunReport(bids_dir, sub, task, run, options)
+%    fmrwhy_qc_generateSubRunReport(bids_dir, sub, task, run, options)
 
 
-
-
-
-    %
-    %% Step 3: anatomical-localizer-preproc:     - rtme_preproc_anatLocaliser.m
-    %fmrwhy_preproc_anatLocaliser(sub, options);
-
-    % Step 3: functional-localizer-preproc:     - rtme_preproc_funcLocaliser.m
-    %                                           - rtme_preproc_generateRegressors.m
-    %                                           - rtme_preproc_generateRetroicor.m
-    %                                           - rtme_preproc_generateFDregr.m
-    %                                           - rtme_preproc_generateTissueSignals.m
-
-    %
-    %for t = 1:numel(defaults.tasks)
-    %%    disp(['Performing 3D volume realignment for: ' sub '_task-' tasks(t) '_run-' defaults.template_run])
-    %    rtme_preproc_funcLocaliser(sub, task, defaults.template_run, options.template_echo, defaults)
-    %end
-
-
-    % Step 4: calculate-prior-measures-preproc - rtme_preproc_estimateParams.m
-    %rtme_preproc_estimateParams(sub, defaults);
 end
 
 

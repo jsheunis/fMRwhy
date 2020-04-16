@@ -1,4 +1,4 @@
-function fmrwhy_util_thePlot(bids_dir, sub, ses, task, run, echo, options)
+function fmrwhy_util_thePlot(functional_fn, mask_fns, roi_img, task_info, saveAs_fn, options)
 %
 % This is a Matlab script that uses custom code and spm12 routines to plot
 % a version of THE PLOT from Jonathan Power. See:
@@ -18,24 +18,16 @@ function fmrwhy_util_thePlot(bids_dir, sub, ses, task, run, echo, options)
 % - 23 July 2019: added voxel ordering options according to RO and GSO
 % methods in: https://www.biorxiv.org/content/10.1101/662726v1.full
 
-% Load/create required defaults
-% Setup fmrwhy BIDS-derivatuve directories on workflow level
-options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
+% ------------------------------------------------------------------------ %
+% functional_fn = 4D timeseries; typically smoothed (NOT realigned nor slice time corrected)
+% mask_fn = binary brain mask; include these voxels
+% roi_fns = cell array of filenames, create ThePlotROI for each roi.
+%
+% ------------------------------------------------------------------------ %
 
-% Grab parameters from workflow settings file
-options = fmrwhy_settings_preprocQC(bids_dir, options);
-
-% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
-
-% Update workflow params with subject anatomical derivative filenames
-options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
-
-% Update workflow params with subject functional derivative filenames
-options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
 
 % ThePlot settings:
-intensity_scale = options.theplot.intensity_scale; % scaling for plot image intensity, see what works
+intensity_scale = options.intensity_scale; % scaling for plot image intensity, see what works
 fontsizeL = 15;
 fontsizeM = 13;
 
@@ -43,18 +35,13 @@ fontsizeM = 13;
 % 0 = Random order via standard Matlab indexing (RO)
 % 1 = Grey matter signal ordering (GSO) (according to the Pearsons correlation between voxel timeseries and global signal )
 % 2 = Cluster-similarity ordering (CO) - NOT IMPLEMENTED YET
+
 % roi = ''; % figure generated for voxels in supplied ROI - NOT IMPLEMENTED YET
 
-% Timeseries to use for ThePlot
-functional4D_fn = options.sfunctional_fn;
-
-% Get image information from
-func_spm = spm_vol(functional4D_fn);
-tsize = size(func_spm);
-Nt = tsize(1);
-Ni= func_spm(1).dim(1);
-Nj= func_spm(1).dim(2);
-Nk= func_spm(1).dim(3);
+% Get image information from functional data
+nii = nii_tool('load', functional_fn);
+data_4D = nii.img;
+[Ni, Nj, Nk, Nt] = size(data_4D);
 
 % Load multiple confound regressors
 confounds_struct = tdfread(options.confounds_fn);

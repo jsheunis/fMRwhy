@@ -33,14 +33,14 @@ masks.WM_mask_2D = reshape(masks.WM_mask_3D, Ni*Nj*Nk, 1); % [Ni*Nj*Nk x 1]
 masks.CSF_mask_2D = reshape(masks.CSF_mask_3D, Ni*Nj*Nk, 1); % [Ni*Nj*Nk x 1]
 masks.brain_mask_2D = reshape(masks.brain_mask_3D, Ni*Nj*Nk, 1); % [Ni*Nj*Nk x 1]
 
-masks.GM_mask_I = find(masks.GM_mask_2D); % [Ni*Nj*Nk x 1]
-masks.WM_mask_I = find(masks.WM_mask_2D); % [Ni*Nj*Nk x 1]
-masks.CSF_mask_I = find(masks.CSF_mask_2D); % [Ni*Nj*Nk x 1]
-masks.brain_mask_I = find(masks.brain_mask_2D); % [Ni*Nj*Nk x 1]
+masks.GM_mask_I = find(masks.GM_mask_2D); % [Ngmvoxels x 1]
+masks.WM_mask_I = find(masks.WM_mask_2D); % [Nwmvoxels x 1]
+masks.CSF_mask_I = find(masks.CSF_mask_2D); % [Ncsfvoxels x 1]
+masks.brain_mask_I = find(masks.brain_mask_2D); % [Nbrainvoxels x 1]
 
-masks.GM_mask_I = masks.GM_mask_I'; % [1 x Ni*Nj*Nk]
-masks.WM_mask_I = masks.WM_mask_I'; % [1 x Ni*Nj*Nk]
-masks.CSF_mask_I = masks.CSF_mask_I'; % [1 x Ni*Nj*Nk]
-masks.brain_mask_I = masks.brain_mask_I'; % [1 x Ni*Nj*Nk]
+masks.GM_mask_I = masks.GM_mask_I'; % [1 x Ngmvoxels]
+masks.WM_mask_I = masks.WM_mask_I'; % [1 x Nwmvoxels]
+masks.CSF_mask_I = masks.CSF_mask_I'; % [1 x Ncsfvoxels]
+masks.brain_mask_I = masks.brain_mask_I'; % [1 x Nbrainvoxels]
 
 masks.field_names = {'GM', 'WM', 'CSF', 'brain'};
