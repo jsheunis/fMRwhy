@@ -52,12 +52,12 @@ disp('---')
 template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
 if ~exist(template_fn, 'file')
     disp(['Template funcional image does not exist yet. Creating now: ' template_fn]);
-    functional0_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_echo-' options.template_echo '_bold.nii,1']);
-    fmrwhy_util_saveNifti(template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn);
+    fmrwhy_util_saveNiftiFrom4D(functional_fn, template_fn, 1)
 else
     disp(['Template funcional image exists: ' template_fn]);
 end
 options.template_fn = template_fn;
+
 
 % -------
 % STEP 3: For all tasks and runs, complete minimal multi-echo preprocessing

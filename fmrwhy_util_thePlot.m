@@ -1,4 +1,4 @@
-function fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, options)
+function fmrwhy_util_thePlot(bids_dir, sub, ses, task, run, echo, options)
 %
 % This is a Matlab script that uses custom code and spm12 routines to plot
 % a version of THE PLOT from Jonathan Power. See:

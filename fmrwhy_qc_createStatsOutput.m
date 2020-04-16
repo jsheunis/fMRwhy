@@ -66,7 +66,7 @@ if run_stats
     disp('Complete!')
     disp('---')
 else
-    disp('Statistical images and files already exist for fMRI timeseries data. Loading them now.')
+    disp('Statistical images and files already exist for fMRI timeseries data.')
     disp('---')
 end
 
@@ -96,7 +96,7 @@ stats_image_colormaps = {'gray', 'parula', 'parula', 'hot'};
 for i = 1:numel(stats_image_fns)
     stats_montage_fns{i} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_space-individual_' stats_image_txt{i} '.png']);
     %if ~exist(stats_montage_fns{i}, 'file')
-        montage = fmrwhy_util_createMontage(stats.(stats_image_fieldname{i}), 9, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max');
+        montage = fmrwhy_util_createMontage(imgs.(stats_image_fieldname{i}), 9, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max');
         ax = montage.ax;
         outerpos = ax.OuterPosition;
         ti = ax.TightInset; 

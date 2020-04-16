@@ -1,6 +1,9 @@
 function fmrwhy_util_compareTSNR(tsnr_fns, mask_fn, roi_fns, I_roi_distr, roi_text, tsnr_saveAs_fns, perc_saveAs_fns, distr_saveAs_fn)
 
 % I_roi_distr is for distribution plot of percdiff in task roi. send 0 if rest.
+% TODO 16 april 2020: this needs to be updated such that I_roi_distr is not sent as a parameter
+% but rather as the task roi filename, such that correct read/write functions can be used inside this function
+% to ensure consistency or nifti orientation.
 
 
 %[p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(t2star_fn);

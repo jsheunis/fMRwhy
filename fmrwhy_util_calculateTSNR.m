@@ -9,19 +9,18 @@ function output = fmrwhy_util_calculateTSNR(functional_fn, mask_fn, saveAs_fn, t
 output = struct;
 
 vols = spm_vol(functional_fn);
-Ni = vols(1).dim(1);
-Nj = vols(1).dim(2);
-Nk = vols(1).dim(3);
-Nt = numel(vols);
-data_4D = spm_read_vols(vols);
+
+nii = nii_tool('load', functional_fn);
+data_4D = nii.img; % [Ni x Nj x Nk x Nt]
+[Ni, Nj, Nk, Nt] = size(data_4D);
 data_2D = reshape(data_4D, Ni*Nj*Nk, Nt); %[voxels, time]
 data_2D = data_2D'; %[time, voxels]
 
 % Then get the mask if fn supplied
 if mask_fn ~= 0
-    mask_vol = spm_vol(mask_fn);
-    mask_3D = spm_read_vols(mask_vol);
-    mask_2D = reshape(mask_3D, N_i*N_j*N_k, 1); %[voxels, 1]
+    nii_mask = nii_tool('load', mask_fn);
+    mask_3D = nii_mask.img; % [Ni x Nj x Nk]
+    mask_2D = reshape(mask_3D, Ni*Nj*Nk, 1); %[voxels, 1]
     I_mask = find(mask_2D); %[voxels, 1]
     I_mask = I_mask'; %[1, voxels]
 end

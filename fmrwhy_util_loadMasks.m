@@ -17,9 +17,6 @@ masks.WM_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individ
 masks.CSF_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-CSF_mask.nii']);
 masks.brain_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-brain_mask.nii']);
 
-
-nii4 = nii_tool('load', template_ts_fn);
-
 nii = nii_tool('load', masks.GM_mask_fn);
 masks.GM_mask_3D = nii.img; % [Ni x Nj x Nk]
 nii = nii_tool('load', masks.WM_mask_fn);

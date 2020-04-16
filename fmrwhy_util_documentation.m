@@ -93,8 +93,13 @@
 % - see if this solves L-R flip issue seen with multi-echo time-series extraction previously
 
 % Progress 15 April. Still to do wrt the nifti read/write/save/load updates:
-% 1 - TODO: fmrwhy_workflow_offlineMEreport (also any other ME stuff)
-% 2 - TODO: fmrwhy_test_...
+% 1 - TODO: fmrwhy_workflow_offlineMEreport + fmrwhy_workflow_multiEchoParams
+%     (including fmrwhy_util_computeROImeasures, fmrwhy_util_compareTSNR, fmrwhy_util_estimateMEparams)
+% 1 - TODO: also any other ME stuff (e.g. realignME)
+% 1 - TODO: all other workflows
+% 2 - TODO: all tests
+% 2 - TODO: check unused functions
+% 2 - TODO: check fmrwhy_util_readNifti (shouldn'' be used anymore)
 
 
 
