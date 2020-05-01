@@ -50,6 +50,12 @@ mask_fn = masks.brain_mask_fn;
 mask_img = p_mask.nii.img;
 I_mask = find(mask_img(:));
 
+masks_oriented = fmrwhy_util_loadOrientMasks(bids_dir, sub);
+mask_fn_oriented = masks_oriented.brain_mask_fn;
+[p_mask_oriented, frm_oriented, rg_oriented, dim_mask_oriented] = fmrwhy_util_readNifti(mask_fn_oriented);
+mask_img_oriented = p_mask_oriented.nii.img;
+I_mask_oriented = find(mask_img_oriented(:));
+
 % -------
 % grab template
 % -------
@@ -60,8 +66,8 @@ options.template_fn = template_fn;
 % Visualise t2star and s0 maps
 % -------
 t2star_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_t2star.nii']);
-[p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(t2star_fn);
-t2star_montage = fmrwhy_util_createMontage(p1.nii.img, 9, 1, 'T2star', 'hot', 'off', 'max', 0);
+[p1, frm1, rg1, dim1] = fmrwhy_util_readOrientNifti(t2star_fn);
+t2star_montage = fmrwhy_util_createMontage(p1.nii.img, 9, 1, 'T2star', 'hot', 'off', 'max', [0 200]);
 colorbar; % caxis([0 200]);
 t2star_png = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_t2star.png']);
 if ~exist(t2star_png, 'file')
@@ -69,8 +75,8 @@ if ~exist(t2star_png, 'file')
 end
 
 s0_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.nii']);
-[p2, frm2, rg2, dim2] = fmrwhy_util_readNifti(s0_fn);
-s0_montage = fmrwhy_util_createMontage(p2.nii.img, 9, 1, 'S0', 'parula', 'off', 'max', 0);
+[p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(s0_fn);
+s0_montage = fmrwhy_util_createMontage(p2.nii.img, 9, 1, 'S0', 'parula', 'off', 'max', [0 20000]);
 colorbar;
 s0_png = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.png']);
 if ~exist(s0_png, 'file')
@@ -91,8 +97,10 @@ task_names = {'rest', 'Right finger tapping', 'Hariri task'}
 roi_fns = {};
 roi_fns{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
 roi_fns{2} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightMotor_roi.nii']);
-roi_fns{3} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftAmygdala_roi.nii']);
-roi_fns{4} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightAmygdala_roi.nii']);
+%roi_fns{3} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftAmygdala_roi.nii']);
+%roi_fns{4} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightAmygdala_roi.nii']);
+roi_fns{3} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rbilateralAmygdala_roi.nii']);
+
 
 
 
@@ -132,12 +140,13 @@ for t = 1:numel(tasks)
         % ---
         % Output 1: Montage of single volume: echo 1, 2, 3, and combined (methods 1, 2, 3)
         % ---
+        volume_nr = 5;
         bold_pngs = {};
         for i = 1:numel(bold_fns)
             bold_pngs{i} = strrep(bold_fns{i}, '.nii', '.png');
             if ~exist(bold_pngs{i}, 'file')
-                [p, frm, rg, dim] = fmrwhy_util_readNifti(bold_fns{i});
-                bold_montage = fmrwhy_util_createMontage(p.nii.img(:,:,:,5), 9, 1, ['Echo ' num2str(i)], 'gray', 'off', 'max', 0);
+                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_fns{i});
+                bold_montage = fmrwhy_util_createMontage(p.nii.img(:,:,:,volume_nr), 9, 1, ['Echo ' num2str(i)], 'gray', 'off', 'max', 0);
                 print(bold_montage.f, bold_pngs{i},'-dpng', '-r0');
             end
         end
@@ -145,8 +154,8 @@ for t = 1:numel(tasks)
         for i = 1:numel(bold_combined_fns)
             combined_pngs{i} = strrep(bold_combined_fns{i}, '.nii', '.png');
             if ~exist(combined_pngs{i}, 'file')
-                [p, frm, rg, dim] = fmrwhy_util_readNifti(bold_combined_fns{i});
-                combined_montage = fmrwhy_util_createMontage(p.nii.img(:,:,:,5), 9, 1, ['Combined - ' combined_str{i+1}], 'gray', 'off', 'max', 0);
+                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_combined_fns{i});
+                combined_montage = fmrwhy_util_createMontage(p.nii.img(:,:,:,volume_nr), 9, 1, ['Combined - ' combined_str{i+1}], 'gray', 'off', 'max', 0);
                 print(combined_montage.f, combined_pngs{i},'-dpng', '-r0');
             end
         end
@@ -172,19 +181,22 @@ for t = 1:numel(tasks)
             roi_img = 0;
         elseif strcmp(task, 'motor')
             overlay_img = {};
-            [p, frm, rg, dim] = fmrwhy_util_readNifti(roi_fns{1});
+            [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(roi_fns{1});
             roi_img = fmrwhy_util_createBinaryImg(p.nii.img, 0.1);
             I_roi_distr = find(roi_img(:));
         else
             roi_img = zeros(dim_mask);
             overlay_img = {};
-            for i = 3:4
-                [p, frm, rg, dim] = fmrwhy_util_readNifti(roi_fns{i});
-                roi_new = fmrwhy_util_createBinaryImg(p.nii.img, 0.1);
-                roi_img = roi_img | roi_new;
-            end
+            [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(roi_fns{3});
+            roi_img = fmrwhy_util_createBinaryImg(p.nii.img, 0.1);
+%            for i = 3:4
+%                [p, frm, rg, dim] = fmrwhy_util_readNifti(roi_fns{i});
+%                roi_new = fmrwhy_util_createBinaryImg(p.nii.img, 0.1);
+%                roi_img = roi_img | roi_new;
+%            end
             I_roi_distr = find(roi_img(:));
         end
+
         fmrwhy_util_compareTSNR(tsnr_fns, mask_fn, roi_fns, I_roi_distr, roi_text{t} , tsnr_pngs, percdiff_pngs, distr_png);
 
 

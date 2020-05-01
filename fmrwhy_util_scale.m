@@ -11,4 +11,4 @@ function out_data = fmrwhy_util_scale(data, lower, upper)
 minVal = min(data);
 maxVal = max(data);
 
-out_data = (data - minVal) * (upper - lower) / (maxVal - minVal) + lower
+out_data = (data - minVal) * (upper - lower) / (maxVal - minVal) + lower;

@@ -19,12 +19,19 @@ masks.brain_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-indi
 
 nii = nii_tool('load', masks.GM_mask_fn);
 masks.GM_mask_3D = nii.img; % [Ni x Nj x Nk]
+%masks.GM_mask_3D(masks.GM_mask_3D~=0) = 1;
+
 nii = nii_tool('load', masks.WM_mask_fn);
 masks.WM_mask_3D = nii.img; % [Ni x Nj x Nk]
+%masks.WM_mask_3D(masks.WM_mask_3D~=0) = 1;
+
 nii = nii_tool('load', masks.CSF_mask_fn);
 masks.CSF_mask_3D = nii.img; % [Ni x Nj x Nk]
+%masks.CSF_mask_3D(masks.CSF_mask_3D~=0) = 1;
+
 nii = nii_tool('load', masks.brain_mask_fn);
 masks.brain_mask_3D = nii.img; % [Ni x Nj x Nk]
+%masks.brain_mask_3D(masks.brain_mask_3D~=0) = 1;
 
 [Ni, Nj, Nk] = size(nii.img);
 

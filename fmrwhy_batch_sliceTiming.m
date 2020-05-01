@@ -2,11 +2,7 @@ function fmrwhy_batch_sliceTiming(functional_fn, saveAs_fn, options)
 
 % Load required options
 
-%[d, f, e] = fileparts(functional_fn);
-%temp_functional_fn = fullfile(d, ['temp_' f e]);
-%copyfile(functional_fn, temp_functional_fn)
-temp_functional_fn = functional_fn;
-func_spm = spm_vol(temp_functional_fn);
+func_spm = spm_vol(functional_fn);
 Nt = numel(func_spm);
 TR = options.TR;
 N_slices = options.N_slices;
@@ -14,7 +10,7 @@ N_slices = options.N_slices;
 % Create cell array of scan names
 scans = {};
 for i = 1:Nt
-    scans{i} = [temp_functional_fn ',' num2str(i)];
+    scans{i} = [functional_fn ',' num2str(i)];
 end
 
 % Create SPM12 batch job
@@ -32,8 +28,7 @@ slice_timing.matlabbatch{1}.spm.temporal.st.prefix = 'a';
 spm_jobman('run',slice_timing.matlabbatch);
 
 if saveAs_fn ~= 0
-    [d, f, e] = fileparts(temp_functional_fn);
-    atemp_functional_fn = fullfile(d, ['a' f e]);
-    [status, msg, msgID] = movefile(atemp_functional_fn, saveAs_fn);
-    delete(temp_functional_fn);
+    [d, f, e] = fileparts(functional_fn);
+    afunctional_fn = fullfile(d, ['a' f e]);
+    [status, msg, msgID] = movefile(afunctional_fn, saveAs_fn);
 end

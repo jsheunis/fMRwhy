@@ -31,6 +31,7 @@ stats_summary_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run
 % Create stats images and files if they don't exist yet
 stats_fn = {mean_fn, std_fn, tsnr_fn, var_fn, stats_timeseries_fn, stats_summary_fn};
 run_stats = 0;
+stats = [];
 for i = 1:numel(stats_fn)
     if ~exist(stats_fn{i}, 'file')
         disp(['Stats output does not exist yet: ' stats_fn{i}]);
@@ -42,10 +43,11 @@ if run_stats
     % Get stats for fMRI timeseries
     stats = fmrwhy_qc_calculateStats(bids_dir, sub, options.rfunctional_fn); % TODO: decide which timeseries to use, processed or not
     % save images to file: fmrwhy_util_saveNifti(template_fn, img, new_fn)
-    fmrwhy_util_saveNifti(mean_fn, stats.data_3D_mean, options.template_fn);
-    fmrwhy_util_saveNifti(std_fn, stats.data_3D_stddev, options.template_fn);
-    fmrwhy_util_saveNifti(tsnr_fn, stats.data_3D_tsnr, options.template_fn);
-    fmrwhy_util_saveNifti(var_fn, stats.data_3D_var, options.template_fn);
+    % TODO: add no_scaling=1 where necessary
+    fmrwhy_util_saveNifti(mean_fn, double(stats.data_3D_mean), options.template_fn);
+    fmrwhy_util_saveNifti(std_fn, double(stats.data_3D_stddev), options.template_fn);
+    fmrwhy_util_saveNifti(tsnr_fn, double(stats.data_3D_tsnr), options.template_fn);
+    fmrwhy_util_saveNifti(var_fn, double(stats.data_3D_var), options.template_fn);
     % Write stats timeseries data to tsv file
     [d, f, e] = fileparts(stats_timeseries_fn);
     temp_txt_fn = fullfile(d, [f '.txt']);
@@ -63,56 +65,41 @@ if run_stats
     writetable(data_table, temp_txt_fn, 'Delimiter','\t');
     [status, msg, msgID] = movefile(temp_txt_fn, stats_summary_fn);
 
+    % Generate montage images, if they don't exist
+    imgs = struct;
+    stats_image_fns = {mean_fn, std_fn, var_fn, tsnr_fn};
+    stats_image_txt = {'mean', 'std', 'var', 'tsnr'};
+    stats_image_fieldname = {'data_3D_mean', 'data_3D_stddev', 'data_3D_var', 'data_3D_tsnr'};
+    stats_image_colormaps = {'gray', 'parula', 'parula', 'hot'};
+    for i = 1:numel(stats_image_fns)
+        stats_montage_fns{i} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_space-individual_' stats_image_txt{i} '.png']);
+        if ~exist(stats_montage_fns{i}, 'file')
+            [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(stats_image_fns{i});
+            imgs.(stats_image_fieldname{i}) = p.nii.img;
+            montage = fmrwhy_util_createMontage(imgs.(stats_image_fieldname{i}), 9, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max');
+            ax = montage.ax;
+            outerpos = ax.OuterPosition;
+            ti = ax.TightInset;
+            left = outerpos(1) + ti(1);
+            bottom = outerpos(2) + ti(2);
+            ax_width = outerpos(3) - ti(1) - ti(3);
+            ax_height = outerpos(4) - ti(2) - ti(4);
+            ax.Position = [left bottom ax_width ax_height];
+            set(ax,'xtick',[])
+            set(ax,'xticklabel',[])
+            set(ax,'ytick',[])
+            set(ax,'yticklabel',[])
+            set(ax,'ztick',[])
+            set(ax,'zticklabel',[])
+            print(montage.f,stats_montage_fns{i},'-dpng', '-r0')
+        end
+    end
+
     disp('Complete!')
     disp('---')
 else
     disp('Statistical images and files already exist for fMRI timeseries data.')
     disp('---')
-end
-
-% Read in data for plotting montages
-imgs = struct;
-[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(mean_fn);
-imgs.data_3D_mean = p.nii.img;
-[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(std_fn);
-imgs.data_3D_stddev = p.nii.img;
-[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_fn);
-imgs.data_3D_tsnr = p.nii.img;
-[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(var_fn);
-imgs.data_3D_var = p.nii.img;
-
-% Get screen size for plotting
-scr_size = get(0,'ScreenSize');
-dist = scr_size(4);
-if scr_size(3) < dist
-    dist = scr_size(3);
-end
-
-% Generate montage images, if they don't exist
-stats_image_fns = {mean_fn, std_fn, var_fn, tsnr_fn};
-stats_image_txt = {'mean', 'std', 'var', 'tsnr'};
-stats_image_fieldname = {'data_3D_mean', 'data_3D_stddev', 'data_3D_var', 'data_3D_tsnr'};
-stats_image_colormaps = {'gray', 'parula', 'parula', 'hot'};
-for i = 1:numel(stats_image_fns)
-    stats_montage_fns{i} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_space-individual_' stats_image_txt{i} '.png']);
-    %if ~exist(stats_montage_fns{i}, 'file')
-        montage = fmrwhy_util_createMontage(imgs.(stats_image_fieldname{i}), 9, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max');
-        ax = montage.ax;
-        outerpos = ax.OuterPosition;
-        ti = ax.TightInset; 
-        left = outerpos(1) + ti(1);
-        bottom = outerpos(2) + ti(2);
-        ax_width = outerpos(3) - ti(1) - ti(3);
-        ax_height = outerpos(4) - ti(2) - ti(4);
-        ax.Position = [left bottom ax_width ax_height];
-        set(ax,'xtick',[])
-        set(ax,'xticklabel',[])
-        set(ax,'ytick',[])
-        set(ax,'yticklabel',[])
-        set(ax,'ztick',[])
-        set(ax,'zticklabel',[])
-        print(montage.f,stats_montage_fns{i},'-dpng', '-r0')
-    %end
 end
 
 

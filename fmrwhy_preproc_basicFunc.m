@@ -1,4 +1,4 @@
-function fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, echo, options)
+function fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, options)
 %--------------------------------------------------------------------------
 
 % Copyright statement....
@@ -9,7 +9,8 @@ function fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, echo, options)
 % Function to run basic functional preprocessing steps that are required for
 % several subsequent analysis steps and quality control.
 
-% THIS PIPELINE IS RUN ON A SIGNLE FUNCTIONAL TIMESERIES FILE
+% THIS PIPELINE IS RUN ON A SIGNLE FUNCTIONAL TIMESERIES (could be single or multi-echo)
+
 % STEPS:
 
 % QUESTION: should functional localisers also be done based on combined echo data? Perhaps this is worth another research question?
@@ -35,19 +36,23 @@ options = fmrwhy_settings_preprocQC(bids_dir, options);
 % Update workflow params with subject anatomical derivative filenames
 options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
-% Update workflow params with subject functional derivative filenames
-options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+%% Update workflow params with subject functional derivative filenames
+%options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
 
-% Filler text
-stre_txt = ['sub-' sub '_task-' task '_run-' run '_echo-' echo];
-str_txt = ['sub-' sub '_task-' task '_run-' run];
-
+% Check if single / multi-echo (check from TE in settings; also possible to derive it from BIDS data)
+is_multiecho = false;
+if numel(options.TE) > 1
+    is_multiecho = true;
+end
 
 % -------
 % STEP 1: Estimate 3D volume realignment parameters from raw data
-% TODO: implement automatic multi-echo processing
 % -------
-% Check if this has already been done by seeing if the tsv file with head movement parameters exist
+% First access template timeseries information
+echo = options.template_echo;
+options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+stre_txt = ['sub-' sub '_task-' task '_run-' run '_echo-' echo];
+% Check if realignment has already been done by seeing if the tsv file with head movement parameters exist
 [d, f, e] = fileparts(options.motion_fn);
 if ~exist(options.motion_fn, 'file')
     % If it does not exist estimate MPs
@@ -69,91 +74,142 @@ end
 %%
 % -------
 % STEP 2: Slice timing correction
-% TODO: implement automatic multi-echo processing
 % -------
-if ~exist(options.afunctional_fn, 'file')
-    disp(['Performing slice timing correction on: ' stre_txt])
-    fmrwhy_batch_sliceTiming(options.functional_fn, options.afunctional_fn, options);
-    disp('Complete!')
-    disp('---')
+if is_multiecho
+    for e = 1:numel(options.TE)
+        disp('---')
+        disp(['Echo ' num2str(e)])
+        disp('---')
+
+        % Update workflow params with subject functional derivative filenames
+        options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, num2str(e), options);
+        % Filler text
+        stre_txt = ['sub-' sub '_task-' task '_run-' run '_echo-' num2str(e)];
+        if ~exist(options.afunctional_fn, 'file')
+            disp(['Performing slice timing correction on: ' stre_txt])
+            fmrwhy_batch_sliceTiming(options.functional_fn, options.afunctional_fn, options);
+            disp('Complete!')
+            disp('---')
+        else
+            disp(['Slice timing correction already completed for: ' stre_txt])
+            disp('---')
+        end
+    end
 else
-    disp(['Slice timing correction already completed for: ' stre_txt])
-    disp('---')
+    % TODO: implement automatic single-echo processing
 end
 
 %%
 % -------
 % STEP 3: 3D volume realignment
-% TODO: implement automatic multi-echo processing
 % -------
-% Realign raw timeseries data
-if ~exist(options.rfunctional_fn, 'file')
-    disp(['Performing 3D realignment on raw timeseries: ' stre_txt])
-    fmrwhy_batch_realignEstResl(options.functional_fn, options.template_fn, options.rfunctional_fn);
-    disp('Complete!')
-    disp('---')
+motion_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' options.template_echo '_desc-confounds_motion.tsv']);
+motion_struct = tdfread(motion_fn)
+motion_params = struct2array(motion_struct);
+if is_multiecho
+    for e = 1:numel(options.TE)
+        disp('---')
+        disp(['Echo ' num2str(e)])
+        disp('---')
+        % Filler text
+        stre_txt = ['sub-' sub '_task-' task '_run-' run '_echo-' num2str(e)];
+        % Update workflow params with subject functional derivative filenames
+        options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, num2str(e), options);
+        % Realign raw timeseries data
+        if ~exist(options.rfunctional_fn, 'file')
+            disp(['Performing 3D realignment on raw timeseries: ' stre_txt])
+            fmrwhy_util_applyTransform(options.functional_fn, motion_params, options.template_fn, options.rfunctional_fn)
+            disp('Complete!')
+            disp('---')
+        else
+            disp(['3D realignment already completed for raw timeseries: ' stre_txt])
+            disp('---')
+        end
+        % Realign slice time corrected timeseries data
+        if ~exist(options.rafunctional_fn, 'file')
+            disp(['Performing 3D realignment on slice time corrected timeseries: ' stre_txt])
+            fmrwhy_util_applyTransform(options.afunctional_fn, motion_params, options.template_fn, options.rafunctional_fn)
+            disp('Complete!')
+            disp('---')
+        else
+            disp(['3D realignment already completed for slice time corrected timeseries: ' stre_txt])
+            disp('---')
+        end
+    end
 else
-    disp(['3D realignment already completed for raw timeseries: ' stre_txt])
-    disp('---')
-end
-% Realign slice time corrected timeseries data
-if ~exist(options.rafunctional_fn, 'file')
-    disp(['Performing 3D realignment on slice time corrected timeseries: ' stre_txt])
-    fmrwhy_batch_realignEstResl(options.afunctional_fn, options.template_fn, options.rafunctional_fn);
-    disp('Complete!')
-    disp('---')
-else
-    disp(['3D realignment already completed for slice time corrected timeseries: ' stre_txt])
-    disp('---')
+    % TODO: implement automatic single-echo processing
+    % fmrwhy_batch_realignEstResl(options.functional_fn, options.template_fn, options.rfunctional_fn);
+    % fmrwhy_batch_realignEstResl(options.afunctional_fn, options.template_fn, options.rafunctional_fn);
 end
 
 %%
 % -------
 % STEP 4: spatial smoothing
-% TODO: implement automatic multi-echo processing
 % -------
-% Smooth raw timeseries data
-if ~exist(options.sfunctional_fn, 'file')
-    disp(['Performing spatial smoothing on raw timeseries: ' stre_txt])
-    fmrwhy_batch_smooth(options.functional_fn, options.sfunctional_fn, options.fwhm);
-    disp('Complete!')
-    disp('---')
+if is_multiecho
+    for e = 1:numel(options.TE)
+        disp('---')
+        disp(['Echo ' num2str(e)])
+        disp('---')
+        % Filler text
+        stre_txt = ['sub-' sub '_task-' task '_run-' run '_echo-' num2str(e)];
+        % Update workflow params with subject functional derivative filenames
+        options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, num2str(e), options);
+        % Smooth raw timeseries data
+        if ~exist(options.sfunctional_fn, 'file')
+            disp(['Performing spatial smoothing on raw timeseries: ' stre_txt])
+            fmrwhy_batch_smooth(options.functional_fn, options.sfunctional_fn, options.fwhm);
+            disp('Complete!')
+            disp('---')
+        else
+            disp(['Spatial smoothing already completed for raw timeseries: ' stre_txt])
+            disp('---')
+        end
+        % Smooth realigned timeseries data
+        if ~exist(options.srfunctional_fn, 'file')
+            disp(['Performing spatial smoothing on realigned timeseries: ' stre_txt])
+            fmrwhy_batch_smooth(options.rfunctional_fn, options.srfunctional_fn, options.fwhm);
+            disp('Complete!')
+            disp('---')
+        else
+            disp(['Spatial smoothing already completed for realigned timeseries: ' stre_txt])
+            disp('---')
+        end
+        % Smooth realigned and slice time corrected timeseries data
+        if ~exist(options.srafunctional_fn, 'file')
+            disp(['Performing spatial smoothing on realigned and slice time corrected timeseries: ' stre_txt])
+            fmrwhy_batch_smooth(options.rafunctional_fn, options.srafunctional_fn, options.fwhm);
+            disp('Complete!')
+            disp('---')
+        else
+            disp(['Spatial smoothing already completed for realigned and slice time corrected timeseries: ' stre_txt])
+            disp('---')
+        end
+    end
 else
-    disp(['Spatial smoothing already completed for raw timeseries: ' stre_txt])
-    disp('---')
-end
-% Smooth realigned timeseries data
-if ~exist(options.srfunctional_fn, 'file')
-    disp(['Performing spatial smoothing on realigned timeseries: ' stre_txt])
-    fmrwhy_batch_smooth(options.rfunctional_fn, options.srfunctional_fn, options.fwhm);
-    disp('Complete!')
-    disp('---')
-else
-    disp(['Spatial smoothing already completed for realigned timeseries: ' stre_txt])
-    disp('---')
-end
-% Smooth realigned and slice time corrected timeseries data
-if ~exist(options.srafunctional_fn, 'file')
-    disp(['Performing spatial smoothing on realigned and slice time corrected timeseries: ' stre_txt])
-    fmrwhy_batch_smooth(options.rafunctional_fn, options.srafunctional_fn, options.fwhm);
-    disp('Complete!')
-    disp('---')
-else
-    disp(['Spatial smoothing already completed for realigned and slice time corrected timeseries: ' stre_txt])
-    disp('---')
+    % TODO: implement automatic single-echo processing
+    % fmrwhy_batch_smooth(options.functional_fn, options.sfunctional_fn, options.fwhm);
 end
 
-
+%%
 % -------
-% STEP 5: Generate multiple regressors for GLM analysis and QC
+% STEP 5: Generate multiple regressors for GLM analysis and QC. In case of multiecho: all from template echo timeseries
 % Includes: 3D realignment parameters, framewise displacement, FD censoring, tissue compartment signals, retroicor and HRV+RVT
 % -------
-if ~exist(options.confounds_fn, 'file')
-    disp(['Generating multiple regressors for GLM analysis and QC'])
-    fmrwhy_preproc_generateMultRegr(bids_dir, sub, ses, task, run, echo, options);
-    disp('Complete!')
-    disp('---')
+if is_multiecho
+    echo = options.template_echo;
+    options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+    if ~exist(options.confounds_fn, 'file')
+        disp(['Generating multiple regressors for GLM analysis and QC'])
+        fmrwhy_preproc_generateMultRegr(bids_dir, sub, ses, task, run, echo, options);
+        disp('Complete!')
+        disp('---')
+    else
+        disp(['Multiple regressors already generated: ' options.confounds_fn])
+        disp('---')
+    end
 else
-    disp(['Multiple regressors already generated: ' options.confounds_fn])
-    disp('---')
+    % TODO: implement automatic single-echo processing
 end
+
+

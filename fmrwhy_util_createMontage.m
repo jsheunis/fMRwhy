@@ -97,7 +97,11 @@ else
 end
 ax = subplot(1,1,1);
 im = imagesc(ax, montage.whole_img); colormap(clrmp); %colorbar;
-caxis(ax, cxs);
+if nargin == 8
+    if ~isempty(cxs)
+        caxis(ax, cxs);
+    end
+end
 % title(str);
 montage.im = im;
 montage.f = f;

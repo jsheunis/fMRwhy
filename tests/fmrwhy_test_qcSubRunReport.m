@@ -6,10 +6,6 @@ bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 sub = '001';
 % Loop through sessions, tasks, runs, etc
 ses = '';
-task = 'rest';
-run = '1';
-echo = '2';
-
 
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
@@ -25,12 +21,23 @@ options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
 % TODO: have to loop through runs for this one if we want to generate report for all runs for sub:
-% Update workflow params with subject functional derivative filenames
-% Choose arbitrary echo for now, since this is not needed for current qc report
+% -------
+% PER TASK and RUN
+% -------
+
+% Loop through sessions, tasks, runs, echoes.
+tasks = {'rest', 'motor', 'emotion'};
+runs = {'1', '2'};
+% Note: Choose arbitrary echo for now, since this is not needed for current qc report
 echo = options.template_echo;
-options = fmrwhy_defaults_subFunc(bids_dir, sub, '', task, run, echo, options);
 
-%stats_summary_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_desc-stats_summary.tsv']);
-%stats = tdfread(stats_summary_fn)
+for t = 1:numel(tasks)
+    task = tasks{t};
+    for r = 1:numel(runs)
+        run = runs{r};
+        % Update workflow params with subject functional derivative filenames
+        options = fmrwhy_defaults_subFunc(bids_dir, sub, '', task, run, echo, options);
+        fmrwhy_qc_generateSubRunReport(bids_dir, sub, task, run, options)
+    end
+end
 
-fmrwhy_qc_generateSubRunReport(bids_dir, sub, task, run, options)

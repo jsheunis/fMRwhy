@@ -131,10 +131,10 @@ if run_masks
     % a treshold on the probability values). Also combined GM, WM and CSF to get brain mask.
     [GM_img_bin, WM_img_bin, CSF_img_bin, brain_img_bin] = fmrwhy_util_createBinaryMasks(options.rgm_probseg_fn, options.rwm_probseg_fn, options.rcsf_probseg_fn, 0.5);
     % save masks to file: rtme_util_saveNifti(template_fn, img, new_fn, descrip)
-    fmrwhy_util_saveNifti(options.gm_mask_fn, GM_img_bin, options.template_fn)
-    fmrwhy_util_saveNifti(options.wm_mask_fn, WM_img_bin, options.template_fn)
-    fmrwhy_util_saveNifti(options.csf_mask_fn, CSF_img_bin, options.template_fn)
-    fmrwhy_util_saveNifti(options.brain_mask_fn, brain_img_bin, options.template_fn)
+    fmrwhy_util_saveNifti(options.gm_mask_fn, double(GM_img_bin), options.template_fn)
+    fmrwhy_util_saveNifti(options.wm_mask_fn, double(WM_img_bin), options.template_fn)
+    fmrwhy_util_saveNifti(options.csf_mask_fn, double(CSF_img_bin), options.template_fn)
+    fmrwhy_util_saveNifti(options.brain_mask_fn, double(brain_img_bin), options.template_fn)
     disp('Complete!')
     disp('---')
 else

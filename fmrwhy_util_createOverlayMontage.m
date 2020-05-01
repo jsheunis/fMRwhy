@@ -1,12 +1,17 @@
-function output = fmrwhy_util_createOverlayMontage(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, cxs, saveAs_fn)
+function output = fmrwhy_util_createOverlayMontage(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, cxs, rgbcolors, saveAs_fn)
 % Function to create montages of images/rois overlaid on a template image
 
 % Structure to save output
 output = struct;
-alpha = 0.1;
+alpha = 0.2;
 plot_contour = 1;
-rgbcolors = [255,255,191; 215,25,28; 253,174,97; 171,217,233; 44,123,182]/255;
-%rgbcolors = [215,25,28; 253,174,97; 255,255,191; 171,217,233; 44,123,182]/255;
+if rgbcolors == 0
+    rgbcolors = [255,255,191; 215,25,28; 253,174,97; 171,217,233; 44,123,182]/255;
+    %rgbcolors = [215,25,28; 253,174,97; 255,255,191; 171,217,233; 44,123,182]/255;
+else
+    rgbcolors = rgbcolors/255;
+end
+
 
 % Create background montage
 montage_template = fmrwhy_util_createMontage(template_img, columns, rotate, 'Template volume', clrmp, 'off', shape, cxs);
@@ -23,8 +28,10 @@ end
 f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
 im1 = imagesc(montage_template.whole_img);
 colormap(clrmp);
-colorbar;
-caxis(cxs);
+colorbar; % TODO: decide if this needs to be user-specified or not
+if ~isempty(cxs)
+    caxis(cxs)
+end
 ax = gca;
 %if cxs ~= 0
 %    caxis(ax, cxs);

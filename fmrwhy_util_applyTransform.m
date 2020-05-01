@@ -25,6 +25,7 @@ for i = 1:N_vol
     tfunctional_spm(i).fname = saveAs_fn;
     tfunctional_spm(i).private.dat.fname = saveAs_fn;
     spm_write_vol(tfunctional_spm(i),functional_img(:,:,:,i));
+    % TODO: replace this with dicm2nii equivalent (ask on github repo)
 end
 
 % Reslice all volumes with reference to template volume

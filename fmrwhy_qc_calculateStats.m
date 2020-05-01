@@ -6,7 +6,7 @@ function stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional_fn)
 
 % First access and reshape the functional data: 4D to 2D
 nii = nii_tool('load', functional_fn);
-data_4D = nii.img;
+data_4D = double(nii.img);
 [Ni, Nj, Nk, Nt] = size(data_4D);
 data_2D = reshape(data_4D, Ni*Nj*Nk, Nt); %[voxels, time]
 data_2D = data_2D'; %[time, voxels]

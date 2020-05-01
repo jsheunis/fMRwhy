@@ -32,6 +32,7 @@ disp('---')
 disp('STEP 1: Estimate 3D volume realignment parameters')
 disp('---')
 % Check if this has already been done by seeing if the tsv file with head movement parameters exist
+% First access template timeseries informatopn
 options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, options.template_echo, options);
 %options.motion_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' options.template_echo '_desc-confounds_motion.tsv'])
 [d, f, e] = fileparts(options.motion_fn);

@@ -25,23 +25,26 @@ end
 output = struct;
 me_data = struct;
 fn = me_fns{1};
-vols = spm_vol(fn);
-Ni = vols(1).dim(1);
-Nj = vols(1).dim(2);
-Nk = vols(1).dim(3);
-Nt = numel(vols);
-mask_3D = spm_read_vols(spm_vol(mask_fn));
+% Load timeseries data
+nii = nii_tool('load', fn);
+data_4D = nii.img; % [Ni x Nj x Nk x Nt]
+[Ni, Nj, Nk, Nt] = size(data_4D);
+% Load mask data
+nii = nii_tool('load', mask_fn);
+mask_3D = double(nii.img);
 mask_2D = reshape(mask_3D, Ni*Nj*Nk, 1); %[voxels, 1]
 I_mask = find(mask_2D); %[voxels, 1]
 I_mask = I_mask'; %[1, voxels]
 % TODO: implement adaptive mask similar to tedana? See: https://github.com/ME-ICA/tedana/blob/master/tedana/utils.py
+
 
 % -------
 % STEP 3: For each echo timeseries, read data, reshape data, detrend data, and calculate timeseries mean
 % -------
 for e = 1:Nme
     % Read functional timeseries data for echo = e
-    data_4D = spm_read_vols(spm_vol(me_fns{e}));
+    nii = nii_tool('load', me_fns{e});
+    data_4D = double(nii.img); % [Ni x Nj x Nk x Nt]
     % Reshape to 2D matrix of time x voxels
     data_2D = reshape(data_4D, Ni*Nj*Nk, Nt); %[voxels, time]
     me_data(e).data_2D = data_2D'; %[time, voxels]
@@ -93,8 +96,9 @@ S0_3D = reshape(S0, Ni, Nj, Nk);
 S0_3D_thresholded = reshape(S0_thresholded, Ni, Nj, Nk);
 
 % Save to file, if required
-fmrwhy_util_saveNifti(saveAs_t2star_fn, T2star_3D_thresholded, template_fn);
-fmrwhy_util_saveNifti(saveAs_s0_fn, S0_3D_thresholded, template_fn);
+no_scaling = 1;
+fmrwhy_util_saveNifti(saveAs_t2star_fn, T2star_3D_thresholded, template_fn, no_scaling);
+fmrwhy_util_saveNifti(saveAs_s0_fn, S0_3D_thresholded, template_fn, no_scaling);
 
 % Save output variables
 output.T2star_3D = T2star_3D;

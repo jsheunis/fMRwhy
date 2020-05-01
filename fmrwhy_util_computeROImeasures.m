@@ -20,11 +20,9 @@ fontsizeM = 13;
 %functional4D_fn = options.sfunctional_fn;
 
 % Get image information
-func_spm = spm_vol(functional_fn);
-Nt = numel(func_spm);
-Ni = func_spm(1).dim(1);
-Nj = func_spm(1).dim(2);
-Nk = func_spm(1).dim(3);
+[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(functional_fn);
+data_4D = double(p.nii.img);
+[Ni, Nj, Nk, Nt] = size(data_4D);
 
 % Load multiple confound regressors
 %confounds_struct = tdfread(options.confounds_fn);
@@ -40,10 +38,10 @@ Nvox_roi = numel(I_roi)
 
 % Load tSNR data
 % (this tsnr image provided as argument will typically be calculated from slice time corrected and realigned data)
-tsnr = spm_read_vols(spm_vol(tsnr_fn));
+[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_fn);
+tsnr = double(p.nii.img);
 
 % Load functional timeseries
-data_4D = spm_read_vols(func_spm);
 data_2D = reshape(data_4D, Ni*Nj*Nk, Nt); %[voxels, time]
 data_2D = data_2D'; %[time, voxels]
 
@@ -100,7 +98,7 @@ Rcorr = corr(ROI_signals', ROI_time_series');
 [R_sorted, I_sorted] = sort(Rcorr,'descend');
 all_img = ROI_signals(I_sorted, :);
 % Plot
-f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', 'on');
+f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', 'off');
 % Ax1 - The Plot
 ax1 = subplot(7,1,[4:7]);
 imagesc(ax1, all_img); colormap(gray); caxis(intensity_scale);

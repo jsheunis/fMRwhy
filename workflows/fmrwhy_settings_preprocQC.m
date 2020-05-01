@@ -25,10 +25,12 @@ settings.TE = [14 28 42];
 settings.Ne = numel(settings.TE);
 
 % Dataset parameters
-settings.Nsessions = 2;
-settings.Nruns = 2;
+settings.sessions = {[]};
+settings.Nsessions = numel(settings.sessions);
 settings.tasks = {'rest', 'motor', 'emotion'};
 settings.Ntasks = numel(settings.tasks);
+settings.runs = {'1', '2'};
+settings.Nruns = numel(settings.runs);
 
 % Settings for structFunc processing
 
@@ -36,17 +38,19 @@ settings.Ntasks = numel(settings.tasks);
 settings.map_rois = 1;
 settings.roi_orig_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_templates';
 settings.roi = struct;
+% IMPORTANT: structure has to be named using the task name as in settings.tasks: settings.roi.(task).orig_fn
 settings.roi.motor.orig_fn = {fullfile(settings.roi_orig_dir, 'Left_Motor_4a_4p.nii'),
                                 fullfile(settings.roi_orig_dir, 'Right_Motor_4a_4p.nii')}; % Raw ROI filenames
 
 settings.roi.motor.name = {'Left Motor', 'Right Motor'}; % For plots and strings
 settings.roi.motor.desc = {'leftMotor', 'rightMotor'}; % For BIDS file naming (after normalisation  to functional space)
 
-settings.roi.emotion.orig_fn = {fullfile(settings.roi_orig_dir, 'Left_Amygdala_allregions.nii'),
+settings.roi.emotion.orig_fn = {fullfile(settings.roi_orig_dir, 'Bilateral_Amygdala_allregions.nii'),
+                                fullfile(settings.roi_orig_dir, 'Left_Amygdala_allregions.nii'),
                                 fullfile(settings.roi_orig_dir, 'Right_Amygdala_allregions.nii')}; % Raw ROI filenames
 
-settings.roi.emotion.name = {'Left Amygdala', 'Right Amygdala'}; % For plots and strings
-settings.roi.emotion.desc = {'leftAmygdala', 'rightAmygdala'}; % For BIDS file naming (after normalisation  to functional space)
+settings.roi.emotion.name = {'Bilateral Amygdala', 'Left Amygdala', 'Right Amygdala'}; % For plots and strings
+settings.roi.emotion.desc = {'bilateralAmygdala', 'leftAmygdala', 'rightAmygdala'}; % For BIDS file naming (after normalisation  to functional space)
 
 %settings.roi.(task).roi_fn = ROIs in subject space (not resliced)
 %settings.roi.(task).rroi_fn = resliced ROIs in subject space

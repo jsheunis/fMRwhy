@@ -28,7 +28,7 @@
         </div>
         <br>
         <div id="summary">
-            <h2>Summary</h2>
+            <h2>Summary: param_report_name</h2>
             <br>
             <table class="qcsummary">
               <tr>
@@ -192,9 +192,13 @@
             <br>
             <h4 id="tempqcplots">Temporal QC plots</h4>
             <div class="tab2">
-              <button id="button2" class="tablinks2 active" onclick="openTab2(event, 'grayplot_ro')">Grayplot (compartment ordered)</button>
-              <button class="tablinks2" onclick="openTab2(event, 'grayplot_gso')">Grayplot (global signal ordered)</button>
-<!--                <button class="tablinks2" onclick="openTab2(event, 'tsplot')">Time series plots</button>-->
+              <button id="button2" class="tablinks2 active" onclick="openTab2(event, 'grayplot_ro')">Brain (tissue type ordered)</button>
+              <button class="tablinks2" onclick="openTab2(event, 'grayplot_gso')">Brain (global signal ordered)</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_lmotor')">Left motor cortex</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_rmotor')">Right motor cortex</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_lamy')">Left amygdala</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_ramy')">Right amygdala</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_biamy')">Bilateral amygdala</button>
             </div>
             <!-- Tab content -->
             <div id="grayplot_ro" class="tabcontent2">
@@ -203,9 +207,21 @@
             <div id="grayplot_gso" class="tabcontent2">
               <img src="param_gsograyplot_img" alt="no picture" style="width:95%;">
             </div>
-<!--            <div id="tsplot" class="tabcontent2">-->
-<!--              <img src="param_gsograyplot_img" alt="no picture" style="width:95%;">-->
-<!--            </div>-->
+            <div id="grayplot_lmotor" class="tabcontent2">
+              <img src="param_leftMotorgrayplot_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="grayplot_rmotor" class="tabcontent2">
+              <img src="param_rightMotorgrayplot_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="grayplot_lamy" class="tabcontent2">
+              <img src="param_leftAmygrayplot_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="grayplot_ramy" class="tabcontent2">
+              <img src="param_rightAmygrayplot_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="grayplot_biamy" class="tabcontent2">
+              <img src="param_biAmygrayplot_img" alt="no picture" style="width:95%;">
+            </div>
             <br>
             <h4 id="physqcplots">Physiology QC plots (from PhysIO)</h4>
             <img src="param_physioqc_img" alt="no picture" style="width:50%;">

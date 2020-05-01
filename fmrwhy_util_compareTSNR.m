@@ -15,7 +15,7 @@ function fmrwhy_util_compareTSNR(tsnr_fns, mask_fn, roi_fns, I_roi_distr, roi_te
 percentage_threshold = 200;
 
 % Get mask indices
-[p_mask, frm, rg, dim_mask] = fmrwhy_util_readNifti(mask_fn);
+[p_mask, frm, rg, dim_mask] = fmrwhy_util_readOrientNifti(mask_fn);
 mask_img = p_mask.nii.img;
 I_mask = find(mask_img(:));
 
@@ -24,8 +24,8 @@ tsnr_img = {};
 diff = {};
 perc_diff = {};
 for i = 1:numel(tsnr_fns)
-    [p, frm, rg, dim] = fmrwhy_util_readNifti(tsnr_fns{i});
-    tsnr_img{i} = p.nii.img .* mask_img;
+    [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_fns{i});
+    tsnr_img{i} = double(p.nii.img);
     if i > 1
         diff{i-1} = tsnr_img{i} - tsnr_img{1};
         perc_diff{i-1} = diff{i-1}./tsnr_img{1}*100;
@@ -37,7 +37,7 @@ end
 roi_img = zeros(dim_mask);
 overlay_img = {};
 for i = 1:numel(roi_fns)
-    [p, frm, rg, dim] = fmrwhy_util_readNifti(roi_fns{i});
+    [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(roi_fns{i});
     overlay_img{i} = fmrwhy_util_createBinaryImg(p.nii.img, 0.1);
     roi_img = roi_img | overlay_img{i};
 end
@@ -53,12 +53,12 @@ end
 for i = 1:numel(tsnr_img)
 
     if ~exist(tsnr_saveAs_fns{i}, 'file')
-        overlaymontage = fmrwhy_util_createOverlayMontage(tsnr_img{i}, roi_img, 9, 1, '', 'hot', 'off', 'max', [0 200], tsnr_saveAs_fns{i});
+        overlaymontage = fmrwhy_util_createOverlayMontage(tsnr_img{i}, roi_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [33, 168, 10], tsnr_saveAs_fns{i});
     end
 end
 for i = 1:numel(perc_diff)
     if ~exist(perc_saveAs_fns{i}, 'file')
-        overlaymontage = fmrwhy_util_createOverlayMontage(perc_diff{i}, roi_img, 9, 1, '', 'parula', 'off', 'max', [0 300], perc_saveAs_fns{i});
+        overlaymontage = fmrwhy_util_createOverlayMontage(perc_diff{i}, roi_img, 9, 1, '', 'parula', 'off', 'max', [0 300], [215,25,28], perc_saveAs_fns{i});
     end
 end
 

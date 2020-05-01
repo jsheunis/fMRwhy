@@ -112,7 +112,7 @@ fmrwhy_batch_coregResl(reslice_fns, template_fn, saveAs_fns)
 % STEP 4:  Create overlay montages
 % -------
 count = 0;
-[p1, frm1, rg1, dim1] = fmrwhy_util_readOrientNifti(template_fn);
+[p1, frm1, rg1, dim1] = fmrwhy_util_readOrientNifti(options.rcoregest_anatomical_fn);
 % Loop through all tasks in BIDS structure
 for i = 1:numel(options.tasks)
     % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
@@ -121,10 +121,10 @@ for i = 1:numel(options.tasks)
         for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
             count = count+1;
             [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(options.roi.(options.tasks{i}).rroi_fn{j});
-            overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0);
+            overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
             title = options.roi.(options.tasks{i}).name{j}
             saveAs_fn = fullfile(options.anat_dir_qc, ['sub-' sub '_space-individual_desc-' options.roi.(options.tasks{i}).desc{j} '_roi_montage.png']);
-            fmrwhy_util_createOverlayMontage(p1.nii.img, overlay_img, 9, 1, title, 'gray', 'off', 'max', saveAs_fn);
+            fmrwhy_util_createOverlayMontage(p1.nii.img, overlay_img, 9, 1, title, 'gray', 'off', 'max', [], [255, 0, 0], saveAs_fn);
         end
     end
 end

@@ -31,6 +31,7 @@ function fmrwhy_util_thePlotROI(functional_fn, mask_fn, roi_fn, task_info, trace
 intensity_scale = [-6 6]; % scaling for plot image intensity, see what works
 fontsizeL = 15;
 fontsizeM = 13;
+visibility = 'off';
 
 %ordering = 0; % ordering of voxels in ThePlotSPM;
 % 0 = Random order via standard Matlab indexing (RO)
@@ -44,7 +45,7 @@ fontsizeM = 13;
 % ------ %
 % Load timeseries data, get image and time dimensions, transform data
 nii = nii_tool('load', functional_fn);
-data_4D = nii.img;
+data_4D = double(nii.img);
 [Ni, Nj, Nk, Nt] = size(data_4D); % [Ni x Nj x Nk x Nt]
 data_2D = reshape(data_4D, Ni*Nj*Nk, Nt); %[voxels, time]
 data_2D = data_2D'; %[time, voxels]
@@ -59,11 +60,15 @@ mask_I = mask_I'; % [1 x Nmaskvoxels]
 % Load ROI data
 roi_nii = nii_tool('load', roi_fn);
 roi_3D = roi_nii.img; % [Ni x Nj x Nk]
+roi_3D = fmrwhy_util_createBinaryImg(roi_3D, 0.1);
 roi_2D = reshape(roi_3D, Ni*Nj*Nk, 1); % [Ni*Nj*Nk x 1]
 roi_I = find(roi_2D); % [Nroivoxels x 1]
 roi_I = roi_I'; % [1 x Nroivoxels]
 
 % TODO: make sure that roi_I and mask_I are the correct format, length, orientation, etc.
+
+% Load task data
+[task_time_course, convolved_ttc] = fmrwhy_util_createBlockParadigm(Nt, task_info.TR, task_info.onsets, task_info.durations, task_info.precision);
 
 % ------ %
 % STEP 2 %
@@ -130,20 +135,20 @@ for i = 1:numel(colors_hex)
 end
 
 % Order voxels
-ROI_signals = F_2D_psc(I_roi, :);
+ROI_signals = F_2D_psc(roi_I, :);
 ROI_time_series = mean(ROI_signals, 1);
 Rcorr = corr(ROI_signals', ROI_time_series');
 [R_sorted, I_sorted] = sort(Rcorr,'descend');
 all_img = ROI_signals(I_sorted, :);
 % Plot
-f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', 'on');
+f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
 % Ax1 - The Plot
 ax1 = subplot(7,1,[4:7]);
 imagesc(ax1, all_img); colormap(gray); caxis(intensity_scale);
-xlabel(ax1, 'fMRI volumes','fontsize',fontsizeM)
-xlim(ax1,[0 Nt])
+xlabel(ax1, 'fMRI volumes','fontsize',fontsizeM);
+xlim(ax1,[0 Nt]);
 set(ax1,'Yticklabel',[]);
-fmrwhy_util_stretchAx(ax1)
+fmrwhy_util_stretchAx(ax1);
 axpos = ax1.Position;
 % Ax2 - Task paradigm
 ax2 = subplot(7,1,1);
@@ -153,23 +158,23 @@ im_task = imagesc(ax2, task_time_course'); colormap(gray);
 %plot(ax2, wm, 'LineWidth', 2, 'Color', colors_rgb{2});
 %plot(ax2, csf, 'LineWidth', 2, 'Color', colors_rgb{3});
 %hold(ax2, 'off')
-xlim(ax2,[0 Nt])
+xlim(ax2,[0 Nt]);
 %ylim(ax2,[0 7.5])
 set(ax2,'Xticklabel',[]);
 set(ax2,'Yticklabel',[]);
 ax2.XAxis.Visible = 'off';
 ax2.YAxis.Visible = 'off';
-fmrwhy_util_stretchAx(ax2)
+fmrwhy_util_stretchAx(ax2);
 ax2.Position(1) = axpos(1); ax2.Position(3) = axpos(3);
-title(title_str)
+
 % Ax3 - Convolved task
 ax3 = subplot(7,1,2);
 plot(ax3, convolved_ttc, 'LineWidth', 2, 'Color', colors_rgb{1});
 %hold(ax3, 'on')
 %plot(ax3, card, 'LineWidth', 2, 'Color', colors_rgb{5});
 %hold(ax3, 'off')
-xlim(ax3,[0 Nt])
-ylim(ax3,[-0.5 1.5])
+xlim(ax3,[0 Nt]);
+ylim(ax3,[-0.5 1.5]);
 set(ax3,'Xticklabel',[]);
 set(ax3,'Yticklabel',[]);
 ax3.XAxis.Visible = 'off';
@@ -180,13 +185,13 @@ ax3.Position(1) = axpos(1); ax3.Position(3) = axpos(3);
 ax4 = subplot(7,1,3);
 ROI_ts = fmrwhy_util_scale(ROI_time_series,-scale_f,scale_f);
 plot(ax4, ROI_time_series, 'LineWidth', 2, 'Color', colors_rgb{3});
-xlim(ax4,[0 Nt])
-ylim(ax4,[-2 2])
+xlim(ax4,[0 Nt]);
+ylim(ax4,[-2 2]);
 set(ax4,'Xticklabel',[]);
 set(ax4,'Yticklabel',[]);
 ax4.XAxis.Visible = 'off';
 ax4.YAxis.Visible = 'off';
-fmrwhy_util_stretchAx(ax4)
+fmrwhy_util_stretchAx(ax4);
 ax4.Position(1) = axpos(1); ax4.Position(3) = axpos(3);
 %% [left bottom width height]
 ax1pos = ax1.OuterPosition;
@@ -204,4 +209,6 @@ h_txt(1) = text(ax3, 2, 1.2, 'Task', 'Color', colors_rgb{1},'FontSize',14);
 h_txt(2) = text(ax4, 2, 1.5, 'ROI signal', 'Color', colors_rgb{3},'FontSize',14);
 
 % Save figure
-print(f, saveAs_fn,'-dpng')
+if ~exist(saveAs_fn, 'file')
+    print(f, saveAs_fn,'-dpng')
+end

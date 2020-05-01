@@ -20,16 +20,13 @@ graph TD
     
     A --> B1
     B1 --> B2
-    B2 --> B2
 
     subgraph For all subjects
         B2 --> B3
         subgraph Per subject
             B3 --> C1
-            C1 --> C1
             C1 --> C2
             subgraph Per run
-                C2 --> C2
                 C2 --> D
                 D --> E
                 E --> F
@@ -39,9 +36,6 @@ graph TD
         end
     end
 ```
-
-
-
 
 
 
@@ -94,9 +88,7 @@ graph TD
     
 
     subgraph Preprocessing for all tasks/runs
-    C --> C
     C --> D
-    D --> D
     D --> E
     end
 
@@ -105,9 +97,7 @@ graph TD
     end
 
     subgraph Preprocessing for all tasks/runs
-    I --> I
     I --> J
-    J --> J
     J --> K1
     J --> K2
     J --> K3

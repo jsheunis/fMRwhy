@@ -38,6 +38,7 @@ options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
 intensity_scale = options.theplot.intensity_scale; % scaling for plot image intensity, see what works
 fontsizeL = 15;
 fontsizeM = 13;
+visibility = 'off';
 
 %ordering = 0; % ordering of voxels in ThePlotSPM;
 % 0 = Random order via standard Matlab indexing (RO)
@@ -114,7 +115,7 @@ WM_img = F_2D_psc(I_WM, :);
 CSF_img = F_2D_psc(I_CSF, :);
 all_img = [GM_img; WM_img; CSF_img];
 % Plot
-f = figure('units','normalized','outerposition',[0 0 1 1]);
+f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
 % Ax1 - The Plot
 ax1 = subplot(7,1,[4:7]);
 imagesc(ax1, all_img); colormap(gray); caxis(intensity_scale);
@@ -196,9 +197,9 @@ for i = 1:6
 end
 % Save figure
 theplot_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-RO_grayplot.png']);
-%if ~exist(theplot_fn, 'file')
+if ~exist(theplot_fn, 'file')
     print(f,theplot_fn,'-dpng')
-%end
+end
 
 % ---
 % Figure 1 - ordering 1
@@ -211,7 +212,7 @@ Rcorr = corr(F_masked_psc', GM_time_series');
 [R_sorted, I_sorted] = sort(Rcorr,'descend');
 all_img = F_masked_psc(I_sorted, :);
 % Plot
-f = figure('units','normalized','outerposition',[0 0 1 1]);
+f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
 % Ax1 - The Plot
 ax1 = subplot(7,1,[4:7]);
 imagesc(ax1, all_img); colormap(gray); caxis(intensity_scale);
@@ -281,9 +282,9 @@ for i = 1:6
 end
 % Save figure
 theplot_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GSO_grayplot.png']);
-%if ~exist(theplot_fn, 'file')
+if ~exist(theplot_fn, 'file')
     print(f,theplot_fn,'-dpng')
-%end
+end
 
 
 

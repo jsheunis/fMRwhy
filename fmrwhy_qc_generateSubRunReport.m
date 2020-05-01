@@ -50,6 +50,7 @@ report.param_asset_js = fullfile(options.fmrwhy_dir, 'assets/fmrwhy_reports.js')
 report.param_avatar = fullfile(options.fmrwhy_dir, 'img/logo_jsheunis_3.jpeg');
 % Details about study, subject, data, etc
 report.param_sub = sub;
+report.param_report_name = ['sub-' sub '_task-' task '_run-' run];
 report.param_datetime = t;
 % Anatomical montage image locations
 report.param_brain_mask = fullfile(options.anat_dir_qc, ['sub-' sub '_brain_mask_montage.png']); % /Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_brain_mask_montage.png
@@ -88,8 +89,14 @@ report.param_std_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '
 % Functional timeseries image locations
 report.param_rograyplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-RO_grayplot.png']);
 report.param_gsograyplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GSO_grayplot.png']);
-report.param_physioqc_img = fullfile(options.func_dir_qc, ['PhysIO_task-' task '_run-' run], 'PhysIO_output_level2_04.jpg');
-
+% TODO: this is hardcoded for this study, need to generalise it
+report.param_leftMotorgrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-leftMotor_grayplot.png']);
+report.param_rightMotorgrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rightMotor_grayplot.png']);
+report.param_leftAmygrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-leftAmygdala_grayplot.png']);
+report.param_rightAmygrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rightAmygdala_grayplot.png']);
+report.param_biAmygrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-bilateralAmygdala_grayplot.png']);
+% PhysIO QC image locations
+report.param_physioqc_img = fullfile(options.func_dir_qc, ['PhysIO_task-' task '_run-' run], ['sub-' sub '_task-' task '_run-' run '_physioQC_03.jpg']);
 
 
 % -----------------------------------------------------
