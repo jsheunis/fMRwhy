@@ -2,17 +2,44 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link rel="stylesheet" href="assets/fmrwhy_reports.css">
+        <link rel="stylesheet" href="fmrwhy_reports.css">
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <script src="assets/fmrwhy_reports.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="fmrwhy_reports.js"></script>
+
+<!--        <script type="application/json" id="params">-->
+<!--            {-->
+<!--                "unicorns": "awesome",-->
+<!--                "tasks": ["rest", "motor", "emotion"]-->
+<!--            }-->
+<!--        </script>-->
+        <script>
+            var data = {
+                "items": [
+                    {
+                      "key": "First",
+                      "value": 100
+                    },{
+                      "key": "Second",
+                      "value": false
+                    },{
+                      "key": "Last",
+                      "value": "Mixed"
+                    }
+                  ]
+            };
+        </script>
         <script>
         window.onload = function() {
             document.getElementById("button1").click();
             document.getElementById("button2").click();
             document.getElementById("button3").click();
             document.getElementById("button4").click();
+            document.getElementById('colorselector').value="red";
+            $('#colorselector').trigger('change');
         };
         </script>
+
     </head>
     <body>
         <div class="topnav">
@@ -20,13 +47,32 @@
           <a href="#anat">Anatomical</a>
           <a href="#func">Functional</a>
           <div class="topnav-centered">
-            <img src="img/logo_jsheunis_3.jpeg" alt="Avatar" class="avatar">
+            <img src="../img/logo_jsheunis_3.jpeg" alt="Avatar" class="avatar">
           </div>
           <div class="topnav-right">
               <a href="#home">fMRwhy Quality Report</a>
           </div>
         </div>
         <br>
+        <a href="#" id="get-data">Get JSON data</a>
+        <div id="show-data"></div>
+<!--        <div>-->
+<!--            <button onclick="$.getJSON('data', function(data) {-->
+<!--                $(function() {-->
+<!--                var x = JSON.parse($('#params').html());-->
+<!--                alert(x.name); //Foo-->
+<!--             });-->
+<!--            });">click</button>-->
+<!--            <select onchange="$('#imageToSwap').attr('src', this.options[this.selectedIndex].value);">-->
+<!--                <option value="http://cdns2.freepik.com/free-photo/facebook-logo_318-49940.jpg" selected>Facebook</option>-->
+<!--                <option value="http://cdns2.freepik.com/free-photo/twitter-logo_318-40459.jpg">Twitter</option>-->
+<!--                <option value="http://cdns2.freepik.com/free-photo/instagram-social-network-logo-of-photo-camera_318-64651.jpg">Instagram</option>-->
+<!--            </select>-->
+
+<!--            <br><br>-->
+
+<!--            <img id="imageToSwap" class="profile" src="http://cdns2.freepik.com/free-photo/facebook-logo_318-49940.jpg">-->
+<!--        </div>-->
         <div id="summary">
             <h2>Summary</h2>
             <br>
@@ -78,16 +124,16 @@
             <br>
             <!-- Tab content -->
             <div id="brain" class="tabcontent3">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_brain_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_brain_mask_montage.png" alt="no picture" style="width:95%;">
             </div>
             <div id="gm" class="tabcontent3">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_GM_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_GM_mask_montage.png" alt="no picture" style="width:95%;">
             </div>
             <div id="wm" class="tabcontent3">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_WM_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_WM_mask_montage.png" alt="no picture" style="width:95%;">
             </div>
             <div id="csf" class="tabcontent3">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_CSF_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_CSF_mask_montage.png" alt="no picture" style="width:95%;">
             </div>
 
             <br>
@@ -101,16 +147,16 @@
             <br>
             <!-- Tab content -->
             <div id="roi1" class="tabcontent4">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_brain_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_brain_mask_montage.png" alt="no picture" style="width:95%;">
             </div>
             <div id="roi2" class="tabcontent4">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_GM_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_GM_mask_montage.png" alt="no picture" style="width:95%;">
             </div>
             <div id="roi3" class="tabcontent4">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_WM_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_WM_mask_montage.png" alt="no picture" style="width:95%;">
             </div>
             <div id="roi4" class="tabcontent4">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_CSF_mask_montage.png" alt="no picture" style="width:95%;">
+              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/anat/sub-001_CSF_mask_montage.png" alt="no picture" style="width:95%;">
             </div>
 
         </div>
@@ -129,6 +175,8 @@
                 </ul>
             </p>
             <br>
+
+
             <h4 id="funcsummary">Functional QC metrics summary</h4>
                 <table class="qcsummary">
                   <tr>
@@ -173,6 +221,22 @@
                   </tr>
                 </table>
             <br>
+
+            <!--            The options in this part will all be written to file in a for loop-->
+            <div class="button dropdown">
+              <select id="runselector">
+                 <option value="rest_run-1">Rest - Run 1</option>
+                 <option value="motor_run-1">Motor - Run 1</option>
+                  <option value="emotion_run-1">Emotion - Run 1</option>
+                  <option value="rest_run-2">Rest - Run 2</option>
+                  <option value="motor_run-2">Motor - Run 2</option>
+                  <option value="emotion_run-2">Emotion - Run 2</option>
+              </select>
+            </div>
+
+            <br>
+            <br>
+
             <h4 id="spatialqcplots">Spatial QC plots</h4>
             <div class="tab1">
               <button id="button1" class="tablinks1 active" onclick="openTab1(event, 'mean')">Mean EPI</button>
@@ -182,14 +246,15 @@
             <br>
             <!-- Tab content -->
             <div id="mean" class="tabcontent1">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_mean.png" alt="no picture" style="width:95%;">
+              <img id="mean_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_mean.png" alt="no picture" style="width:95%;">
             </div>
             <div id="std" class="tabcontent1">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_std.png" alt="no picture" style="width:95%;">
+              <img id="std_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_std.png" alt="no picture" style="width:95%;">
             </div>
             <div id="tsnr" class="tabcontent1">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_tsnr.png" alt="no picture" style="width:95%;">
+              <img id="tsnr_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_tsnr.png" alt="no picture" style="width:95%;">
             </div>
+
             <br>
             <h4 id="tempqcplots">Temporal QC plots</h4>
             <div class="tab2">
@@ -199,17 +264,34 @@
             </div>
             <!-- Tab content -->
             <div id="grayplot_ro" class="tabcontent2">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-RO_grayplot.png" alt="no picture" style="width:95%;">
+              <img id="grayplot_ro_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-RO_grayplot.png" alt="no picture" style="width:95%;">
             </div>
             <div id="grayplot_gso" class="tabcontent2">
-              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-GSO_grayplot.png" alt="no picture" style="width:95%;">
+              <img id="grayplot_gso_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-GSO_grayplot.png" alt="no picture" style="width:95%;">
             </div>
 <!--            <div id="tsplot" class="tabcontent2">-->
-<!--              <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-GSO_grayplot.png" alt="no picture" style="width:95%;">-->
+<!--              <img src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-GSO_grayplot.png" alt="no picture" style="width:95%;">-->
 <!--            </div>-->
             <br>
             <h4 id="physqcplots">Physiology QC plots (from PhysIO)</h4>
-            <img src="/Volumes/Stephan_WD/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/PhysIO_output_level2_04.jpg" alt="no picture" style="width:50%;">
+            <img id="physqcplots_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/PhysIO_task-rest_run-1/sub-001_task-rest_run-1_physioQC_03.jpg" alt="no picture" style="width:50%;">
         </div>
+
+        <div class="button dropdown">
+          <select id="colorselector">
+             <option value="red">Red</option>
+             <option value="yellow">Yellow</option>
+             <option value="blue">Blue</option>
+          </select>
+        </div>
+
+        <div class="output">
+          <div id="red" class="colors red">  “Good artists copy, great artists steal” Pablo Picasso</div>
+          <div id="yellow" class="colors yellow"> “Art is the lie that enables us to realize the truth” Pablo Picasso</div>
+          <div id="blue" class="colors blue"> “If I don't have red, I use blue” Pablo Picasso</div>
+        </div>
+
+
     </body>
 </html>
+

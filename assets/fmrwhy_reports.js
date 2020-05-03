@@ -117,3 +117,45 @@ $(document).ready(function() {
     $('#' + $(this).val()).show();
   });
 });
+
+
+$(document).ready(function() {
+  $('#runselector').change(function(){
+
+    // Variables
+    var selectArray = {
+      "rest_run-1": "Rest - Run 1",
+      "motor_run-1": "Motor - Run 1",
+      "emotion_run-1": "Emotion - Run 1",
+      "rest_run-2": "Rest - Run 2",
+      "motor_run-2": "Motor - Run 2",
+      "emotion_run-2": "Emotion - Run 2"
+    };
+
+    var str0 = "/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-";
+    var str1 = "/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/PhysIO_task-";
+    var str2 = "/sub-001_task-";
+    var str3 = "_physioQC_03.jpg";
+    var imgArray = {
+      "mean_img": "_space-individual_mean.png",
+      "std_img": "_space-individual_std.png",
+      "tsnr_img": "_space-individual_tsnr.png",
+      "grayplot_ro_img": "_echo-2_desc-RO_grayplot.png",
+      "grayplot_gso_img": "_echo-2_desc-GSO_grayplot.png",
+      "grayplot_lmotor_img": "_echo-2_desc-leftMotor_grayplot.png",
+      "grayplot_biamy_img": "_echo-2_desc-bilateralAmygdala_grayplot.png"
+    };
+    // Reset sources for images
+    for (var key in imgArray) {
+      console.log("key " + key + " has value " + imgArray[key]);
+      $("#" + key).attr("src", str0 + $(this).val() + imgArray[key]);
+    }
+    $("#physqcplots_img").attr("src", str1 + $(this).val() + str2 + $(this).val() + str3);
+
+    // Reset heading names
+    $("#spatialqcplots").html( "Spatial QC Plots: " + selectArray[$(this).val()] );
+    $("#tempqcplots").html("Temporal QC plots: " + selectArray[$(this).val()] );
+    $("#physqcplots").html("PhysIO QC plots: " + selectArray[$(this).val()] );
+
+  });
+});

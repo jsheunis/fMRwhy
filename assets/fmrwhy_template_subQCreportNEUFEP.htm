@@ -1,0 +1,299 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="param_asset_css">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="param_asset_js"></script>
+        <script>
+            window.onload = function() {
+                document.getElementById("button1").click();
+                document.getElementById("button2").click();
+                document.getElementById("button3").click();
+                document.getElementById("button4").click();
+                document.getElementById('runselector').value="rest_run-1";
+                $('#runselector').trigger('change');
+            };
+        </script>
+    </head>
+    <body>
+        <div class="topnav">
+          <a class="active" href="#summary">Summary</a>
+          <a href="#anat">Anatomical</a>
+          <a href="#func">Functional</a>
+          <div class="topnav-centered">
+            <img src="param_avatar" alt="Avatar" class="avatar">
+          </div>
+          <div class="topnav-right">
+              <a href="#home">fMRwhy Quality Report</a>
+          </div>
+        </div>
+        <br>
+        <div id="summary">
+            <h2>Summary: param_report_name</h2>
+            <br>
+            <table class="qcsummary">
+              <tr>
+                <td>Subject ID</td>
+                <td>param_sub</td>
+              </tr>
+              <tr>
+                <td>Date/time</td>
+                <td>param_datetime</td>
+              </tr>
+              <tr>
+                <td>Anat resolution</td>
+                <td>1x1x1 mm (100x100x100 voxels)</td>
+              </tr>
+              <tr>
+                <td>Func resolution</td>
+                <td>3.5x3.5x3.5 mm 64x64x34 voxels)</td>
+              </tr>
+              <tr>
+                <td>Func acquisition</td>
+                <td>Multi-echo (TE = 14,28,42 ms)</td>
+              </tr>
+              <tr>
+                <td>Func tasks</td>
+                <td>3 (rest, motor, emotion)</td>
+              </tr>
+              <tr>
+                <td>Func runs</td>
+                <td>6 (2 per task)</td>
+              </tr>
+            </table>
+            <br>
+        </div>
+        <br>
+        <div id="anat">
+            <h2>Anatomical QC</h2>
+            <p>
+                The T1w image was coregistered to the template functional image (task-rest_run-1_echo_2, volume 1) using SPM12 coregister/estimate functionality. Before resampling to the functional resolution, this coregistered T1w image was segmented using tissue probability maps and SPM12's unified segmentation algorithm. This yielded subject-specific probability maps for gray matter, white matter, csf, soft tissue, bone and air in the functional space. All of the segmentations where then resampled (coregister/write) to the functional resolution. Masks were generated for gray matter, white matter, csf, and the whole brain (a combination - logical OR after thresholding - of the previous three masks). These are overlaid on the template functional image below, to allow visual inspection of segmentation and registration quality.
+            </p>
+            <h4>T1w coregistration and segmentation</h4>
+            <div class="tab3">
+              <button id="button3" class="tablinks3 active" onclick="openTab3(event, 'brain')">Brain mask</button>
+              <button class="tablinks3" onclick="openTab3(event, 'gm')">Gray matter mask</button>
+              <button class="tablinks3" onclick="openTab3(event, 'wm')">White matter mask</button>
+              <button class="tablinks3" onclick="openTab3(event, 'csf')">CSF mask</button>
+            </div>
+            <br>
+            <!-- Tab content -->
+            <div id="brain" class="tabcontent3">
+              <img src="param_brain_mask" alt="no picture" style="width:95%;">
+            </div>
+            <div id="gm" class="tabcontent3">
+              <img src="param_gm_mask" alt="no picture" style="width:95%;">
+            </div>
+            <div id="wm" class="tabcontent3">
+              <img src="param_wm_mask" alt="no picture" style="width:95%;">
+            </div>
+            <div id="csf" class="tabcontent3">
+              <img src="param_csf_mask" alt="no picture" style="width:95%;">
+            </div>
+
+            <br>
+            <h4>Anatomical localisation</h4>
+            <div class="tab4">
+              <button id="button4" class="tablinks4 active" onclick="openTab4(event, 'roi1')">param_roi_name1</button>
+              <button class="tablinks4" onclick="openTab4(event, 'roi2')">param_roi_name2</button>
+              <button class="tablinks4" onclick="openTab4(event, 'roi3')">param_roi_name3</button>
+              <button class="tablinks4" onclick="openTab4(event, 'roi4')">param_roi_name4</button>
+            </div>
+            <br>
+            <!-- Tab content -->
+            <div id="roi1" class="tabcontent4">
+              <img src="param_roi_img1" alt="no picture" style="width:95%;">
+            </div>
+            <div id="roi2" class="tabcontent4">
+              <img src="param_roi_img2" alt="no picture" style="width:95%;">
+            </div>
+            <div id="roi3" class="tabcontent4">
+              <img src="param_roi_img3" alt="no picture" style="width:95%;">
+            </div>
+            <div id="roi4" class="tabcontent4">
+              <img src="param_roi_img4" alt="no picture" style="width:95%;">
+            </div>
+        </div>
+        <br>
+        <div id="func">
+            <h2>Functional QC</h2>
+            <p>
+                For functional quality reporting, several processing steps are completed and a variety of data sources, including the functional time series, head movement parameters and physiology data. Statistical measures are calculated from the time series data, yielding spatial QC measure plots (e.g. standard deviation and temporal signal to noise ratio) and timeseries visualisations (e.g. framewise displacement, grayplots, etc). If physiology data are available, quality metrics for these will be extracted from the PhysIO pipeline included as a dependency in this toolbox.
+
+                QC information is available for:
+                <ul>
+                    <li><a href="#funcsummary">A summary of functional QC metrics</a></li>
+                    <li><a href="#spatialqcplots">Spatial QC plots of statistical measures</a></li>
+                    <li><a href="#tempqcplots">Time series QC plots</a></li>
+                    <li><a href="#physqcplots">QC plots of physiology data</a></li>
+                </ul>
+            </p>
+            <br>
+            <h4 id="funcsummary">Functional QC metrics summary</h4>
+                <table class="qcsummary">
+                  <tr>
+                    <th>Metric</th>
+                    <th>Rest Run 1</th>
+                      <th>Motor Run 1</th>
+                      <th>Emotion Run 1</th>
+                      <th>Rest Run 2</th>
+                      <th>Motor Run 2</th>
+                      <th>Emotion Run 2</th>
+                  </tr>
+                  <tr>
+                    <td>Mean framewise displacement</td>
+                    <td align="right">param_fd_mean</td>
+                      <td align="right">param_fd_mean</td>
+                      <td align="right">param_fd_mean</td>
+                      <td align="right">param_fd_mean</td>
+                      <td align="right">param_fd_mean</td>
+                      <td align="right">param_fd_mean</td>
+                  </tr>
+                  <tr>
+                    <td>Total framewise displacement</td>
+                    <td align="right">param_fd_total</td>
+                      <td align="right">param_fd_total</td>
+                      <td align="right">param_fd_total</td>
+                      <td align="right">param_fd_total</td>
+                      <td align="right">param_fd_total</td>
+                      <td align="right">param_fd_total</td>
+                  </tr>
+                  <tr>
+                    <td>Framewise displacement outliers (threshold = 0.2mm)</td>
+                    <td align="right">param_fd_outliers02</td>
+                      <td align="right">param_fd_outliers02</td>
+                      <td align="right">param_fd_outliers02</td>
+                      <td align="right">param_fd_outliers02</td>
+                      <td align="right">param_fd_outliers02</td>
+                      <td align="right">param_fd_outliers02</td>
+                  </tr>
+                  <tr>
+                    <td>Framewise displacement outliers (threshold = 0.5mm)</td>
+                    <td align="right">param_fd_outliers05</td>
+                      <td align="right">param_fd_outliers05</td>
+                      <td align="right">param_fd_outliers05</td>
+                      <td align="right">param_fd_outliers05</td>
+                      <td align="right">param_fd_outliers05</td>
+                      <td align="right">param_fd_outliers05</td>
+                  </tr>
+                  <tr>
+                    <td>Mean Zscore</td>
+                    <td align="right">param_zscore_mean</td>
+                      <td align="right">param_zscore_mean</td>
+                      <td align="right">param_zscore_mean</td>
+                      <td align="right">param_zscore_mean</td>
+                      <td align="right">param_zscore_mean</td>
+                      <td align="right">param_zscore_mean</td>
+                  </tr>
+                  <tr>
+                    <td>Global correlation</td>
+                    <td align="right">param_gcor</td>
+                      <td align="right">param_gcor</td>
+                      <td align="right">param_gcor</td>
+                      <td align="right">param_gcor</td>
+                      <td align="right">param_gcor</td>
+                      <td align="right">param_gcor</td>
+                  </tr>
+                  <tr>
+                    <td>Mean tSNR (GM)</td>
+                    <td align="right">param_tsnr_GM_mean</td>
+                      <td align="right">param_tsnr_GM_mean</td>
+                      <td align="right">param_tsnr_GM_mean</td>
+                      <td align="right">param_tsnr_GM_mean</td>
+                      <td align="right">param_tsnr_GM_mean</td>
+                      <td align="right">param_tsnr_GM_mean</td>
+                  </tr>
+                  <tr>
+                    <td>Mean tSNR (WM)</td>
+                    <td align="right">param_tsnr_WM_mean</td>
+                      <td align="right">param_tsnr_WM_mean</td>
+                      <td align="right">param_tsnr_WM_mean</td>
+                      <td align="right">param_tsnr_WM_mean</td>
+                      <td align="right">param_tsnr_WM_mean</td>
+                      <td align="right">param_tsnr_WM_mean</td>
+                  </tr>
+                  <tr>
+                    <td>Mean tSNR (CSF)</td>
+                    <td align="right">param_tsnr_CSF_mean</td>
+                      <td align="right">param_tsnr_CSF_mean</td>
+                      <td align="right">param_tsnr_CSF_mean</td>
+                      <td align="right">param_tsnr_CSF_mean</td>
+                      <td align="right">param_tsnr_CSF_mean</td>
+                      <td align="right">param_tsnr_CSF_mean</td>
+                  </tr>
+                  <tr>
+                    <td>Mean tSNR (brain)</td>
+                    <td align="right">param_tsnr_brain_mean</td>
+                      <td align="right">param_tsnr_brain_mean</td>
+                      <td align="right">param_tsnr_brain_mean</td>
+                      <td align="right">param_tsnr_brain_mean</td>
+                      <td align="right">param_tsnr_brain_mean</td>
+                      <td align="right">param_tsnr_brain_mean</td>
+                  </tr>
+                </table>
+            <br>
+
+            <div class="button dropdown">
+              <select id="runselector">
+                 <option value="rest_run-1">Rest - Run 1</option>
+                 <option value="motor_run-1">Motor - Run 1</option>
+                  <option value="emotion_run-1">Emotion - Run 1</option>
+                  <option value="rest_run-2">Rest - Run 2</option>
+                  <option value="motor_run-2">Motor - Run 2</option>
+                  <option value="emotion_run-2">Emotion - Run 2</option>
+              </select>
+            </div>
+
+            <br>
+            <br>
+
+
+            <h4 id="spatialqcplots">Spatial QC plots</h4>
+            <div class="tab1">
+              <button id="button1" class="tablinks1 active" onclick="openTab1(event, 'mean')">Mean EPI</button>
+              <button class="tablinks1" onclick="openTab1(event, 'std')">Standard deviation</button>
+              <button class="tablinks1" onclick="openTab1(event, 'tsnr')">Temporal SNR</button>
+            </div>
+            <br>
+            <!-- Tab content -->
+            <div id="mean" class="tabcontent1">
+              <img id="mean_img" src="param_mean_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="std" class="tabcontent1">
+              <img id="std_img" src="param_std_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="tsnr" class="tabcontent1">
+              <img id="tsnr_img" src="param_tsnr_img" alt="no picture" style="width:95%;">
+            </div>
+            <br>
+            <h4 id="tempqcplots">Temporal QC plots</h4>
+            <div class="tab2">
+              <button id="button2" class="tablinks2 active" onclick="openTab2(event, 'grayplot_ro')">Brain (tissue type ordered)</button>
+              <button class="tablinks2" onclick="openTab2(event, 'grayplot_gso')">Brain (global signal ordered)</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_lmotor')">Left motor cortex</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_rmotor')">Right motor cortex</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_lamy')">Left amygdala</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_ramy')">Right amygdala</button>
+                <button class="tablinks2" onclick="openTab2(event, 'grayplot_biamy')">Bilateral amygdala</button>
+            </div>
+            <!-- Tab content -->
+            <div id="grayplot_ro" class="tabcontent2">
+              <img id="grayplot_ro_img" src="param_rograyplot_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="grayplot_gso" class="tabcontent2">
+              <img id="grayplot_gso_img" src="param_gsograyplot_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="grayplot_lmotor" class="tabcontent2">
+              <img id="grayplot_lmotor_img" src="param_leftMotorgrayplot_img" alt="no picture" style="width:95%;">
+            </div>
+            <div id="grayplot_biamy" class="tabcontent2">
+              <img id="grayplot_biamy_img" src="param_biAmygrayplot_img" alt="no picture" style="width:95%;">
+            </div>
+            <br>
+            <h4 id="physqcplots">PhysIO QC plots</h4>
+            <img id="physqcplots_img" src="param_physioqc_img" alt="no picture" style="width:50%;">
+        </div>
+    </body>
+</html>
