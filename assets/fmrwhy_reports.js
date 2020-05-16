@@ -132,10 +132,9 @@ $(document).ready(function() {
       "emotion_run-2": "Emotion - Run 2"
     };
 
-    var str0 = "/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-";
-    var str1 = "/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/PhysIO_task-";
-    var str2 = "/sub-001_task-";
-    var str3 = "_physioQC_03.jpg";
+
+    var str2 = "param_str2";
+    var str3 = "param_str3";
     var imgArray = {
       "mean_img": "_space-individual_mean.png",
       "std_img": "_space-individual_std.png",
@@ -148,10 +147,9 @@ $(document).ready(function() {
     // Reset sources for images
     for (var key in imgArray) {
       console.log("key " + key + " has value " + imgArray[key]);
-      $("#" + key).attr("src", str0 + $(this).val() + imgArray[key]);
+      $("#" + key).attr("src", "img" + str2 + $(this).val() + imgArray[key]);
     }
-    $("#physqcplots_img").attr("src", str1 + $(this).val() + str2 + $(this).val() + str3);
-
+    $("#physqcplots_img").attr("src", "img" + str2 + $(this).val() + str3);
     // Reset heading names
     $("#spatialqcplots").html( "Spatial QC Plots: " + selectArray[$(this).val()] );
     $("#tempqcplots").html("Temporal QC plots: " + selectArray[$(this).val()] );

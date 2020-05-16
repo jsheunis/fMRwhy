@@ -1,6 +1,6 @@
 function options = fmrwhy_defaults_setupDerivDirs(bids_dir, options)
 
-if isempty(options)
+if nargin < 2
     options = struct;
 end
 

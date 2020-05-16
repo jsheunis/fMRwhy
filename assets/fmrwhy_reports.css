@@ -59,7 +59,7 @@
 
 /* Dropdown button */
 .dropdown .dropbtn {
-  font-size: 16px;
+  font-size: 30px;
   border: none;
   outline: none;
   color: white;
@@ -107,7 +107,6 @@
 .qcsummary {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
-  width: 60%;
 }
 
 .qcsummary td, .qcsummary th {
@@ -123,11 +122,20 @@
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: #4CAF50;
+  background-color: #586F7C;
   color: white;
 }
 
 /* Style the tab */
+/* Style the tab content */
+.tabcontent1 {
+  display: none;
+  /*padding: 6px 6px;*/
+  border: 1px solid #ccc;
+  border-top: none;
+  text-align: center;
+}
+
 .tab1 {
   overflow: hidden;
   border: 1px solid #ccc;
@@ -158,9 +166,10 @@
 /* Style the tab content */
 .tabcontent2 {
   display: none;
-  padding: 6px 12px;
+  /*padding: 6px 6px;*/
   border: 1px solid #ccc;
   border-top: none;
+  text-align: center;
 }
 
 /* Style the tab */
@@ -197,9 +206,10 @@
 /* Style the tab content */
 .tabcontent3 {
   display: none;
-  padding: 6px 12px;
+  /*padding: 6px 12px;*/
   border: 1px solid #ccc;
   border-top: none;
+  text-align: center;
 }
 
 /* Style the tab */
@@ -235,9 +245,10 @@
 /* Style the tab content */
 .tabcontent4 {
   display: none;
-  padding: 6px 12px;
+  /*padding: 6px 12px;*/
   border: 1px solid #ccc;
   border-top: none;
+  text-align: center;
 }
 
 /* Style the tab */

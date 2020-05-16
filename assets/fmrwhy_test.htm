@@ -73,7 +73,7 @@
 
 <!--            <img id="imageToSwap" class="profile" src="http://cdns2.freepik.com/free-photo/facebook-logo_318-49940.jpg">-->
 <!--        </div>-->
-        <div id="summary">
+        <div id="summary" style="padding-left:3%; max-width:94%">
             <h2>Summary</h2>
             <br>
             <table class="qcsummary">
@@ -109,10 +109,27 @@
             <br>
         </div>
         <br>
-        <div id="anat">
+        <div id="anat" style="padding-left:3%; max-width:94%">
             <h2>Anatomical QC</h2>
             <p>
-                The T1w image was coregistered to the template functional image (task-rest_run-1_echo_2, volume 1) using SPM12 coregister/estimate functionality. Before resampling to the functional resolution, this coregistered T1w image was segmented using tissue probability maps and SPM12's unified segmentation algorithm. This yielded subject-specific probability maps for gray matter, white matter, csf, soft tissue, bone and air in the functional space. All of the segmentations where then resampled (coregister/write) to the functional resolution. Masks were generated for gray matter, white matter, csf, and the whole brain (a combination - logical OR after thresholding - of the previous three masks). These are overlaid on the template functional image below, to allow visual inspection of segmentation and registration quality.
+                <br>
+                The T1w anatomical image was coregistered to the template functional image (task rest, run 1, echo 2, volume 1) using SPM12 <code>coregister/estimate</code> functionality.
+                Before resampling to the functional resolution, this coregistered T1w image was segmented using tissue probability maps and SPM12's <code>unified segmentation</code> algorithm.
+                This yielded subject-specific probability maps for gray matter, white matter, CSF, soft tissue, bone and air in the subject functional space.
+                All of these probability maps where then resampled (using <code>coregister/write</code>) to the subject functional resolution.
+                Masks were generated for gray matter, white matter, CSF, and the whole brain (a combination - logical OR after thresholding - of the previous three masks).
+                These are overlaid on the coregistered and resampled T1w image below, to allow visual inspection of segmentation and registration quality.
+
+                <br><br>
+
+                Anatomical regions of interest were taken from the cytoarchitecture-based atlases in the <a target="_blank" href="https://www.fz-juelich.de/inm/inm-1/EN/Forschung/_docs/SPMAnatomyToolbox/SPMAnatomyToolbox_node.html">SPM Anatomy Toolbox</a>.
+                For the motor cortex, regions 4a and 4p were used. For the amygdala, regions LB, IF, SF, MF, VTM, and CM were used.
+                Regions of interest were transformed from MNI152 space to the subject functional space using SPM12 <code>normalise/write</code>, as well as
+                the inverse transformation field that was saved as part of the segemntation procedure mentioned above.
+
+                The regions of interest for this study include the left motor cortex (for the motor task runs) and the bilateral amygdala (for the emotion task runs).
+                These ROIs are overlaid on the coregistered and resampled T1w image below, to allow visual inspection of normalisation quality.
+
             </p>
             <h4>T1w coregistration and segmentation</h4>
             <div class="tab3">
@@ -161,70 +178,157 @@
 
         </div>
         <br>
-        <div id="func">
+        <div id="func" style="padding-left:3%; max-width:94%">
+            <hr>
             <h2>Functional QC</h2>
             <p>
-                For functional quality reporting, several processing steps are completed and a variety of data sources, including the functional time series, head movement parameters and physiology data. Statistical measures are calculated from the time series data, yielding spatial QC measure plots (e.g. standard deviation and temporal signal to noise ratio) and timeseries visualisations (e.g. framewise displacement, grayplots, etc). If physiology data are available, quality metrics for these will be extracted from the PhysIO pipeline included as a dependency in this toolbox.
+                <br>
+                For functional quality reporting, several processing steps are executed on several data sources, including the functional time series, head movement parameters and physiology data.
+                Statistical measures are calculated from the time series data, yielding spatial QC measures (e.g. standard deviation and temporal signal to noise ratio maps) and timeseries visualisations (e.g. framewise displacement, grayplots, etc).
+                If physiology data are available for a run, quality metrics for these are extracted from the PhysIO pipeline included as a dependency in this toolbox.
+                <br>
+                <br>
+                The following QC measures are derived and displayed below:
+                <div style="max-width:95%">
+                    <ul>
+                        <li><a href="#funcsummary"><u>A summary of functional QC metrics:</u></a></li>
+                        This includes framewise displacement means and outliers, as well as statistical measures like mean temporal signal to noise ratios (tSNR) in different tissue types.
 
-                QC information is available for:
-                <ul>
-                    <li><a href="#funcsummary">A summary of functional QC metrics</a></li>
-                    <li><a href="#spatialqcplots">Spatial QC plots of statistical measures</a></li>
-                    <li><a href="#tempqcplots">Time series QC plots</a></li>
-                    <li><a href="#physqcplots">QC plots of physiology data</a></li>
-                </ul>
+                        <li><a href="#spatialqcplots"><u>Spatial QC plots of statistical measures:</u></a></li>
+                        This includes several image montages. The time series mean gives a quick view of the general quality of the time series and can also spikes or interference artefacts.
+                        The standard deviation map shows areas with high signal fluctuation that is often related to movement (e.g. the eyes).
+                        The temporal signal to noise ratio maps are useful for investigating signal dropout and comparing the tSNR across regions.
+
+                        <li><a href="#tempqcplots"><u>Time series QC plots:</u></a></li>
+                        The main feature here is the grayplot (<a target="_blank" href="https://doi.org/10.1016/j.neuroimage.2016.08.009">see this article</a>) which displays voxel intensity in percentage signal change from the mean (color axis) over time (horizontal axis).
+                        The vertical axis indicates single voxels, either grouped together per tissue type (compartment ordered) or ordered from top to bottom according to the voxel's time series correlation strength to the global signal.
+                        Single traces above the grayplot are also shown, including tissue compartment signals, respiration, heart rate, and framewise displacement.
+                        These plots are useful quality checking tools as they make it easy to visualise widescale signal fluctuations across voxels,
+                        which can then be related visually to changes in physiological traces or subject movement.
+                        <li><a href="#physqcplots"><u>QC plots of physiology data:</u></a></li>
+
+                        Checking the quality of the recorded heart rate and breathing traces is made possible with these images extracted from the PhysIO workflow.
+                        The top plot displays temporal lag between derived heart beats within thresholds for outliers,
+                        while the bottom plot allows checking the breathing belt amplitude distribution for unexpected shapes.
+
+                    </ul>
+                </div>
             </p>
             <br>
 
 
-            <h4 id="funcsummary">Functional QC metrics summary</h4>
-                <table class="qcsummary">
+            <h4 id="funcsummary" style="text-align:center;">Functional QC metrics summary</h4>
+                <table class="qcsummary" style="margin-left:auto;margin-right:auto;">
+                    <tr>
+                    <th>Metric</th>
+                    <th>Rest Run 1</th>
+                      <th>Motor Run 1</th>
+                      <th>Emotion Run 1</th>
+                      <th>Rest Run 2</th>
+                      <th>Motor Run 2</th>
+                      <th>Emotion Run 2</th>
+                  </tr>
                   <tr>
                     <td>Framewise displacement threshold</td>
                     <td>0.25 mm</td>
+                      <td>0.25 mm</td>
+                      <td>0.25 mm</td>
+                      <td>0.25 mm</td>
+                      <td>0.25 mm</td>
+                      <td>0.25 mm</td>
                   </tr>
                   <tr>
                     <td>Framewise displacement outliers</td>
                     <td>21</td>
+                      <td>21</td>
+                      <td>21</td>
+                      <td>21</td>
+                      <td>21</td>
+                      <td>21</td>
                   </tr>
                   <tr>
                     <td>Total framewise displacement</td>
                     <td>20.1367</td>
+                      <td>20.1367</td>
+                      <td>20.1367</td>
+                      <td>20.1367</td>
+                      <td>20.1367</td>
+                      <td>20.1367</td>
                   </tr>
                   <tr>
                     <td>Mean framewise displacement</td>
                     <td>20.1367</td>
+                      <td>20.1367</td>
+                      <td>20.1367</td>
+                      <td>20.1367</td>
+                      <td>20.1367</td>
+                      <td>20.1367</td>
                   </tr>
                   <tr>
                     <td>Mean Zscore</td>
                     <td>0.76807</td>
+                      <td>0.76807</td>
+                      <td>0.76807</td>
+                      <td>0.76807</td>
+                      <td>0.76807</td>
+                      <td>0.76807</td>
                   </tr>
                   <tr>
                     <td>Global correlation</td>
                     <td>0.025621</td>
+                      <td>0.025621</td>
+                      <td>0.025621</td>
+                      <td>0.025621</td>
+                      <td>0.025621</td>
+                      <td>0.025621</td>
                   </tr>
                   <tr>
                     <td>Mean tSNR (GM)</td>
                     <td>61.2908</td>
+                      <td>61.2908</td>
+                      <td>61.2908</td>
+                      <td>61.2908</td>
+                      <td>61.2908</td>
+                      <td>61.2908</td>
                   </tr>
                   <tr>
                     <td>Mean tSNR (WM)</td>
                     <td>81.2157</td>
+                      <td>81.2157</td>
+                      <td>81.2157</td>
+                      <td>81.2157</td>
+                      <td>81.2157</td>
+                      <td>81.2157</td>
                   </tr>
                   <tr>
                     <td>Mean tSNR (CSF)</td>
                     <td>31.6234</td>
+                      <td>31.6234</td>
+                      <td>31.6234</td>
+                      <td>31.6234</td>
+                      <td>31.6234</td>
+                      <td>31.6234</td>
                   </tr>
                   <tr>
                     <td>Mean tSNR (brain)</td>
                     <td>62.3282</td>
+                      <td>62.3282</td>
+                      <td>62.3282</td>
+                      <td>62.3282</td>
+                      <td>62.3282</td>
+                      <td>62.3282</td>
                   </tr>
                 </table>
             <br>
 
             <!--            The options in this part will all be written to file in a for loop-->
-            <div class="button dropdown">
-              <select id="runselector">
+            <hr>
+            <div style="text-align:center;">
+            <h3>Select a functional run</h3>
+            <h6><i>This will update all images displayed below to those of the selected run</i></h6>
+                <br>
+                <div >
+              <select id="runselector" style="width:30%; height:40px">
                  <option value="rest_run-1">Rest - Run 1</option>
                  <option value="motor_run-1">Motor - Run 1</option>
                   <option value="emotion_run-1">Emotion - Run 1</option>
@@ -233,8 +337,12 @@
                   <option value="emotion_run-2">Emotion - Run 2</option>
               </select>
             </div>
-
+            </div>
             <br>
+            <hr>
+
+
+
             <br>
 
             <h4 id="spatialqcplots">Spatial QC plots</h4>
@@ -243,15 +351,17 @@
               <button class="tablinks1" onclick="openTab1(event, 'std')">Standard deviation</button>
               <button class="tablinks1" onclick="openTab1(event, 'tsnr')">Temporal SNR</button>
             </div>
-            <br>
             <!-- Tab content -->
             <div id="mean" class="tabcontent1">
+                <br>
               <img id="mean_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_mean.png" alt="no picture" style="width:95%;">
             </div>
             <div id="std" class="tabcontent1">
+                <br>
               <img id="std_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_std.png" alt="no picture" style="width:95%;">
             </div>
             <div id="tsnr" class="tabcontent1">
+                <br>
               <img id="tsnr_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/sub-001_task-rest_run-1_space-individual_tsnr.png" alt="no picture" style="width:95%;">
             </div>
 
@@ -276,20 +386,7 @@
             <h4 id="physqcplots">Physiology QC plots (from PhysIO)</h4>
             <img id="physqcplots_img" src="/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-qc/sub-001/func/PhysIO_task-rest_run-1/sub-001_task-rest_run-1_physioQC_03.jpg" alt="no picture" style="width:50%;">
         </div>
-
-        <div class="button dropdown">
-          <select id="colorselector">
-             <option value="red">Red</option>
-             <option value="yellow">Yellow</option>
-             <option value="blue">Blue</option>
-          </select>
-        </div>
-
-        <div class="output">
-          <div id="red" class="colors red">  “Good artists copy, great artists steal” Pablo Picasso</div>
-          <div id="yellow" class="colors yellow"> “Art is the lie that enables us to realize the truth” Pablo Picasso</div>
-          <div id="blue" class="colors blue"> “If I don't have red, I use blue” Pablo Picasso</div>
-        </div>
+    <!---->
 
 
     </body>
