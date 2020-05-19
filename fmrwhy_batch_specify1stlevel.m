@@ -20,12 +20,15 @@ design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.scans = {};
 for i = 1:Nt
     design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.scans{i,1} = [functional_fn ',' num2str(i) ];
 end
-design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.name = params.cond_name;
-design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.onset = params.cond_onset;
-design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.duration = params.cond_duration;
-design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.tmod = 0;
-design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.pmod = {''};
-design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.orth = 1;
+% cond
+design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond = params.cond;
+%design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.name = params.cond_name;
+%design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.onset = params.cond_onset;
+%design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.duration = params.cond_duration;
+%design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.tmod = 0;
+%design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.pmod = {''};
+%design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.cond.orth = 1;
+% extras
 design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.multi = {''};
 design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.regress = {''};
 design_stats.matlabbatch{1}.spm.stats.fmri_spec.sess.multi_reg = {multi_reg_fn};

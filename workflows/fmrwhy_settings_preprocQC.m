@@ -102,3 +102,27 @@ settings.firstlevel.emotion.sess_params.timing_RT = 2;
 settings.firstlevel.emotion.sess_params.cond_name = 'Match_shapes_faces';
 settings.firstlevel.emotion.sess_params.cond_onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
 settings.firstlevel.emotion.sess_params.cond_duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
+
+% Settings for first level analysis: glm regressors to include
+settings.firstlevel.glm_regressors.trans_rot = true;
+settings.firstlevel.glm_regressors.trans_rot_derivative1 = true;
+settings.firstlevel.glm_regressors.trans_rot_power2 = false;
+settings.firstlevel.glm_regressors.trans_rot_derivative1_power2 = false;
+settings.firstlevel.glm_regressors.framewise_displacement_censor02 = false;
+settings.firstlevel.glm_regressors.framewise_displacement_censor05 = false;
+settings.firstlevel.glm_regressors.dvars_censor = false; % not yet implemented
+settings.firstlevel.glm_regressors.std_dvars_censor = false; % not yet implemented
+settings.firstlevel.glm_regressors.grey_matter = false;
+settings.firstlevel.glm_regressors.white_matter = false;
+settings.firstlevel.glm_regressors.csf = true;
+settings.firstlevel.glm_regressors.global_signal = false;
+% Order of included retroicor regressors; if 0 ==> exclude
+settings.firstlevel.glm_regressors.retroicor_c = 2; % cardiac, max 6
+settings.firstlevel.glm_regressors.retroicor_r = 2; % respiratory, max 8
+settings.firstlevel.glm_regressors.retroicor_cxr = 0; % interaction, max 4
+settings.firstlevel.glm_regressors.hrv = false;
+settings.firstlevel.glm_regressors.rvt = false;
+
+
+
+
