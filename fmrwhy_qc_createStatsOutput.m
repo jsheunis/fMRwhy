@@ -78,6 +78,7 @@ if run_stats
             imgs.(stats_image_fieldname{i}) = p.nii.img;
             montage = fmrwhy_util_createMontage(imgs.(stats_image_fieldname{i}), 9, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max');
             ax = montage.ax;
+            colorbar;
             outerpos = ax.OuterPosition;
             ti = ax.TightInset;
             left = outerpos(1) + ti(1);

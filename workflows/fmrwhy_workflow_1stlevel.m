@@ -85,23 +85,18 @@ dlmwrite(regressors_fn, regressors_mat, 'delimiter', '\t', 'precision', '%1.7e')
 % -------
 % STEP 3: Set up statistical design parameters, based on task data
 % -------
-%% CREATE MODEL
-
+% Load task events file
 events_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_events.tsv']);
 events_struct = tdfread(events_fn)
-%assignin('base','events_struct',events_struct)
-
-
-options.firstlevel.(task).sess_params.timing_units = 'secs';
-options.firstlevel.(task).sess_params.timing_RT = 2;
-cond_names = {'Shapes', 'Faces'};
+% Load session parameters (specifically, conditions, onsets and durations) from events file
+cond_names = options.firstlevel.(task).(['run' run]).sess_params.cond_names;
 [cond, trials] = fmrwhy_util_1stlevelBIDStoConditions(events_fn, cond_names);
-
-
-options.firstlevel.(task).sess_params.cond = cond;
-sess_params = options.firstlevel.(task).sess_params;
+options.firstlevel.(task).(['run' run]).sess_params.cond = cond;
+sess_params = options.firstlevel.(task).(['run' run]).sess_params;
+% Select functional timeseries to use
 %functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
 functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEt2star_bold.nii'])
+% CREATE MODEL
 fmrwhy_batch_specify1stlevel(func_dir_stats, functional_fn, regressors_fn, sess_params)
 load([func_dir_stats filesep 'SPM.mat']);
 
@@ -112,13 +107,17 @@ fmrwhy_batch_estimate1stlevel(func_dir_stats)
 [Ntt, Nregr] = size(SPM.xX.X);
 contrast_params = struct;
 contrast_params.weights = zeros(1, Nregr);
-contrast_params.weights(2) = 1;
-contrast_params.weights(1) = -1;
-contrast_params.name = 'Faces';
+%contrast_params.weights(2) = -1;
+%contrast_params.weights(1) = 1;
+%contrast_params.name = 'Faces';
+contrast_params.weights(1) = 1;
+contrast_params.name = 'Fingertapping';
 fmrwhy_batch_contrast1stlevel(func_dir_stats, contrast_params)
 
 
 % RUN RESULTS
 fmrwhy_batch_threshold1stlevel(func_dir_stats)
-[SPM, xSPM] = spm_getSPM(fullfile(func_dir_stats, 'SPM.mat'));
-assignin('base', 'SPM', SPM)
+
+% TODO: how to get xSPM without the code below, which for some reason prompts SPM dialog box to open up and ask for file selection
+%[SPM, xSPM] = spm_getSPM(fullfile(func_dir_stats, 'SPM.mat'));
+%assignin('base', 'SPM', SPM)

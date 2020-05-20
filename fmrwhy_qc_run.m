@@ -137,9 +137,9 @@ if strcmp(task, 'rest') ~= 1
         desc = options.roi.(task).desc{j};
         saveAs_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' desc '_grayplot.png']);
 
-        task_info.TR = options.firstlevel.(task).sess_params.timing_RT;
-        task_info.onsets = options.firstlevel.(task).sess_params.cond_onset;
-        task_info.durations = options.firstlevel.(task).sess_params.cond_duration;
+        task_info.TR = options.firstlevel.(task).(['run' run]).sess_params.timing_RT;
+        task_info.onsets = options.firstlevel.(task).(['run' run]).plot_params.cond_onset;
+        task_info.durations = options.firstlevel.(task).(['run' run]).plot_params.cond_duration;
         task_info.precision = 1;
 
         if ~exist(saveAs_fn, 'file')

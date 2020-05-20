@@ -90,18 +90,35 @@ settings.physio.options.fig_output_file = ''; % unnecessary if verbose.level = 0
 settings.theplot.intensity_scale = [-6 6];
 
 % Settings for first level analysis: task-motor
-settings.firstlevel.motor.sess_params.timing_units = 'scans';
-settings.firstlevel.motor.sess_params.timing_RT = 2;
-settings.firstlevel.motor.sess_params.cond_name = 'Finger_tapping_rhs';
-settings.firstlevel.motor.sess_params.cond_onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
-settings.firstlevel.motor.sess_params.cond_duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
+settings.firstlevel.motor.run1.sess_params.timing_units = 'secs';
+settings.firstlevel.motor.run1.sess_params.timing_RT = 2;
+settings.firstlevel.motor.run1.sess_params.cond_names = {'FingerTapping'};
+settings.firstlevel.motor.run2.sess_params.timing_units = 'secs';
+settings.firstlevel.motor.run2.sess_params.timing_RT = 2;
+settings.firstlevel.motor.run2.sess_params.cond_names = {'MentalFingerTapping'};
 
 % Settings for first level analysis: task-emotion
-settings.firstlevel.emotion.sess_params.timing_units = 'scans';
-settings.firstlevel.emotion.sess_params.timing_RT = 2;
-settings.firstlevel.emotion.sess_params.cond_name = 'Match_shapes_faces';
-settings.firstlevel.emotion.sess_params.cond_onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
-settings.firstlevel.emotion.sess_params.cond_duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
+settings.firstlevel.emotion.run1.sess_params.timing_units = 'secs';
+settings.firstlevel.emotion.run1.sess_params.timing_RT = 2;
+settings.firstlevel.emotion.run1.sess_params.cond_name = {'Faces', 'Shapes'};
+settings.firstlevel.emotion.run2.sess_params.timing_units = 'secs';
+settings.firstlevel.emotion.run2.sess_params.timing_RT = 2;
+settings.firstlevel.emotion.run2.sess_params.cond_name = {'MentalEmotion'};
+
+% Settings for plotting task conditions
+onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
+duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
+settings.firstlevel.motor.run1.plot_params.cond_onset = onset;
+settings.firstlevel.motor.run1.plot_params.cond_duration = duration;
+settings.firstlevel.motor.run2.plot_params.cond_onset = onset;
+settings.firstlevel.motor.run2.plot_params.cond_duration = duration;
+settings.firstlevel.emotion.run2.plot_params.cond_onset = onset;
+settings.firstlevel.emotion.run2.plot_params.cond_duration = duration;
+onset = [12; 32; 52; 72; 92; 112; 132; 152; 172; 192];
+duration = [9; 9; 9; 9; 9; 9; 9; 9; 9; 9];
+settings.firstlevel.emotion.run1.plot_params.cond_onset = onset;
+settings.firstlevel.emotion.run1.plot_params.cond_duration = duration;
+
 
 % Settings for first level analysis: glm regressors to include
 settings.firstlevel.glm_regressors.trans_rot = true;

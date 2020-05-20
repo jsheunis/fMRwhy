@@ -9,7 +9,7 @@ bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 % Loop through subjects, sessions, tasks, runs, etc
 sub = '001';
 ses = '';
-task = 'emotion';
+task = 'motor';
 run = '1';
 echo = '2';
 

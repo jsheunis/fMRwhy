@@ -28,7 +28,7 @@ end
 f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
 im1 = imagesc(montage_template.whole_img);
 colormap(clrmp);
-colorbar; % TODO: decide if this needs to be user-specified or not
+%colorbar; % TODO: decide if this needs to be user-specified or not
 if ~isempty(cxs)
     caxis(cxs)
 end
