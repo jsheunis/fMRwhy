@@ -103,8 +103,6 @@
 
 
 
-
-
 % ---------------------------------------
 % 2. HOW DEPENDENCIES ARE HANDLED
 % ---------------------------------------
@@ -136,6 +134,13 @@
 % - Specifically look at where motion_fn is used to see if it is initialised correctly each time (wrt template echo)
 
 
+% ---------------------------------------
+% 6. MULTI-ECHO STANDARD WORKFLOWS / PIPELINES
+% ---------------------------------------
+
+% - Created fmwrhy_preproc_minFunc for minimal preprocessing before multi-echo combination. fmwrhy_preproc_minFunc is a
+% a copy of fmwrhy_preproc_basicFunc, excluding smoothing and generating multiple regressors. This is also very similar to
+% fmrwhy_preproc_ME. TODO: decide how to structure these funcitons/workflows, and which ones to include/exclude
 
 
 % ---------------------------

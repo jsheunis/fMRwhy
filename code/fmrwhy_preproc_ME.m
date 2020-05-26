@@ -1,8 +1,8 @@
-% A custom workflow that does the minimal preprocessing necessary for multi-echo combination
+function fmrwhy_preproc_ME(bids_dir, sub, ses, task, run, options)
+
+% A workflow that does the minimal preprocessing necessary for multi-echo combination
 
 % Code steps:
-% 1. Define template/default variables, directories and filenames
-% 2. Create functional template, if it does not exist
 % 3. Estimate 3D volume realignment parameters from raw template echo timeseries (given supplied template volume)
 % 4. Run slice time correction for each echo timeseries
 % 5. Realign each echo timeseries by applying rigid body transormation estimated from template echo realignment parameters
@@ -10,18 +10,12 @@
 %--------------------------------------------------------------------------
 
 
-% -------
-% STEP 1 -- Load defaults, filenames and parameters
-% -------
+
 disp('---')
-disp('STEP 1 -- Load defaults, filenames and parameters')
+disp('*** Running fmrwhy_preproc_multiecho ***')
+disp('---')
 disp('---')
 
-% Load fMRwhy defaults
-options = fmrwhy_defaults;
-
-% Main input: BIDS root folder
-bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -29,50 +23,19 @@ options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
 % Grab parameters from workflow settings file
 options = fmrwhy_settings_preprocQC(bids_dir, options);
 
-% Loop through subjects, sessions, tasks, runs, etc
-sub = '001';
-
-% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
-
 % Update workflow params with subject anatomical derivative filenames
 options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
 % -------
-% STEP 2 -- Create functional template, if it does not exist
+% STEP 1: Estimate 3D volume realignment parameters from raw timeseries (using given task, run, template echo)
 % -------
 disp('---')
-disp('STEP 2 -- Create functional template, if it does not exist')
-disp('---')
-% Create, if it does not exist
-template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
-if ~exist(template_fn, 'file')
-    disp(['Template funcional image does not exist yet. Creating now: ' template_fn]);
-    functional0_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_echo-' options.template_echo '_bold.nii,1']);
-    fmrwhy_util_saveNifti(template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn);
-else
-    disp(['Template funcional image exists: ' template_fn]);
-end
-options.template_fn = template_fn;
-
-
-% -------------------------------------
-% -------------------------------------
-% Run process on specific task and run
-% -------------------------------------
-% -------------------------------------
-ses = '';
-task = 'motor';
-run = '1';
-% -------
-% STEP 3: Estimate 3D volume realignment parameters from raw template echo timeseries
-% -------
-disp('---')
-disp('STEP 3: Estimate 3D volume realignment parameters')
+disp('STEP 1: Estimate 3D volume realignment parameters')
 disp('---')
 % Check if this has already been done by seeing if the tsv file with head movement parameters exist
-echo = options.template_echo;
-options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+% First access template timeseries informatopn
+options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, options.template_echo, options);
+%options.motion_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' options.template_echo '_desc-confounds_motion.tsv'])
 [d, f, e] = fileparts(options.motion_fn);
 if ~exist(options.motion_fn, 'file')
     % If it does not exist estimate MPs
@@ -100,12 +63,11 @@ disp('---')
 disp('STEP 4: Slice time correction for each echo timeseries')
 disp('---')
 for e = 1:options.Ne
-    echo = num2str(e);
     disp('---')
-    disp(['Echo ' echo])
+    disp(['Echo ' num2str(e)])
     disp('---')
     % Update workflow params with subject functional derivative filenames
-    options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+    options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, num2str(e), options);
 
     if ~exist(options.afunctional_fn, 'file')
         disp('---')
@@ -119,19 +81,17 @@ for e = 1:options.Ne
     end
 end
 % -------
-% STEP 5: Realignment for each echo timeseries
 % -------
 disp('---')
 disp('STEP 5: Realignment for each echo timeseries')
 disp('---')
 % For each echo apply transormation derived from motion parameters
 for e = 1:options.Ne
-    echo = num2str(e);
     disp('---')
-    disp(['Echo ' echo])
+    disp(['Echo ' num2str(e)])
     disp('---')
     % Update workflow params with subject functional derivative filenames
-    options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+    options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, num2str(e), options);
 
     if ~exist(options.rafunctional_fn, 'file')
         disp('---')

@@ -25,7 +25,7 @@ options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
 options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
-subs = {'003', '004', '005'};
+subs = {'016'};
 %sub = '002';
 ses = '';
 
@@ -129,7 +129,7 @@ for s = 1:numel(subs)
             % -------
             % STEP 1 -- Basic functional preprocessing: fmrwhy_preproc_basicFunc.m
             % -------
-            % NOTE: all outputs for multi-echo are many files, they will be checked individually in fmrwhy_preproc_basicFunc
+            % NOTE: all outputs for multi-echo are many files, they w/ill be checked individually in fmrwhy_preproc_basicFunc
             fmrwhy_preproc_basicFunc(bids_dir, sub, ses, task, run, options);
 
             % -------
