@@ -10,6 +10,7 @@ bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 sub = '001';
 ses = '';
 task = 'motor';
+%task = 'emotion';
 run = '1';
 echo = '2';
 

@@ -36,6 +36,7 @@ settings.Nruns = numel(settings.runs);
 
 % Settings for anatLocaliser processing
 settings.map_rois = 1;
+%settings.roi_orig_dir = '/Volumes/Stephan_WD/NEUFEPME_data_templates';
 settings.roi_orig_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_templates';
 settings.roi = struct;
 % IMPORTANT: structure has to be named using the task name as in settings.tasks: settings.roi.(task).orig_fn
@@ -100,10 +101,10 @@ settings.firstlevel.motor.run2.sess_params.cond_names = {'MentalFingerTapping'};
 % Settings for first level analysis: task-emotion
 settings.firstlevel.emotion.run1.sess_params.timing_units = 'secs';
 settings.firstlevel.emotion.run1.sess_params.timing_RT = 2;
-settings.firstlevel.emotion.run1.sess_params.cond_name = {'Faces', 'Shapes'};
+settings.firstlevel.emotion.run1.sess_params.cond_names = {'Faces', 'Shapes'};
 settings.firstlevel.emotion.run2.sess_params.timing_units = 'secs';
 settings.firstlevel.emotion.run2.sess_params.timing_RT = 2;
-settings.firstlevel.emotion.run2.sess_params.cond_name = {'MentalEmotion'};
+settings.firstlevel.emotion.run2.sess_params.cond_names = {'MentalEmotion'};
 
 % Settings for plotting task conditions
 onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
@@ -141,5 +142,28 @@ settings.firstlevel.glm_regressors.hrv = false;
 settings.firstlevel.glm_regressors.rvt = false;
 
 
+% Settings for first level analysis: task-motor
+settings.firstlevel.motor.run1.contrast_params.consess{1}.tcon.name = 'FingerTapping';
+settings.firstlevel.motor.run1.contrast_params.consess{1}.tcon.weights = [1];
+settings.firstlevel.motor.run1.contrast_params.consess{1}.tcon.sessrep = 'none';
+settings.firstlevel.motor.run2.contrast_params.consess{1}.tcon.name = 'MentalFingerTapping';
+settings.firstlevel.motor.run2.contrast_params.consess{1}.tcon.weights = [1];
+settings.firstlevel.motor.run2.contrast_params.consess{1}.tcon.sessrep = 'none';
 
+% Settings for first level analysis: task-emotion
+settings.firstlevel.emotion.run1.contrast_params.consess{1}.tcon.name = 'Faces';
+settings.firstlevel.emotion.run1.contrast_params.consess{1}.tcon.weights = [1 0];
+settings.firstlevel.emotion.run1.contrast_params.consess{1}.tcon.sessrep = 'none';
+settings.firstlevel.emotion.run1.contrast_params.consess{2}.tcon.name = 'Shapes';
+settings.firstlevel.emotion.run1.contrast_params.consess{2}.tcon.weights = [0 1];
+settings.firstlevel.emotion.run1.contrast_params.consess{2}.tcon.sessrep = 'none';
+settings.firstlevel.emotion.run1.contrast_params.consess{3}.tcon.name = 'Faces>Shapes';
+settings.firstlevel.emotion.run1.contrast_params.consess{3}.tcon.weights = [1 -1];
+settings.firstlevel.emotion.run1.contrast_params.consess{3}.tcon.sessrep = 'none';
+settings.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.name = 'MentalEmotion';
+settings.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.weights = [1];
+settings.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.sessrep = 'none';
 
+matlabbatch{1}.spm.stats.con.consess{2}.tcon.name = 'Patients > Control';
+matlabbatch{1}.spm.stats.con.consess{2}.tcon.convec = [-1 1];
+matlabbatch{1}.spm.stats.con.consess{2}.tcon.sessrep = 'none';

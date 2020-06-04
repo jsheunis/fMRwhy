@@ -44,10 +44,24 @@ overlay_fn{4} = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivativ
 %%montage2 = fmrwhy_util_createMontage(p2.nii.img(:,:,181:214), 9, rotate, 'test', 'gray', 'off', 'max');
 
 koek = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-preproc/sub-001/anat/sub-001_space-individual_desc-WM_mask.nii';
-[p3, frm3, rg3, dim3] = fmrwhy_util_readOrientNifti(koek);
-roi_img = fmrwhy_util_createBinaryImg(p3.nii.img, 0.1);
+tmap = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1/spmT_0001.nii';
+tmap_clusters = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1/spmT_0001_nary_clusters.nii';
+[ptmap, frm3, rg3, dim3] = fmrwhy_util_readOrientNifti(tmap);
+[ptmapc, frm3, rg3, dim3] = fmrwhy_util_readOrientNifti(tmap_clusters);
+
+
+
+roi_img = fmrwhy_util_maskImage(double(ptmap.nii.img), double(ptmapc.nii.img));
+
+
+%[p3, frm3, rg3, dim3] = fmrwhy_util_readOrientNifti(koek);
+%roi_img = p3.nii.img;
+%roi_img = fmrwhy_util_createBinaryImg(p3.nii.img, 0.1);
 fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-preproc/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-rapreproc_tsnr.nii';
 template_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-preproc/sub-001/func/sub-001_task-rest_run-1_space-individual_bold.nii';
 [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(template_fn);
 %montage_template = fmrwhy_util_createMontage(p.nii.img, 9, 1, 'Template volume', 'hot', 'on', 'max', [0 100]); colorbar;
-overlaymontage = fmrwhy_util_createOverlayMontage(p.nii.img, roi_img, 9, 1, 'xxx', 'gray', 'on', 'max', [], 0);
+%overlaymontage = fmrwhy_util_createOverlayMontage(p.nii.img, roi_img, 9, 1, 'xxx', 'gray', 'on', 'max', [], 0, 0);
+overlaymontage = fmrwhy_util_createOverlayMontageColormap(p.nii.img, roi_img, 9, 1, 'xxx', 'gray', 'on', 'max', [], 'hot', 0);
+
+%fmrwhy_util_createOverlayMontageColormap(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, cxs, overlay_clrmp, saveAs_fn)

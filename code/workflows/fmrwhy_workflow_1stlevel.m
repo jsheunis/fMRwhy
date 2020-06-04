@@ -28,11 +28,11 @@ options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
 % STEP 1: set up directories for outputs
 % -------
 options.sub_dir_stats = fullfile(options.stats_dir, ['sub-' sub]);
-func_dir_stats = fullfile(options.sub_dir_stats, 'func');
-if ~exist(func_dir_stats, 'dir')
-    mkdir(func_dir_stats)
+run_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run]);
+if ~exist(run_dir_stats, 'dir')
+    mkdir(run_dir_stats);
 end
-
+cd(run_dir_stats);
 % -------
 % STEP 2: create design matrix regressors
 % -------
@@ -77,47 +77,70 @@ for i = 1:numel(fields)
     end
 end
 
-regressors_fn = fullfile(func_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GLM_regressors.txt']);
-disp(regressors_names)
-dlmwrite(regressors_fn, regressors_mat, 'delimiter', '\t', 'precision', '%1.7e')
-
+regressors_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GLM_regressors.txt']);
+dlmwrite(regressors_fn, regressors_mat, 'delimiter', '\t', 'precision', '%1.7e');
 
 % -------
 % STEP 3: Set up statistical design parameters, based on task data
 % -------
 % Load task events file
 events_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_events.tsv']);
-events_struct = tdfread(events_fn)
+events_struct = tdfread(events_fn);
 % Load session parameters (specifically, conditions, onsets and durations) from events file
 cond_names = options.firstlevel.(task).(['run' run]).sess_params.cond_names;
 [cond, trials] = fmrwhy_util_1stlevelBIDStoConditions(events_fn, cond_names);
 options.firstlevel.(task).(['run' run]).sess_params.cond = cond;
 sess_params = options.firstlevel.(task).(['run' run]).sess_params;
 % Select functional timeseries to use
-%functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
-functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEt2star_bold.nii'])
+functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
+%functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEt2star_bold.nii'])
 % CREATE MODEL
-fmrwhy_batch_specify1stlevel(func_dir_stats, functional_fn, regressors_fn, sess_params)
-load([func_dir_stats filesep 'SPM.mat']);
+fmrwhy_batch_specify1stlevel(run_dir_stats, functional_fn, regressors_fn, sess_params)
+load([run_dir_stats filesep 'SPM.mat']);
 
 %% ESTIMATE MODEL
-fmrwhy_batch_estimate1stlevel(func_dir_stats)
+fmrwhy_batch_estimate1stlevel(run_dir_stats)
+
+%% REVIEW MODEL
+review_params.print = 'jpg';
+review_params_display = {'matrix', 'covariance', 'orth'};
+for i = 1:numel(review_params_display)
+    review_params.display = review_params_display{i};
+    fmrwhy_batch_review1stlevel(run_dir_stats, review_params)
+end
 
 %% SETUP TASK CONTRAST
 [Ntt, Nregr] = size(SPM.xX.X);
-contrast_params = struct;
-contrast_params.weights = zeros(1, Nregr);
-%contrast_params.weights(2) = -1;
-%contrast_params.weights(1) = 1;
-%contrast_params.name = 'Faces';
-contrast_params.weights(1) = 1;
-contrast_params.name = 'Fingertapping';
-fmrwhy_batch_contrast1stlevel(func_dir_stats, contrast_params)
+
+consess = options.firstlevel.(task).(['run' run]).contrast_params.consess;
+for j = 1:numel(consess)
+    default_weights = consess{j}.tcon.weights;
+    consess{j}.tcon.weights = zeros(1, Nregr);
+    consess{j}.tcon.weights(1:length(default_weights)) = default_weights;
+end
+fmrwhy_batch_contrast1stlevel(run_dir_stats, consess)
+
+%if exist('xSPM','var')
+%    disp('xSPM exists. Saving.')
+%    save('xSPM.mat', 'xSPM')
+%else
+%    disp('xSPM does not exist.')
+%end
 
 
 % RUN RESULTS
-fmrwhy_batch_threshold1stlevel(func_dir_stats)
+conspec = struct;
+for k = 1:numel(consess)
+    conspec(k).titlestr = consess{k}.tcon.name;
+    conspec(k).contrasts = k;
+    conspec(k).threshdesc = 'FWE';
+    conspec(k).thresh = 0.0500;
+    conspec(k).extent = 0;
+    conspec(k).conjunction = 1;
+    conspec(k).mask.none = 1;
+end
+fmrwhy_batch_threshold1stlevel(run_dir_stats, conspec)
 
 % TODO: how to get xSPM without the code below, which for some reason prompts SPM dialog box to open up and ask for file selection
-%[SPM, xSPM] = spm_getSPM(fullfile(func_dir_stats, 'SPM.mat'));
+%[SPM, xSPM] = spm_getSPM(fullfile(run_dir_stats, 'SPM.mat'));
 %assignin('base', 'SPM', SPM)

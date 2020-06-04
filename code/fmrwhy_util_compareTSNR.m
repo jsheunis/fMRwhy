@@ -16,7 +16,8 @@ diff = {};
 perc_diff = {};
 for i = 1:numel(tsnr_fns)
     [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_fns{i});
-    tsnr_img{i} = double(p.nii.img);
+%    tsnr_img{i} = double(p.nii.img);
+    tsnr_img{i} = fmrwhy_util_maskImage(double(p.nii.img), mask_img);
     if i > 1
         diff{i-1} = tsnr_img{i} - tsnr_img{1};
         perc_diff{i-1} = diff{i-1}./tsnr_img{1}*100;

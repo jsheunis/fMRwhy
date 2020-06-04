@@ -20,7 +20,7 @@
 options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
-bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
+bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -33,7 +33,7 @@ end
 options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
-subs = {'001'};
+subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 %sub = '002';
 ses = '';
 

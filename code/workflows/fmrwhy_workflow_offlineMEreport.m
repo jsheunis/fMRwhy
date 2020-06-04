@@ -51,19 +51,13 @@ options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 task = 'rest';
 run = '1';
 % Mask details
-
-% TODO: replace fmrwhy_util_loadMasks here with the correct usage (to be checked elsewhere)
-% TODO: combination of loadMasks and loadOrientMasks is used wrongly below, fix it
 masks = fmrwhy_util_loadMasks(bids_dir, sub);
 mask_fn = masks.brain_mask_fn;
-[p_mask, frm, rg, dim_mask] = fmrwhy_util_readNifti(mask_fn);
-mask_img = p_mask.nii.img;
-I_mask = find(mask_img(:));
+mask_img = masks.brain_mask_3D;
+I_mask = masks.brain_mask_I;
 masks_oriented = fmrwhy_util_loadOrientMasks(bids_dir, sub);
-mask_fn_oriented = masks_oriented.brain_mask_fn;
-[p_mask_oriented, frm_oriented, rg_oriented, dim_mask_oriented] = fmrwhy_util_readNifti(mask_fn_oriented);
-mask_img_oriented = p_mask_oriented.nii.img;
-I_mask_oriented = find(mask_img_oriented(:));
+mask_img_oriented = masks_oriented.brain_mask_3D;
+I_mask_oriented = masks_oriented.brain_mask_I;
 % Functional volume template
 template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
 options.template_fn = template_fn;
