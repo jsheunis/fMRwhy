@@ -105,7 +105,6 @@ linkaxes([ax1 ax2])
 
 %hold(ax, 'off');
 ax1 = fmrwhy_util_removeTicksAx(ax1)
-hold(ax2, 'on');
 % Add custom colorbar
 [s1, s2] = size(overlay)
 x1 = s2 - s2/columns/2 - round(s2/columns/8);
@@ -117,13 +116,12 @@ y = [y1 y1 y2 y2];
 cmax = max(max(overlay));
 cmin = min(min(overlay));
 C = [cmin cmin cmax cmax];
-pp = patch(x,y,C);
+pp = patch(ax2, x,y,C);
 pp.LineWidth = 1;
 pp.EdgeColor = [91, 92, 91]/255;
 % Add t-values to colorbar
-t1 = text(ax2, x2+2, y1, num2str(round(cmin, 2)),'FontSize',13,'Color','white');
-t2 = text(ax2, x2+2, y2, num2str(round(cmax, 2)),'FontSize',13,'Color','white');
-hold(ax2, 'off');
+t1 = text(ax1, x2+2, y1, num2str(round(cmin, 2)),'FontSize',13,'Color','white');
+t2 = text(ax1, x2+2, y2, num2str(round(cmax, 2)),'FontSize',13,'Color','white');
 
 
 
@@ -132,7 +130,10 @@ hold(ax2, 'off');
 output.f = f;
 
 if saveAs_fn ~= 0
+%    set(f, 'visible','on');
+%    pause(1);
     print(f, saveAs_fn,'-dpng', '-r0')
+%    set(f, 'visible','off');
 end
 % Close necessary figure handles
 close(montage_template.f)

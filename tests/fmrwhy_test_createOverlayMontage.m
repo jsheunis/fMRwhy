@@ -62,6 +62,7 @@ template_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives
 [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(template_fn);
 %montage_template = fmrwhy_util_createMontage(p.nii.img, 9, 1, 'Template volume', 'hot', 'on', 'max', [0 100]); colorbar;
 %overlaymontage = fmrwhy_util_createOverlayMontage(p.nii.img, roi_img, 9, 1, 'xxx', 'gray', 'on', 'max', [], 0, 0);
-overlaymontage = fmrwhy_util_createOverlayMontageColormap(p.nii.img, roi_img, 9, 1, 'xxx', 'gray', 'on', 'max', [], 'hot', 0);
+saveas_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1/blabla.png';
+overlaymontage = fmrwhy_util_createOverlayMontageColormap(p.nii.img, roi_img, 9, 1, 'xxx', 'gray', 'off', 'max', [], 'hot', saveas_fn);
 
 %fmrwhy_util_createOverlayMontageColormap(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, cxs, overlay_clrmp, saveAs_fn)

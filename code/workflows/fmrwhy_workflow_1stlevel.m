@@ -1,146 +1,71 @@
-function fmrwhy_workflow_1stlevel(bids_dir, sub, ses, task, run, echo, options)
+% A custom workflow that runs 1st level analysis for all runs of all tasks of specified subjects
 
-% A custom workflow that runs 1st level analysis for a single run based on specified parameters
+% Code steps:
+% 1.
 
-% STEPS:
 
 %--------------------------------------------------------------------------
 
 
-% Load/create required defaults
+% -------
+% STEP 0.1 -- Load defaults, filenames and parameters
+% -------
+
+% Load fMRwhy defaults
+options = fmrwhy_defaults;
+
+% Main input: BIDS root folder
+bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
+
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
 
 % Grab parameters from workflow settings file
 options = fmrwhy_settings_preprocQC(bids_dir, options);
 
-% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
-
-% Update workflow params with subject anatomical derivative filenames
-options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
-
-% Update workflow params with subject functional derivative filenames
-options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+% Loop through subjects, sessions, tasks, runs, etc
+subs = {'001'};
+%sub = '002';
+ses = '';
 
 
-% -------
-% STEP 1: set up directories for outputs
-% -------
-options.sub_dir_stats = fullfile(options.stats_dir, ['sub-' sub]);
-run_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run]);
-if ~exist(run_dir_stats, 'dir')
-    mkdir(run_dir_stats);
-end
-cd(run_dir_stats);
-% -------
-% STEP 2: create design matrix regressors
-% -------
-% Load multiple confound regressors
-confounds_struct = tdfread(options.confounds_fn);
-confounds_mat = struct2array(confounds_struct);
-regressors_mat = [];
-regressors_names = {};
+for s = 1:numel(subs)
+    sub = subs{s};
+    % Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
+    options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 
-fields = fieldnames(options.firstlevel.glm_regressors);
+    % Update workflow params with subject anatomical derivative filenames
+    options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
-for i = 1:numel(fields)
-    key = fields{i};
-    val = options.firstlevel.glm_regressors.(key);
-    % If the value is true or larger than zero (for retroicor order), parse key and include relevant data in regressor matrix
-    if val
-        if strfind(key,'trans_rot')
-            if strcmp(key,'trans_rot')
-                trans_rot_keys = {'trans_x', 'trans_y', 'trans_z', 'rot_x', 'rot_y', 'rot_z'};
-            elseif strcmp(key,'trans_rot_derivative1')
-                trans_rot_keys = {'trans_x_derivative1', 'trans_y_derivative1', 'trans_z_derivative1', 'rot_x_derivative1', 'rot_y_derivative1', 'rot_z_derivative1'};
-            elseif strcmp(key,'trans_rot_power2')
-                trans_rot_keys = {'trans_x_power2', 'trans_y_power2', 'trans_z_power2', 'rot_x_power2', 'rot_y_power2', 'rot_z_power2'};
-            elseif strcmp(key,'trans_rot_derivative1_power2')
-                trans_rot_keys = {'trans_x_derivative1_power2', 'trans_y_derivative1_power2', 'trans_z_derivative1_power2', 'rot_x_derivative1_power2', 'rot_y_derivative1_power2', 'rot_z_derivative1_power2'};
-            else
-            end
-            for j = 1:numel(trans_rot_keys)
-                regressors_mat = [regressors_mat confounds_struct.(trans_rot_keys{j})];
-                regressors_names = [regressors_names {trans_rot_keys{j}}];
-            end
-        elseif strcmp(key,'retroicor_c') || strcmp(key,'retroicor_r') || strcmp(key,'retroicor_cxr')
-            for k=1:val
-                new_key = [key num2str(k)];
-                regressors_mat = [regressors_mat confounds_struct.(new_key)];
-                regressors_names = [regressors_names {new_key}];
-            end
-        else
-            regressors_mat = [regressors_mat confounds_struct.(key)];
-            regressors_names = [regressors_names {key}];
+    % -------
+    % PER TASK and RUN
+    % -------
+    % Loop through sessions, tasks, runs, echoes.
+    ses = '';
+    tasks = {'motor', 'emotion'};
+    runs = {'1', '2'};
+
+    for t = 1:numel(tasks)
+        task = tasks{t};
+        for r = 1:numel(runs)
+            run = runs{r};
+
+            % -------
+            % STEP 1 -- 1st level analysis for a single run
+            % -------
+            fmrwhy_workflow_1stlevelRun(bids_dir, sub, ses, task, run, options.template_echo, options)
+
+%            % -------
+%            % STEP 2 --
+%            % -------
+%            output = fmrwhy_util_createOverlayMontageColormap(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, cxs, overlay_clrmp, saveAs_fn)
+
         end
     end
+
+%    % -------
+%    % STEP 3 -- 1st level report
+%    % -------
+%    fmrwhy_neufep_generateSubReport(bids_dir, sub);
+
 end
-
-regressors_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GLM_regressors.txt']);
-dlmwrite(regressors_fn, regressors_mat, 'delimiter', '\t', 'precision', '%1.7e');
-
-% -------
-% STEP 3: Set up statistical design parameters, based on task data
-% -------
-% Load task events file
-events_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_events.tsv']);
-events_struct = tdfread(events_fn);
-% Load session parameters (specifically, conditions, onsets and durations) from events file
-cond_names = options.firstlevel.(task).(['run' run]).sess_params.cond_names;
-[cond, trials] = fmrwhy_util_1stlevelBIDStoConditions(events_fn, cond_names);
-options.firstlevel.(task).(['run' run]).sess_params.cond = cond;
-sess_params = options.firstlevel.(task).(['run' run]).sess_params;
-% Select functional timeseries to use
-functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
-%functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEt2star_bold.nii'])
-% CREATE MODEL
-fmrwhy_batch_specify1stlevel(run_dir_stats, functional_fn, regressors_fn, sess_params)
-load([run_dir_stats filesep 'SPM.mat']);
-
-%% ESTIMATE MODEL
-fmrwhy_batch_estimate1stlevel(run_dir_stats)
-
-%% REVIEW MODEL
-review_params.print = 'jpg';
-review_params_display = {'matrix', 'covariance', 'orth'};
-for i = 1:numel(review_params_display)
-    review_params.display = review_params_display{i};
-    fmrwhy_batch_review1stlevel(run_dir_stats, review_params)
-end
-
-%% SETUP TASK CONTRAST
-[Ntt, Nregr] = size(SPM.xX.X);
-
-consess = options.firstlevel.(task).(['run' run]).contrast_params.consess;
-for j = 1:numel(consess)
-    default_weights = consess{j}.tcon.weights;
-    consess{j}.tcon.weights = zeros(1, Nregr);
-    consess{j}.tcon.weights(1:length(default_weights)) = default_weights;
-end
-fmrwhy_batch_contrast1stlevel(run_dir_stats, consess)
-
-%if exist('xSPM','var')
-%    disp('xSPM exists. Saving.')
-%    save('xSPM.mat', 'xSPM')
-%else
-%    disp('xSPM does not exist.')
-%end
-
-
-% RUN RESULTS
-conspec = struct;
-for k = 1:numel(consess)
-    conspec(k).titlestr = consess{k}.tcon.name;
-    conspec(k).contrasts = k;
-    conspec(k).threshdesc = 'FWE';
-    conspec(k).thresh = 0.0500;
-    conspec(k).extent = 0;
-    conspec(k).conjunction = 1;
-    conspec(k).mask.none = 1;
-end
-fmrwhy_batch_threshold1stlevel(run_dir_stats, conspec)
-
-% TODO: how to get xSPM without the code below, which for some reason prompts SPM dialog box to open up and ask for file selection
-%[SPM, xSPM] = spm_getSPM(fullfile(run_dir_stats, 'SPM.mat'));
-%assignin('base', 'SPM', SPM)
