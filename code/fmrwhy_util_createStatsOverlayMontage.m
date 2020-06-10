@@ -1,4 +1,4 @@
-function output = fmrwhy_util_createStatsOverlayMontage(template_img, stats_img, roi_img, columns, rotate, str, clrmp, visibility, shape, cxs, stats_clrmp, roi_rgbcolors, saveAs_fn)
+function output = fmrwhy_util_createStatsOverlayMontage(template_img, stats_img, roi_img, columns, rotate, str, clrmp, visibility, shape, cxs, stats_clrmp, roi_rgbcolors, clrbar, saveAs_fn)
 % Function to create montages of images overlaid on a template image
 
 % Structure to save output
@@ -23,7 +23,9 @@ end
 % Create background montage
 montage_template = fmrwhy_util_createMontage(template_img, columns, rotate, 'Template volume', clrmp, 'off', shape, cxs);
 % Create stats montage
-montage_stats = fmrwhy_util_createMontage(stats_img, columns, rotate, 'Overlay', stats_clrmp, 'off', shape, 'auto');
+if ~isempty(stats_img)
+    montage_stats = fmrwhy_util_createMontage(stats_img, columns, rotate, 'Overlay', stats_clrmp, 'off', shape, 'auto');
+end
 % Create ROI montage(s)
 montage_rois = {};
 if iscell(roi_img)
@@ -47,23 +49,30 @@ ax1 = axes('Parent', f);
 im1 = imagesc(ax1, montage_template.whole_img);
 colormap(ax1, clrmp);
 if ~isempty(cxs)
-    caxis(ax1, cxs)
+    caxis(ax1, cxs);
 end
-ax1 = fmrwhy_util_stretchAx(ax1)
-ax1 = fmrwhy_util_removeTicksAx(ax1)
+ax1 = fmrwhy_util_stretchAx(ax1);
+ax1 = fmrwhy_util_removeTicksAx(ax1);
 
 ax2 = axes('Parent',f);
-stats = montage_stats.whole_img;
-imagesc(ax2, stats, 'alphadata', stats>0);
-colormap(ax2, stats_clrmp);
-set(ax2, 'color','none','visible','off');
-ax2 = fmrwhy_util_stretchAx(ax2)
 
-linkaxes([ax1 ax2])
+if ~isempty(stats_img)
+    stats = montage_stats.whole_img;
+    imagesc(ax2, stats, 'alphadata', stats>0);
+    colormap(ax2, stats_clrmp);
+else
+    stats = nan(size(montage_template.whole_img));
+    imagesc(ax2, stats,'alphadata', stats>0);
+    colormap(ax2, clrmp);
+end
+
+set(ax2, 'color','none','visible','off');
+ax2 = fmrwhy_util_stretchAx(ax2);
+linkaxes([ax1 ax2]);
 
 
 % Plot ROIs
-hold(ax2, 'on')
+hold(ax2, 'on');
 for i=1:numel(montage_rois)
     rbgclr = roi_rgbcolors(i,:);
     clr = cat(3, rbgclr(1)*oo, rbgclr(2)*oo, rbgclr(3)*oo);
@@ -73,29 +82,38 @@ for i=1:numel(montage_rois)
         bound_whole_bin = bwboundaries(montage_rois{i}.whole_img);
         Nblobs_bin = numel(bound_whole_bin);
         for b = 1:Nblobs_bin
-            p = plot(ax2, bound_whole_bin{b,1}(:,2), bound_whole_bin{b,1}(:,1), 'color', rbgclr, 'LineWidth', 1);
+            p = plot(ax2, bound_whole_bin{b,1}(:,2), bound_whole_bin{b,1}(:,1), 'color', rbgclr, 'LineWidth', 1.5);
         end
     end
 end
-hold(ax2, 'off')
+hold(ax2, 'off');
 
 % Add custom colorbar for stat map
-[s1, s2] = size(stats)
-x1 = s2 - s2/columns/2 - round(s2/columns/8);
-x2 = s2 - s2/columns/2 + round(s2/columns/8);
-x = [x1 x2 x2 x1];
-y1 = s1 - s2/columns/4;
-y2 = y1 - s2/columns/2;
-y = [y1 y1 y2 y2];
-cmax = max(max(stats));
-cmin = min(min(stats));
-C = [cmin cmin cmax cmax];
-pp = patch(ax2, x,y,C);
-pp.LineWidth = 1;
-pp.EdgeColor = [91, 92, 91]/255;
-% Add t-values to colorbar
-t1 = text(ax1, x2+2, y1, num2str(round(cmin, 2)),'FontSize',13,'Color','white');
-t2 = text(ax1, x2+2, y2, num2str(round(cmax, 2)),'FontSize',13,'Color','white');
+
+if clrbar
+    [s1, s2] = size(montage_template.whole_img);
+    x1 = s2 - s2/columns/2 - round(s2/columns/8);
+    x2 = s2 - s2/columns/2 + round(s2/columns/8);
+    x = [x1 x2 x2 x1];
+    y1 = s1 - s2/columns/4;
+    y2 = y1 - s2/columns/2;
+    y = [y1 y1 y2 y2];
+
+    if ~isempty(cxs)
+        cmin = cxs(1);
+        cmax = cxs(2);
+    else
+        cmin = min(min(stats));
+        cmax = max(max(stats));
+    end
+    C = [cmin cmin cmax cmax];
+    pp = patch(ax2, x,y,C);
+    pp.LineWidth = 1;
+    pp.EdgeColor = [91, 92, 91]/255;
+    % Add t-values to colorbar
+    t1 = text(ax1, x2+2, y1, num2str(round(cmin, 2)),'FontSize',13,'Color','white');
+    t2 = text(ax1, x2+2, y2, num2str(round(cmax, 2)),'FontSize',13,'Color','white');
+end
 
 
 % Save and close figures
@@ -105,7 +123,9 @@ if saveAs_fn ~= 0
 end
 % Close necessary figure handles
 close(montage_template.f)
-close(montage_stats.f)
+if ~isempty(stats_img)
+    close(montage_stats.f)
+end
 for i=1:numel(montage_rois)
     close(montage_rois{i}.f)
 end

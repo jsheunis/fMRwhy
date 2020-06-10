@@ -41,7 +41,8 @@ end
 % ---
 for i = 1:numel(tsnr_img)
     if ~exist(tsnr_saveAs_fns{i}, 'file')
-        overlaymontage = fmrwhy_util_createOverlayMontage(tsnr_img{i}, overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [33, 168, 10], tsnr_saveAs_fns{i});
+%        overlaymontage = fmrwhy_util_createOverlayMontage(tsnr_img{i}, overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [33, 168, 10], tsnr_saveAs_fns{i});
+        overlaymontage = fmrwhy_util_createStatsOverlayMontage(tsnr_img{i}, [], overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [], [148, 239, 255], true, tsnr_saveAs_fns{i});
     end
 end
 
@@ -50,7 +51,8 @@ end
 % ---
 for i = 1:numel(perc_diff)
     if ~exist(perc_saveAs_fns{i}, 'file')
-        overlaymontage = fmrwhy_util_createOverlayMontage(perc_diff{i}, overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 300], [215,25,28], perc_saveAs_fns{i});
+%        overlaymontage = fmrwhy_util_createOverlayMontage(perc_diff{i}, overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 300], [215,25,28], perc_saveAs_fns{i});
+        overlaymontage = fmrwhy_util_createStatsOverlayMontage(perc_diff{i}, [], overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 300], [], [255, 115, 236], true, perc_saveAs_fns{i});
     end
 end
 

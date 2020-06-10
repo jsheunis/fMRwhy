@@ -1,4 +1,7 @@
 function output = fmrwhy_util_createOverlayMontage(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, cxs, rgbcolors, saveAs_fn)
+
+%fmrwhy_util_createOverlayMontage(tsnr_img{i}, overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [33, 168, 10], tsnr_saveAs_fns{i});
+
 % Function to create montages of images/rois overlaid on a template image
 
 % Structure to save output

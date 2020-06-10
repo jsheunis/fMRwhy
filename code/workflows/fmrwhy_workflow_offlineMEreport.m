@@ -44,6 +44,10 @@ options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 % Update workflow params with subject anatomical derivative filenames
 options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
+% Plotting settings
+rgb_ongray = [255, 115, 236];
+rgb_onhot = [148, 239, 255];
+rgb_onparula = [255, 115, 236];
 
 % -------
 % STEP 2: Grab template data
@@ -61,31 +65,53 @@ I_mask_oriented = masks_oriented.brain_mask_I;
 % Functional volume template
 template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
 options.template_fn = template_fn;
+% ROIs
+roi_fns = {};
+roi_fns{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
+roi_fns{2} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rbilateralAmygdala_roi.nii']);
+compare_roi_txt = {'left motor cortex', 'bilateral amygdala'};
+% Grab+load ROI image data; get ROI indices; combine ROI image data into a single overlay image
+roi_img = {};
+I_roi = {};
+overlay_img = zeros(size(mask_img_oriented));
+for i = 1:numel(roi_fns)
+    [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(roi_fns{i});
+    roi_img{i} = fmrwhy_util_createBinaryImg(p.nii.img, 0.1);
+    I_roi{i} = find(roi_img{i}(:));
+    overlay_img = overlay_img | roi_img{i};
+end
 
 % -------
 % STEP 3: Visualise t2star and s0 maps
 % -------
 % t2star
 t2star_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_t2star.nii']);
+t2star_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_t2star.png']);
 [p1, frm1, rg1, dim1] = fmrwhy_util_readOrientNifti(t2star_fn);
 t2star_img = fmrwhy_util_maskImage(p1.nii.img, mask_img_oriented);
-t2star_montage = fmrwhy_util_createMontage(t2star_img, 9, 1, 'T2star', 'hot', 'off', 'max', [0 200]);
-fmrwhy_util_stretchAx(t2star_montage.ax)
-fmrwhy_util_removeTicksAx(t2star_montage.ax)
+t2star_montage = fmrwhy_util_createStatsOverlayMontage(t2star_img, [], overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 200], [], rgb_onhot, true, t2star_png);
+%t2star_montage = fmrwhy_util_createMontage(t2star_img, 9, 1, 'T2star', 'hot', 'off', 'max', [0 200]);
+%fmrwhy_util_stretchAx(t2star_montage.ax)
+%fmrwhy_util_removeTicksAx(t2star_montage.ax)
 %colorbar; % caxis([0 200]);
-t2star_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_t2star.png']);
+
+
+
+
 if ~exist(t2star_png, 'file')
     print(t2star_montage.f, t2star_png,'-dpng', '-r0')
 end
 % S0
 s0_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.nii']);
+s0_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.png']);
 [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(s0_fn);
 s0_img = fmrwhy_util_maskImage(p2.nii.img, mask_img_oriented);
-s0_montage = fmrwhy_util_createMontage(s0_img, 9, 1, 'S0', 'parula', 'off', 'max', [0 20000]);
-fmrwhy_util_stretchAx(s0_montage.ax)
-fmrwhy_util_removeTicksAx(s0_montage.ax)
+s0_montage = fmrwhy_util_createStatsOverlayMontage(s0_img, [], overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 18000], [], rgb_onparula, true, s0_png);
+%s0_montage = fmrwhy_util_createMontage(s0_img, 9, 1, 'S0', 'parula', 'off', 'max', [0 20000]);
+%fmrwhy_util_stretchAx(s0_montage.ax)
+%fmrwhy_util_removeTicksAx(s0_montage.ax)
 %colorbar;
-s0_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.png']);
+
 if ~exist(s0_png, 'file')
     print(s0_montage.f, s0_png,'-dpng', '-r0')
 end
@@ -98,21 +124,49 @@ runs = {'1', '2'};
 combined_str = {'Echo 2', 'T2star', 'tSNR', 'TE'};
 roi_text = {'', 'left motor cortex', 'bilateral amygdala'};
 task_names = {'rest', 'Right finger tapping', 'Hariri task'}
-% ROIs
-roi_fns = {};
-roi_fns{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
-roi_fns{2} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rbilateralAmygdala_roi.nii']);
-compare_roi_txt = {'left motor cortex', 'bilateral amygdala'};
+
 
 for t = 1:numel(tasks)
     task = tasks{t};
     for r = 1:numel(runs)
         run = runs{r};
 
-        % Skip template task and run
+        % For template task and run
         if strcmp(task, 'rest') == 1 && strcmp(run, '1') == 1
+            % Grab filenames for bold
+            bold_fns = {};
+            bold_fns{1} = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-1_desc-rapreproc_bold.nii']);
+            bold_fns{2} = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-rapreproc_bold.nii']);
+            bold_fns{3} = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-3_desc-rapreproc_bold.nii']);
+            % use arbitrary volume number
+            volume_nr = 5;
+            % Create image outputs for original multi-echo bold data
+            bold_pngs = {};
+            for i = 1:numel(bold_fns)
+                [dir_name, file_name, ext] = fileparts(bold_fns{i});
+                bold_pngs{i} = fullfile(options.func_dir_me, [file_name '.png']);
+                if ~exist(bold_pngs{i}, 'file')
+                    [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_fns{i});
+                    bold_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
+                    bold_montage = fmrwhy_util_createStatsOverlayMontage(bold_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, bold_pngs{i});
+                end
+            end
+            % Create image outputs for original multi-echo tsnr data
+            tsnr_fns = {};
+            tsnr_pngs = {};
+            for i = 1:numel(bold_fns)
+                [dir_name, file_name, ext] = fileparts(bold_fns{i});
+                tsnr_fns{i} = fullfile(options.func_dir_me, [file_name ext]);
+                tsnr_pngs{i} = strrep(tsnr_fns{i}, '.nii', '.png');
+                if ~exist(tsnr_pngs{i}, 'file')
+                    [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_pngs{i});
+                    tsnr_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
+                    tsnr_montage = fmrwhy_util_createStatsOverlayMontage(tsnr_img, [], overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [], rgb_onhot, true, tsnr_pngs{i});
+                end
+            end
+
             disp('------------')
-            disp(['Skipping Template files: Task = ' task ';  Run = ' run])
+            disp(['Skipping Combined files for: Task = ' task ';  Run = ' run])
             disp('------------')
             continue;
         end
@@ -146,11 +200,14 @@ for t = 1:numel(tasks)
             bold_pngs{i} = fullfile(options.func_dir_me, [file_name '.png']);
             if ~exist(bold_pngs{i}, 'file')
                 [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_fns{i});
-                bold_img = fmrwhy_util_maskImage(p.nii.img(:,:,:,volume_nr), mask_img_oriented);
-                bold_montage = fmrwhy_util_createMontage(bold_img, 9, 1, ['Echo ' num2str(i)], 'gray', 'off', 'max', 0);
-                fmrwhy_util_stretchAx(bold_montage.ax)
-                fmrwhy_util_removeTicksAx(bold_montage.ax)
-                print(bold_montage.f, bold_pngs{i},'-dpng', '-r0');
+                bold_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
+                bold_montage = fmrwhy_util_createStatsOverlayMontage(bold_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, bold_pngs{i});
+%                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_fns{i});
+%                bold_img = fmrwhy_util_maskImage(p.nii.img(:,:,:,volume_nr), mask_img_oriented);
+%                bold_montage = fmrwhy_util_createMontage(bold_img, 9, 1, ['Echo ' num2str(i)], 'gray', 'off', 'max', 0);
+%                fmrwhy_util_stretchAx(bold_montage.ax)
+%                fmrwhy_util_removeTicksAx(bold_montage.ax)
+%                print(bold_montage.f, bold_pngs{i},'-dpng', '-r0');
             end
         end
         % Create image outputs for combined multi-echo data
@@ -159,11 +216,15 @@ for t = 1:numel(tasks)
             combined_pngs{i} = strrep(bold_combined_fns{i}, '.nii', '.png');
             if ~exist(combined_pngs{i}, 'file')
                 [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_combined_fns{i});
-                combined_img = fmrwhy_util_maskImage(p.nii.img(:,:,:,volume_nr), mask_img_oriented);
-                combined_montage = fmrwhy_util_createMontage(combined_img, 9, 1, ['Combined - ' combined_str{i+1}], 'gray', 'off', 'max', 0);
-                fmrwhy_util_stretchAx(combined_montage.ax)
-                fmrwhy_util_removeTicksAx(combined_montage.ax)
-                print(combined_montage.f, combined_pngs{i},'-dpng', '-r0');
+                combined_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
+                combined_montage = fmrwhy_util_createStatsOverlayMontage(combined_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, bold_pngs{i});
+
+%                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_combined_fns{i});
+%                combined_img = fmrwhy_util_maskImage(p.nii.img(:,:,:,volume_nr), mask_img_oriented);
+%                combined_montage = fmrwhy_util_createMontage(combined_img, 9, 1, ['Combined - ' combined_str{i+1}], 'gray', 'off', 'max', 0);
+%                fmrwhy_util_stretchAx(combined_montage.ax)
+%                fmrwhy_util_removeTicksAx(combined_montage.ax)
+%                print(combined_montage.f, combined_pngs{i},'-dpng', '-r0');
             end
         end
 
@@ -217,7 +278,13 @@ for t = 1:numel(tasks)
             for p = 1:numel(smooth_fns)
                 functional_fn = smooth_fns{p};
                 tsnr_fn = tsnr_fns{p};
-                saveAs_fn = strrep(smooth_fns{p}, '_bold.nii', '_tsplot.png');
+                if p == 1
+                    [dir_name, file_name, ext] = fileparts(smooth_fns{p});
+                    tmp_fn = fullfile(options.func_dir_me, [file_name ext]);
+                    saveAs_fn = strrep(tmp_fn, '_bold.nii', '_tsplot.png');
+                else
+                    saveAs_fn = strrep(smooth_fns{p}, '_bold.nii', '_tsplot.png');
+                end
                 task_info.TR = options.firstlevel.(task).(['run' run]).sess_params.timing_RT;
                 task_info.onsets = options.firstlevel.(task).(['run' run]).plot_params.cond_onset;
                 task_info.durations = options.firstlevel.(task).(['run' run]).plot_params.cond_duration;
