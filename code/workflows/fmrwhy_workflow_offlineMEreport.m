@@ -89,6 +89,7 @@ t2star_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run 
 t2star_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_t2star.png']);
 [p1, frm1, rg1, dim1] = fmrwhy_util_readOrientNifti(t2star_fn);
 t2star_img = fmrwhy_util_maskImage(p1.nii.img, mask_img_oriented);
+t2star_img(t2star_img>=500) = 0; % TODO, is this fine to do?
 t2star_montage = fmrwhy_util_createStatsOverlayMontage(t2star_img, [], overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 200], [], rgb_onhot, true, t2star_png);
 %t2star_montage = fmrwhy_util_createMontage(t2star_img, 9, 1, 'T2star', 'hot', 'off', 'max', [0 200]);
 %fmrwhy_util_stretchAx(t2star_montage.ax)
@@ -106,7 +107,7 @@ s0_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_de
 s0_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.png']);
 [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(s0_fn);
 s0_img = fmrwhy_util_maskImage(p2.nii.img, mask_img_oriented);
-s0_montage = fmrwhy_util_createStatsOverlayMontage(s0_img, [], overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 18000], [], rgb_onparula, true, s0_png);
+s0_montage = fmrwhy_util_createStatsOverlayMontage(s0_img, [], overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 7000], [], rgb_onparula, true, s0_png);
 %s0_montage = fmrwhy_util_createMontage(s0_img, 9, 1, 'S0', 'parula', 'off', 'max', [0 20000]);
 %fmrwhy_util_stretchAx(s0_montage.ax)
 %fmrwhy_util_removeTicksAx(s0_montage.ax)
@@ -133,6 +134,9 @@ for t = 1:numel(tasks)
 
         % For template task and run
         if strcmp(task, 'rest') == 1 && strcmp(run, '1') == 1
+            disp('------------')
+            disp(['Task: ' task ';  Run: ' run])
+            disp('------------')
             % Grab filenames for bold
             bold_fns = {};
             bold_fns{1} = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-1_desc-rapreproc_bold.nii']);
@@ -155,12 +159,19 @@ for t = 1:numel(tasks)
             tsnr_fns = {};
             tsnr_pngs = {};
             for i = 1:numel(bold_fns)
+
                 [dir_name, file_name, ext] = fileparts(bold_fns{i});
                 tsnr_fns{i} = fullfile(options.func_dir_me, [file_name ext]);
+                tsnr_fns{i} = strrep(tsnr_fns{i}, 'bold.nii', 'tsnr.nii');
                 tsnr_pngs{i} = strrep(tsnr_fns{i}, '.nii', '.png');
+%                [di, fi, ex] = fileparts(tsnr_pngs{i});
+%                di
+%                fi
+%                ex
                 if ~exist(tsnr_pngs{i}, 'file')
-                    [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_pngs{i});
-                    tsnr_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
+                    disp(['File exists: ' tsnr_pngs{i}])
+                    [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_fns{i});
+                    tsnr_img = fmrwhy_util_maskImage(double(p.nii.img), mask_img_oriented);
                     tsnr_montage = fmrwhy_util_createStatsOverlayMontage(tsnr_img, [], overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [], rgb_onhot, true, tsnr_pngs{i});
                 end
             end
@@ -217,7 +228,7 @@ for t = 1:numel(tasks)
             if ~exist(combined_pngs{i}, 'file')
                 [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_combined_fns{i});
                 combined_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
-                combined_montage = fmrwhy_util_createStatsOverlayMontage(combined_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, bold_pngs{i});
+                combined_montage = fmrwhy_util_createStatsOverlayMontage(combined_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, combined_pngs{i});
 
 %                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_combined_fns{i});
 %                combined_img = fmrwhy_util_maskImage(p.nii.img(:,:,:,volume_nr), mask_img_oriented);
