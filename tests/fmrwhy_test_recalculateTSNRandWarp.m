@@ -17,7 +17,8 @@ options.dash_me_dir = '/Users/jheunis/Documents/Websites/rt-me-fmri-dash/bids/de
 options.dash_deriv_dir = '/Users/jheunis/Documents/Websites/rt-me-fmri-dash/bids/derivatives';
 
 % Set subject, sessions
-subs = {'002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
+%subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
+subs = {'001'};
 for s = 1:numel(subs)
     sub = subs{s};
     ses = '';
