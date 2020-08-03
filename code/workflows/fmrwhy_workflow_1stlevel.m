@@ -15,7 +15,8 @@
 options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
-bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
+%bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
+bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -25,6 +26,7 @@ options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
 subs = {'001'};
+%subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 %sub = '002';
 ses = '';
 
@@ -41,7 +43,6 @@ for s = 1:numel(subs)
     % PER TASK and RUN
     % -------
     % Loop through sessions, tasks, runs, echoes.
-    ses = '';
     tasks = {'motor', 'emotion'};
     runs = {'1', '2'};
 
@@ -54,18 +55,7 @@ for s = 1:numel(subs)
             % STEP 1 -- 1st level analysis for a single run
             % -------
             fmrwhy_workflow_1stlevelRun(bids_dir, sub, ses, task, run, options.template_echo, options)
-
-%            % -------
-%            % STEP 2 --
-%            % -------
-%            output = fmrwhy_util_createOverlayMontageColormap(template_img, overlay_img, columns, rotate, str, clrmp, visibility, shape, cxs, overlay_clrmp, saveAs_fn)
-
         end
     end
-
-%    % -------
-%    % STEP 3 -- 1st level report
-%    % -------
-%    fmrwhy_neufep_generateSubReport(bids_dir, sub);
 
 end

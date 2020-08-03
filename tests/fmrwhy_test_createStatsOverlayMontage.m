@@ -45,12 +45,13 @@ end
 
 % Parameters
 saveAs_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-multiecho/sub-001/blabla.png';
+saveAs_fn = [];
 columns = 9;
 rotate = 1;
 str = '';
 %clrmp = 'hot';
 clrmp = 'parula';
-visibility = 'off';
+visibility = 'on';
 shape = 'max';
 %cxs = [0 250];
 cxs = [0 300];

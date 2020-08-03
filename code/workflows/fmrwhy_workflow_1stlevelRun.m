@@ -113,22 +113,30 @@ fmrwhy_batch_estimate1stlevel(run_dir_stats)
 % -------
 review_params.print = 'jpg';
 review_params_display = {'matrix', 'covariance', 'orth'};
+stats_review_outputs = {'matrix', 'covariance', 'orthogonality'};
 for i = 1:numel(review_params_display)
     review_params.display = review_params_display{i};
     fmrwhy_batch_review1stlevel(run_dir_stats, review_params)
+    % Rename figure outputs
+    dt = datetime;
+    y = num2str(year(dt));
+    m = month(dt, 'shortname');
+    m = m{1};
+    d = sprintf('%02d', day(dt));
+    fnames = dir([run_dir_stats filesep 'spm_' y m d '_*.jpg']);
+    if isempty(fnames)
+        disp('Warning: stats review file outputs not found... please inspect')
+        continue;
+    else
+%        bv1 = BVQXfile(fullfile(pth, fnames(1).name));
+        for j = 1:numel(fnames)
+            src = fullfile(run_dir_stats, ['spm_' y m d '_' sprintf('%03d', j) '.jpg']);
+            dest = fullfile(run_dir_stats, ['statsreview_' stats_review_outputs{i} '_' sprintf('%03d', j) '.jpg']);
+            movefile(src, dest);
+        end
+    end
 end
-% Rename figure outputs
-stats_review_outputs = {'matrix', 'covariance1', 'covariance2', 'covariance3', 'orthogonality'};
-dt = datetime;
-y = num2str(year(dt));
-m = month(dt, 'shortname');
-m = m{1};
-d = sprintf('%02d', day(dt));
-for i = 1:5
-    src = fullfile(run_dir_stats, ['spm_' y m d '_' sprintf('%03d', i) '.jpg']);
-    dest = fullfile(run_dir_stats, ['statsreview_' stats_review_outputs{i} '.jpg']);
-    movefile(src, dest);
-end
+
 
 
 % -------
@@ -159,6 +167,13 @@ for k = 1:numel(consess)
     conspec(k).mask.none = 1;
 end
 fmrwhy_batch_threshold1stlevel(run_dir_stats, conspec)
+% Rename files
+for k = 1:numel(consess)
+    src = fullfile(run_dir_stats, ['spm_' y m d '_' sprintf('%03d', k) '.jpg']);
+    dest = fullfile(run_dir_stats, ['statsresults_clusters_' sprintf('%03d', k) '.jpg']);
+    movefile(src, dest);
+end
+
 
 
 % TODO: how to get xSPM without the code below, which for some reason prompts SPM dialog box to open up and ask for file selection

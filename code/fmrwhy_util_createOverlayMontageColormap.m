@@ -106,7 +106,7 @@ linkaxes([ax1 ax2])
 %hold(ax, 'off');
 ax1 = fmrwhy_util_removeTicksAx(ax1)
 % Add custom colorbar
-[s1, s2] = size(overlay)
+[s1, s2] = size(overlay);
 x1 = s2 - s2/columns/2 - round(s2/columns/8);
 x2 = s2 - s2/columns/2 + round(s2/columns/8);
 x = [x1 x2 x2 x1];
