@@ -44,7 +44,7 @@ for s = 1:numel(subs)
     % Create, if it does not exist
     template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
     if ~exist(template_fn, 'file')
-        disp(['Template funcional image does not exist yet. Creating now: ' template_fn]);
+        disp(['Template functional image does not exist yet. Creating now: ' template_fn]);
         functional_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_echo-' options.template_echo '_bold.nii']);
         fmrwhy_util_saveNiftiFrom4D(functional_fn, template_fn, 1)
     else
