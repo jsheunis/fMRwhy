@@ -41,13 +41,13 @@ end
 if run_stats
     disp('Computing and saving statistical images and files for fMRI timeseries data')
     % Get stats for fMRI timeseries
-    stats = fmrwhy_qc_calculateStats(bids_dir, sub, options.rfunctional_fn); % TODO: decide which timeseries to use, processed or not
+    stats = fmrwhy_qc_calculateStats(bids_dir, sub, options.rafunctional_fn); % TODO: decide which timeseries to use, processed or not, Aug 4 2020 note: changed this from rfunctional to rafunctional when redoing QC output. Reasoning = to be consistent with multi-echo use.
     % save images to file: fmrwhy_util_saveNifti(template_fn, img, new_fn)
-    % TODO: add no_scaling=1 where necessary
-    fmrwhy_util_saveNifti(mean_fn, double(stats.data_3D_mean), options.template_fn);
-    fmrwhy_util_saveNifti(std_fn, double(stats.data_3D_stddev), options.template_fn);
-    fmrwhy_util_saveNifti(tsnr_fn, double(stats.data_3D_tsnr), options.template_fn);
-    fmrwhy_util_saveNifti(var_fn, double(stats.data_3D_var), options.template_fn);
+    no_scaling = 1;
+    fmrwhy_util_saveNifti(mean_fn, double(stats.data_3D_mean, no_scaling), options.template_fn);
+    fmrwhy_util_saveNifti(std_fn, double(stats.data_3D_stddev, no_scaling), options.template_fn);
+    fmrwhy_util_saveNifti(tsnr_fn, double(stats.data_3D_tsnr, no_scaling), options.template_fn);
+    fmrwhy_util_saveNifti(var_fn, double(stats.data_3D_var, no_scaling), options.template_fn);
     % Write stats timeseries data to tsv file
     [d, f, e] = fileparts(stats_timeseries_fn);
     temp_txt_fn = fullfile(d, [f '.txt']);
