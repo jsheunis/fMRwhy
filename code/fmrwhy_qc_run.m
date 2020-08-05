@@ -60,7 +60,7 @@ for i = 1:numel(mask_montage_fns)
         run_montage = 1;
     end
 end
-if run_montage
+if run_montage || options.qc_overwrite_tissuecontours
     disp('Creating mask overlay montages')
     montage_data = fmrwhy_qc_createMaskMontages(bids_dir, sub, 1);
     disp('Complete!')
@@ -82,9 +82,9 @@ for i = 1:numel(options.tasks)
         for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
             [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(options.roi.(options.tasks{i}).rroi_fn{j});
             overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
-            title = options.roi.(options.tasks{i}).name{j}
+            title = options.roi.(options.tasks{i}).name{j};
             saveAs_fn = fullfile(options.anat_dir_qc, ['sub-' sub '_space-individual_desc-' options.roi.(options.tasks{i}).desc{j} '_roi_montage.png']);
-            if ~exist(saveAs_fn, 'file')
+            if ~exist(saveAs_fn, 'file') || options.qc_overwrite_ROIcontours
                 fmrwhy_util_createOverlayMontage(p1.nii.img, overlay_img, 9, 1, title, 'gray', 'off', 'max', [], [255,0,0], saveAs_fn);
             else
                 disp(['File already exists: ' saveAs_fn])
@@ -108,7 +108,7 @@ end
 %confounds_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_regressors.tsv']);
 
 % -------
-% STEP 2: Calculate and generate statistical measures / images (tsnr, variance, std, psc, DVARS)
+% STEP 2: Calculate and generate statistical measures and images (tsnr, variance, std, psc, DVARS)
 % -------
 stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, ses, task, run, echo, options);
 
@@ -118,7 +118,7 @@ stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, ses, task, run, echo, options
 theplot_fn = {};
 theplot_fn{1} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-RO_grayplot.png']);
 theplot_fn{2} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GSO_grayplot.png']);
-if ~exist(theplot_fn{1}, 'file') || ~exist(theplot_fn{2}, 'file')
+if ~exist(theplot_fn{1}, 'file') || ~exist(theplot_fn{2}, 'file') || options.qc_overwrite_theplot
     fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, options);
 end
 
@@ -142,7 +142,7 @@ if strcmp(task, 'rest') ~= 1
         task_info.durations = options.firstlevel.(task).(['run' run]).plot_params.cond_duration;
         task_info.precision = 1;
 
-        if ~exist(saveAs_fn, 'file')
+        if ~exist(saveAs_fn, 'file') || options.qc_overwrite_theplot
             trace_info = [];
             fmrwhy_util_thePlotROI(functional_fn, options.brain_mask_fn, options.roi.(task).rroi_fn{j}, task_info, trace_info, saveAs_fn)
         else

@@ -43,7 +43,7 @@ css_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_reports.css');
 js_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_reports.js');
 avatar_template_fn = fullfile(fmrwhy_dir, 'img', 'logo_jsheunis_3.jpeg');
 
-report_dir = fullfile(options.sub_dir_qc, 'report');
+report_dir = fullfile(options.sub_dir_qc, ['report_' dt_str]);
 report_assets_dir = fullfile(report_dir, 'assets');
 report_img_dir = fullfile(report_dir, 'img');
 if ~exist(report_dir, 'dir')

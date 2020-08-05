@@ -75,6 +75,10 @@ defaults.output_multiple_regressors_fn = 'PhysIO_multiple_regressors.txt'; % tex
 
 % Settings for QC
 defaults.theplot.intensity_scale = [-6 6];
+defaults.qc_overwrite_tissuecontours = true;
+defaults.qc_overwrite_ROIcontours = true;
+defaults.qc_overwrite_theplot = false;
+defaults.qc_overwrite_statsoutput = true;
 
 
 

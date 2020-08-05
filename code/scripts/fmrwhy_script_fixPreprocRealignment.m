@@ -5,7 +5,8 @@
 options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
-bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/';
+%bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/';
+bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -14,12 +15,13 @@ options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
 options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Set subject, sessions
-subs = {'001'}
+subs = {'016', '017', '018', '019', '020', '021', '022', '023', '024'};
 %subs = {'002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 ses = '';
 
 
 for s = 1:numel(subs)
+    tic;
     sub = subs{s};
 
 
@@ -32,7 +34,6 @@ for s = 1:numel(subs)
     % Loop through sessions, tasks, runs, etc
     tasks = {'rest', 'motor', 'emotion'};
     runs = {'1', '2'};
-    echo = '2';
 
     for t = 1:numel(tasks)
 
@@ -122,15 +123,21 @@ for s = 1:numel(subs)
             % -------
             % STEP 5: fix QC processing and outputs (including redoing QC image styling)
             % -------
-            % TODO
             % Recreating the plot for whole brain and ROI are not necessary, as they use options.sfunctional_fn (i.e. not realigned)
+            fmrwhy_qc_run(bids_dir, sub, ses, task, run, options.template_echo, options);
 
             % -------
             % STEP 6: fix ME processing and outputs
             % -------
-            % TODO
-
-
+%            options.me_dir = fullfile(options.deriv_dir, 'fmrwhy-multiecho');
+%            options.sub_dir_me = fullfile(options.me_dir, ['sub-' sub]);
+%            options.func_dir_me = fullfile(options.sub_dir_me, 'func');
+%            all_files = dir(fullfile(options.func_dir_me, ['sub-' sub '*']));
+%            for i=1:numel(all_files)
+%                delete(fullfile(options.func_dir_me, all_files(i).name))
+%            end
         end
     end
+    fmrwhy_neufep_generateSubReport(bids_dir, sub)
+    toc;
 end

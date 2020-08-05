@@ -20,15 +20,31 @@ options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 % Update workflow params with subject anatomical derivative filenames
 options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 
+% set flag to specify echo information
+% If one of the standard echoes was passed, set flag to true.
+% If non-standard echo string was passed, set flag to false, assuming that this points to a string to identify a combined echo timeseries in the fmrwhy-multiecho derivatives folder
+echoes = {};
+is_standard_echo = false;
+for e = 1:options.Ne
+    echoes{e} = num2str(e);
+end
+if sum(ismember(echoes, echo))
+    is_standard_echo = true;
+end
+
 % Update workflow params with subject functional derivative filenames
-options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+if is_standard_echo
+    options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
+else
+    options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, options.template_echo, options);
+end
 
 
 % -------
 % STEP 1: set up directories for outputs
 % -------
 options.sub_dir_stats = fullfile(options.stats_dir, ['sub-' sub]);
-run_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run]);
+run_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run '_echo-' echo]);
 if ~exist(run_dir_stats, 'dir')
     mkdir(run_dir_stats);
 end
@@ -77,7 +93,7 @@ for i = 1:numel(fields)
     end
 end
 
-regressors_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GLM_regressors.txt']);
+regressors_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' options.template_echo '_desc-GLM_regressors.txt']);
 dlmwrite(regressors_fn, regressors_mat, 'delimiter', '\t', 'precision', '%1.7e');
 
 % -------
@@ -92,7 +108,17 @@ cond_names = options.firstlevel.(task).(['run' run]).sess_params.cond_names;
 options.firstlevel.(task).(['run' run]).sess_params.cond = cond;
 sess_params = options.firstlevel.(task).(['run' run]).sess_params;
 % Select functional timeseries to use
-functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
+% If one of the standard echoes was passed as a parameter select appropriate timeseries, otherwise assume multiecho combined and select appropriate combined timeseries
+if is_standard_echo
+    functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-srapreproc_bold.nii']);
+else
+    options.me_dir = fullfile(options.deriv_dir, 'fmrwhy-multiecho');
+    options.sub_dir_me = fullfile(options.me_dir, ['sub-' sub]);
+    options.func_dir_me = fullfile(options.sub_dir_me, 'func');
+    functional_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-s' echo '_bold.nii']);
+end
+
+
 %functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEt2star_bold.nii'])
 
 
@@ -198,12 +224,44 @@ for k = 1:numel(consess)
     tmap_clusters_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
     [ptmap, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_fn);
     [ptmapc, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_clusters_fn);
-    roi_img = fmrwhy_util_maskImage(double(ptmap.nii.img), double(ptmapc.nii.img));
+    stats_img = fmrwhy_util_maskImage(double(ptmap.nii.img), double(ptmapc.nii.img));
     str = consess{k}.tcon.name;
     saveAs_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str '_threshtmap.png']);
-    overlaymontage = fmrwhy_util_createOverlayMontageColormap(p.nii.img, roi_img, 9, 1, '', 'gray', 'off', 'max', [], 'hot', saveAs_fn);
+    overlaymontage = fmrwhy_util_createStatsOverlayMontage(p.nii.img, stats_img, [], 9, 1, '', 'gray', 'off', 'max', [], 'hot', [], true, saveAs_fn)
 end
 
+% -------
+% STEP 10: Calculate anatomical-functional overlap ROI
+% -------
+% For now, just use the first ROI in the list of ROIs per task. TODO: change in future
+anat_roi_fn = {};
+anat_roi_fn{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-r' options.roi.(task).desc{1} '_roi.nii']);
 
+% For each anatomical ROI:
+for j = 1:numel(anat_roi_fn)
+    % Grab binary image of ROI, not yet for plotting
+    [panat, ~, ~, ~] = fmrwhy_util_readNifti(anat_roi_fn{j}); % TODO: REMEMBER NOT TO USE readNifti anywhere!!! just nii_tool('load')!!!
+    anat_roi_img = fmrwhy_util_createBinaryImg(panat.nii.img, 0.1);
+    % For each task contrast, i.e. for each tmap, grab binary tmap clusters, find overlap with anatomical ROI, save
+    for k = 1:numel(consess)
+        tmap_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '.nii']);
+        tmap_clusters_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
+        [ptmap, ~, ~, ~] = fmrwhy_util_readNifti(tmap_fn);
+        [ptmapc, ~, ~, ~] = fmrwhy_util_readNifti(tmap_clusters_fn);
+        func_roi_img = double(ptmapc.nii.img);
 
+        overlap_img = anat_roi_img & func_roi_img;
+        size_anat_roi = sum(anat_roi_img(:));
+        size_func_roi = sum(func_roi_img(:));
+        size_overlap = sum(overlap_img(:));
+        dice_coeff = 2*size_overlap/(size_anat_roi + size_func_roi);
 
+        no_scaling = 1;
+        saveAs_overlap_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str 'Overlaps' options.roi.(task).desc{j} '_roi.nii']);
+        fmrwhy_util_saveNifti(saveAs_overlap_fn, overlap_img, options.template_fn, no_scaling);
+        [poverlap, ~, ~, ~] = fmrwhy_util_readOrientNifti(saveAs_overlap_fn);
+        plot_overlap_img = double(poverlap.nii.img);
+        saveAs_fn = strrep(saveAs_overlap_fn, '.nii', '.png');
+        overlapmontage = fmrwhy_util_createStatsOverlayMontage(background_img, [], plot_overlap_img, 9, 1, '', 'gray', 'off', 'max', [], [], [], false, saveAs_fn)
+    end
+end

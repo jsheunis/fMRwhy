@@ -1,21 +1,21 @@
 % Template
-%template_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-preproc/sub-001/anat/sub-001_space-individual_desc-coregEstResl_T1w.nii';
+template_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-preproc/sub-001/anat/sub-001_space-individual_desc-coregEstResl_T1w.nii';
 template_tsnr_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-multiecho/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-rapreproc_tsnr.nii';
 template_perc_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-multiecho/sub-001/func/sub-001_task-rest_run-1_echo-2_desc-rapreproc_tsnr.nii';
 
-[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(template_tsnr_fn);
+[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(template_fn);
 template_img = p.nii.img;
 
 % Stats
 
-%tmap = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1/spmT_0001.nii';
-%tmap_clusters = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1/spmT_0001_nary_clusters.nii';
-tmap = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-emotion_run-1/spmT_0001.nii';
-tmap_clusters = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-emotion_run-1/spmT_0001_nary_clusters.nii';
+tmap = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1/spmT_0001.nii';
+tmap_clusters = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1/spmT_0001_nary_clusters.nii';
+%tmap = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-emotion_run-1/spmT_0001.nii';
+%tmap_clusters = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-emotion_run-1/spmT_0001_nary_clusters.nii';
 [ptmap, frm3, rg3, dim3] = fmrwhy_util_readOrientNifti(tmap);
 [ptmapc, frm3, rg3, dim3] = fmrwhy_util_readOrientNifti(tmap_clusters);
 stats_img = fmrwhy_util_maskImage(double(ptmap.nii.img), double(ptmapc.nii.img));
-stats_img = [];
+%stats_img = [];
 
 % ROIs
 roi_lmotor_fn = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-preproc/sub-001/anat/sub-001_space-individual_desc-rleftMotor_roi.nii';
@@ -26,9 +26,10 @@ roi_fns = {roi_lmotor_fn, roi_bamygdala_fn};
 %roi_img = {};
 %roi_img{1} = fmrwhy_util_createBinaryImg(p1.nii.img, 0.1);
 %roi_img{2} = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
-%roi_img = fmrwhy_util_createBinaryImg(p1.nii.img, 0.1);
-roi_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
+roi_img = fmrwhy_util_createBinaryImg(p1.nii.img, 0.1);
+%roi_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
 
+roi_fns = {roi_lmotor_fn};
 roi_img = {};
 I_roi = {};
 overlay_img = zeros(dim);
@@ -49,15 +50,15 @@ saveAs_fn = [];
 columns = 9;
 rotate = 1;
 str = '';
-%clrmp = 'hot';
-clrmp = 'parula';
+clrmp = 'gray';
+%clrmp = 'parula';
 visibility = 'on';
 shape = 'max';
 %cxs = [0 250];
-cxs = [0 300];
-stats_clrmp = [];
+%cxs = [0 300];
+cxs = [];
+stats_clrmp = 'hot';
 clrbar = true;
-%roi_rgbcolors = [148, 239, 255];
 roi_rgbcolors = [148, 239, 255];
 
 % Call function

@@ -89,6 +89,15 @@ settings.physio.options.fig_output_file = ''; % unnecessary if verbose.level = 0
 
 % Settings for QC
 settings.theplot.intensity_scale = [-6 6];
+settings.qc_overwrite_tissuecontours = true;
+settings.qc_overwrite_ROIcontours = true;
+settings.qc_overwrite_theplot = false;
+settings.qc_overwrite_statsoutput = true;
+
+
+% Settings for first level analysis: steps to include/exclude
+settings.firstlevel.tmap_montages = true;
+settings.firstlevel.anat_func_roi = true;
 
 % Settings for first level analysis: task-motor
 settings.firstlevel.motor.run1.sess_params.timing_units = 'secs';
@@ -119,7 +128,6 @@ onset = [12; 32; 52; 72; 92; 112; 132; 152; 172; 192];
 duration = [9; 9; 9; 9; 9; 9; 9; 9; 9; 9];
 settings.firstlevel.emotion.run1.plot_params.cond_onset = onset;
 settings.firstlevel.emotion.run1.plot_params.cond_duration = duration;
-
 
 % Settings for first level analysis: glm regressors to include
 settings.firstlevel.glm_regressors.trans_rot = true;
@@ -164,6 +172,6 @@ settings.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.name = 'MentalE
 settings.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.weights = [1];
 settings.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.sessrep = 'none';
 
-matlabbatch{1}.spm.stats.con.consess{2}.tcon.name = 'Patients > Control';
-matlabbatch{1}.spm.stats.con.consess{2}.tcon.convec = [-1 1];
-matlabbatch{1}.spm.stats.con.consess{2}.tcon.sessrep = 'none';
+%matlabbatch{1}.spm.stats.con.consess{2}.tcon.name = 'Patients > Control';
+%matlabbatch{1}.spm.stats.con.consess{2}.tcon.convec = [-1 1];
+%matlabbatch{1}.spm.stats.con.consess{2}.tcon.sessrep = 'none';

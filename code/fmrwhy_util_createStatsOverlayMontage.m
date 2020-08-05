@@ -27,13 +27,15 @@ if ~isempty(stats_img)
     montage_stats = fmrwhy_util_createMontage(stats_img, columns, rotate, 'Overlay', stats_clrmp, 'off', shape, 'auto');
 end
 % Create ROI montage(s)
-montage_rois = {};
-if iscell(roi_img)
-    for i=1:numel(roi_img)
-        montage_rois{i} = fmrwhy_util_createMontage(roi_img{i}, columns, rotate, 'Overlay', clrmp, 'off', shape, 'auto');
+if ~isempty(roi_img)
+    montage_rois = {};
+    if iscell(roi_img)
+        for i=1:numel(roi_img)
+            montage_rois{i} = fmrwhy_util_createMontage(roi_img{i}, columns, rotate, 'Overlay', clrmp, 'off', shape, 'auto');
+        end
+    else
+        montage_rois{1} = fmrwhy_util_createMontage(roi_img, columns, rotate, 'Overlay', clrmp, 'off', shape, 'auto');
     end
-else
-    montage_rois{1} = fmrwhy_util_createMontage(roi_img, columns, rotate, 'Overlay', clrmp, 'off', shape, 'auto');
 end
 % Prepare colours for ROIs
 [Nimx, Nimy] = size(montage_template.whole_img);
@@ -72,24 +74,25 @@ linkaxes([ax1 ax2]);
 
 
 % Plot ROIs
-hold(ax2, 'on');
-for i=1:numel(montage_rois)
-    rbgclr = roi_rgbcolors(i,:);
-    clr = cat(3, rbgclr(1)*oo, rbgclr(2)*oo, rbgclr(3)*oo);
-    imC = imagesc(ax2, clr);
-    set(imC, 'AlphaData', alpha*montage_rois{i}.whole_img);
-    if plot_contour
-        bound_whole_bin = bwboundaries(montage_rois{i}.whole_img);
-        Nblobs_bin = numel(bound_whole_bin);
-        for b = 1:Nblobs_bin
-            p = plot(ax2, bound_whole_bin{b,1}(:,2), bound_whole_bin{b,1}(:,1), 'color', rbgclr, 'LineWidth', 1.5);
+if ~isempty(roi_img)
+    hold(ax2, 'on');
+    for i=1:numel(montage_rois)
+        rbgclr = roi_rgbcolors(i,:);
+        clr = cat(3, rbgclr(1)*oo, rbgclr(2)*oo, rbgclr(3)*oo);
+        imC = imagesc(ax2, clr);
+        set(imC, 'AlphaData', alpha*montage_rois{i}.whole_img);
+        if plot_contour
+            bound_whole_bin = bwboundaries(montage_rois{i}.whole_img);
+            Nblobs_bin = numel(bound_whole_bin);
+            for b = 1:Nblobs_bin
+                p = plot(ax2, bound_whole_bin{b,1}(:,2), bound_whole_bin{b,1}(:,1), 'color', rbgclr, 'LineWidth', 1.5);
+            end
         end
     end
+    hold(ax2, 'off');
 end
-hold(ax2, 'off');
 
 % Add custom colorbar for stat map
-
 if clrbar
     [s1, s2] = size(montage_template.whole_img);
     x1 = s2 - s2/columns/2 - round(s2/columns/8);
@@ -126,8 +129,10 @@ close(montage_template.f)
 if ~isempty(stats_img)
     close(montage_stats.f)
 end
-for i=1:numel(montage_rois)
-    close(montage_rois{i}.f)
+if ~isempty(roi_img)
+    for i=1:numel(montage_rois)
+        close(montage_rois{i}.f)
+    end
 end
 if strcmp(visibility, 'off')
     close(f);

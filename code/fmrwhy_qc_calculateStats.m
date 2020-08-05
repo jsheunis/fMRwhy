@@ -47,7 +47,7 @@ data_2D_psc(isnan(data_2D_psc)) = 0;
 data_2D_norms = sqrt(sum(data_2D_demeaned.^2));
 data_2D_scaled = data_2D_demeaned./data_2D_norms;
 data_2D_ave_timeseries = nanmean(data_2D_scaled(:, masks.brain_mask_I));
-GCOR = sum(data_2D_ave_timeseries.^2);
+GCOR = sum(data_2D_ave_timeseries.^2, 'omitnan');
 
 % Calculate tSNR
 tSNR_2D = data_2D_mean./data_2D_stddev;
@@ -56,8 +56,8 @@ tSNR_mean_GM = nanmean(tSNR_2D(masks.GM_mask_I));
 tSNR_mean_WM = nanmean(tSNR_2D(masks.WM_mask_I));
 tSNR_mean_CSF = nanmean(tSNR_2D(masks.CSF_mask_I));
 
-% Calculate DVARS
-% TODO: look at Soroosh paper, implement
+% Calculate DVARS and standardised DVARS
+% TODO: look at Soroosh Afyouni paper, implement.
 
 % Prepare 3D and 4D images
 data_3D_mean = reshape(data_2D_mean, Ni, Nj, Nk);
