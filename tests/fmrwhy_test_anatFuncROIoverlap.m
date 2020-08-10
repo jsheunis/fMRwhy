@@ -1,7 +1,7 @@
 bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 sub = '001'
 ses = '';
-task = 'motor';
+task = 'emotion';
 run = '1';
 echo = '2';
 
@@ -56,7 +56,7 @@ for j = 1:numel(anat_roi_fn)
         [poverlap, ~, ~, ~] = fmrwhy_util_readOrientNifti(saveAs_overlap_fn);
         plot_overlap_img = double(poverlap.nii.img);
         saveAs_fn = strrep(saveAs_overlap_fn, '.nii', '.png');
-        roi_rgbcolors = [148, 239, 255];
+        roi_rgbcolors = [255, 0, 0];
 
 %        [ptmapc, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_clusters_fn);
 %        func_roi_img = double(ptmapc.nii.img);
@@ -67,7 +67,7 @@ for j = 1:numel(anat_roi_fn)
 %        funcmontage = fmrwhy_util_createStatsOverlayMontage(background_img, [], func_roi_img, 9, 1, '', 'gray', 'on', 'max', [], [], roi_rgbcolors, false, [])
 %        anatmontage = fmrwhy_util_createStatsOverlayMontage(background_img, [], anat_roi_img, 9, 1, '', 'gray', 'on', 'max', [], [], roi_rgbcolors, false, [])
 %        overlapss = fmrwhy_util_createStatsOverlayMontage(background_img, [], double(overlap_img), 9, 1, '', 'gray', 'on', 'max', [], [], roi_rgbcolors, false, [])
-        overlapmontage = fmrwhy_util_createStatsOverlayMontage(background_img, [], plot_overlap_img, 9, 1, '', 'gray', 'on', 'max', [], [], roi_rgbcolors, false, [])
+        overlapmontage = fmrwhy_util_createStatsOverlayMontage(background_img, [], plot_overlap_img, 9, 1, '', 'gray', 'off', 'max', [], [], roi_rgbcolors, false, saveAs_fn);
 
     end
 end

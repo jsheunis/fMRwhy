@@ -5,7 +5,8 @@
 options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
-bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
+%bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
+bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -17,8 +18,8 @@ options.dash_me_dir = '/Users/jheunis/Documents/Websites/rt-me-fmri-dash/bids/de
 options.dash_deriv_dir = '/Users/jheunis/Documents/Websites/rt-me-fmri-dash/bids/derivatives';
 
 % Set subject, sessions
-subs = {'002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-%subs = {'001'};
+%subs = {'002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
+subs = {'001'};
 tasks = {'rest', 'motor', 'emotion'};
 runs = {'1', '2'};
 echo = '2';

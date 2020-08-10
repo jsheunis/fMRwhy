@@ -22,6 +22,7 @@ options = fmrwhy_defaults;
 % Main input: BIDS root folder
 %bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
 bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/';
+bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS/';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -34,8 +35,8 @@ end
 options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
-%subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-subs = {'001'};
+subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
+%subs = {'001'};
 ses = '';
 
 
@@ -154,14 +155,6 @@ for s = 1:numel(subs)
         MEparams.S0_3D_thresholded = nii.img;
         disp('---')
     end
-
-    %% Visualise t2star and s0 maps
-    %[p1, frm1, rg1, dim1] = fmrwhy_util_readNifti(t2star_fn);
-    %[p2, frm2, rg2, dim2] = fmrwhy_util_readNifti(s0_fn);
-    %t2star_montage = fmrwhy_util_createMontage(p1.nii.img, 9, 1, 'T2star', 'hot', 'on', 'max');
-    %colorbar; % caxis([0 200]);
-    %s0_montage = fmrwhy_util_createMontage(p2.nii.img, 9, 1, 'S0', 'parula', 'on', 'max');
-    %colorbar;
 
     % --------
     % --------
@@ -298,37 +291,3 @@ for s = 1:numel(subs)
         end
     end
 end
-%
-%%%
-
-%for p = 1:4
-%    functional_fn = smooth_fns{p}
-%%    mask_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
-%%    mask_img = spm_read_vols(spm_vol(mask_fn));
-%%    roi_img = fmrwhy_util_createBinaryImg(mask_img, 0.1);
-%    mask_fn1 = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftAmygdala_roi.nii']);
-%    mask_fn2 = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightAmygdala_roi.nii']);
-%
-%
-%
-%    mask_img1 = spm_read_vols(spm_vol(mask_fn1));
-%    mask_img2 = spm_read_vols(spm_vol(mask_fn2));
-%    roi_img1 = fmrwhy_util_createBinaryImg(mask_img1, 0.1);
-%    roi_img2 = fmrwhy_util_createBinaryImg(mask_img2, 0.1);
-%    roi_img = roi_img1 | roi_img2;
-%    task_info.TR = options.firstlevel.(task).sess_params.timing_RT;
-%    task_info.onsets = options.firstlevel.(task).sess_params.cond_onset;
-%    task_info.durations = options.firstlevel.(task).sess_params.cond_duration;
-%    task_info.precision = 1;
-%    tsnr_fn = tsnr_fns{p};
-%%    str1 = 'Finger tapping - Left motor cortex - Single echo';
-%%    str2 = 'Finger tapping - Left motor cortex - Multi-echo combined (method T2star)';
-%%    str3 = 'Finger tapping - Left motor cortex - Multi-echo combined (method tSNR)';
-%%    str4 = 'Finger tapping - Left motor cortex - Multi-echo combined (method TE)';
-%    str1 = 'Hariri task - Bilateral amygdala - Single echo';
-%    str2 = 'Hariri task - Bilateral amygdala - Multi-echo combined (method T2star)';
-%    str3 = 'Hariri task - Bilateral amygdala - Multi-echo combined (method tSNR)';
-%    str4 = 'Hariri task - Bilateral amygdala - Multi-echo combined (method TE)';
-%    title_str = {str1, str2, str3, str4};
-%    fmrwhy_util_computeROImeasures(functional_fn, roi_img, task_info, tsnr_fn, title_str{p}, options)
-%end

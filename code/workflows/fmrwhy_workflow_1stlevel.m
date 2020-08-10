@@ -15,8 +15,7 @@
 options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
-%bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
-bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
+bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);

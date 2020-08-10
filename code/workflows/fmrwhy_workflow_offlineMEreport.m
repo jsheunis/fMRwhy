@@ -70,6 +70,7 @@ roi_fns = {};
 roi_fns{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
 roi_fns{2} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rbilateralAmygdala_roi.nii']);
 compare_roi_txt = {'left motor cortex', 'bilateral amygdala'};
+roi_desc_txt = {'lmotor', 'bamygdala'};
 % Grab+load ROI image data; get ROI indices; combine ROI image data into a single overlay image
 roi_img = {};
 I_roi = {};
@@ -80,6 +81,8 @@ for i = 1:numel(roi_fns)
     I_roi{i} = find(roi_img{i}(:));
     overlay_img = overlay_img | roi_img{i};
 end
+% Transform to MNI
+transformation_fn = options.indiv_to_mni_fn;
 
 % -------
 % STEP 3: Visualise t2star and s0 maps
@@ -89,33 +92,15 @@ t2star_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run 
 t2star_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_t2star.png']);
 [p1, frm1, rg1, dim1] = fmrwhy_util_readOrientNifti(t2star_fn);
 t2star_img = fmrwhy_util_maskImage(p1.nii.img, mask_img_oriented);
-t2star_img(t2star_img>=500) = 0; % TODO, is this fine to do?
-t2star_montage = fmrwhy_util_createStatsOverlayMontage(t2star_img, [], overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 200], [], rgb_onhot, true, t2star_png);
-%t2star_montage = fmrwhy_util_createMontage(t2star_img, 9, 1, 'T2star', 'hot', 'off', 'max', [0 200]);
-%fmrwhy_util_stretchAx(t2star_montage.ax)
-%fmrwhy_util_removeTicksAx(t2star_montage.ax)
-%colorbar; % caxis([0 200]);
-
-
-
-
-if ~exist(t2star_png, 'file')
-    print(t2star_montage.f, t2star_png,'-dpng', '-r0')
-end
+t2star_img(t2star_img>=500) = 0; % TODO, is this fine to do? Also, isn't this already done when estimating t2star map the first time?
+t2star_montage = fmrwhy_util_createStatsOverlayMontage(t2star_img, [], overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 120], [], rgb_onhot, true, t2star_png);
 % S0
 s0_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.nii']);
 s0_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-MEparams_s0.png']);
 [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(s0_fn);
 s0_img = fmrwhy_util_maskImage(p2.nii.img, mask_img_oriented);
 s0_montage = fmrwhy_util_createStatsOverlayMontage(s0_img, [], overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 7000], [], rgb_onparula, true, s0_png);
-%s0_montage = fmrwhy_util_createMontage(s0_img, 9, 1, 'S0', 'parula', 'off', 'max', [0 20000]);
-%fmrwhy_util_stretchAx(s0_montage.ax)
-%fmrwhy_util_removeTicksAx(s0_montage.ax)
-%colorbar;
 
-if ~exist(s0_png, 'file')
-    print(s0_montage.f, s0_png,'-dpng', '-r0')
-end
 
 % -------
 % STEP 4: For all tasks and runs, generate ME-related images
@@ -125,6 +110,9 @@ runs = {'1', '2'};
 combined_str = {'Echo 2', 'T2star', 'tSNR', 'TE'};
 roi_text = {'', 'left motor cortex', 'bilateral amygdala'};
 task_names = {'rest', 'Right finger tapping', 'Hariri task'}
+toTransform_fns = {};
+saveAs_transform_fns = {};
+count = 0;
 
 
 for t = 1:numel(tasks)
@@ -144,7 +132,7 @@ for t = 1:numel(tasks)
             bold_fns{3} = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-3_desc-rapreproc_bold.nii']);
             % use arbitrary volume number
             volume_nr = 5;
-            % Create image outputs for original multi-echo bold data
+            % Create image outputs for templare run multi-echo bold data
             bold_pngs = {};
             for i = 1:numel(bold_fns)
                 [dir_name, file_name, ext] = fileparts(bold_fns{i});
@@ -155,19 +143,14 @@ for t = 1:numel(tasks)
                     bold_montage = fmrwhy_util_createStatsOverlayMontage(bold_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, bold_pngs{i});
                 end
             end
-            % Create image outputs for original multi-echo tsnr data
+            % Create image outputs for template run multi-echo tsnr data
             tsnr_fns = {};
             tsnr_pngs = {};
             for i = 1:numel(bold_fns)
-
                 [dir_name, file_name, ext] = fileparts(bold_fns{i});
                 tsnr_fns{i} = fullfile(options.func_dir_me, [file_name ext]);
                 tsnr_fns{i} = strrep(tsnr_fns{i}, 'bold.nii', 'tsnr.nii');
                 tsnr_pngs{i} = strrep(tsnr_fns{i}, '.nii', '.png');
-%                [di, fi, ex] = fileparts(tsnr_pngs{i});
-%                di
-%                fi
-%                ex
                 if ~exist(tsnr_pngs{i}, 'file')
                     disp(['File exists: ' tsnr_pngs{i}])
                     [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(tsnr_fns{i});
@@ -176,6 +159,15 @@ for t = 1:numel(tasks)
                 end
             end
 
+            % setup filenames for eventual transformations to MNI space
+            toTransform_fns = [toTransform_fns, tsnr_fns];
+            save_rafunctional1_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-rest_run-1_echo-1_space-MNI152_desc-rapreproc_tsnr.nii']);
+            save_rafunctional2_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-rest_run-1_echo-2_space-MNI152_desc-rapreproc_tsnr.nii']);
+            save_rafunctional3_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-rest_run-1_echo-3_space-MNI152_desc-rapreproc_tsnr.nii']);
+            run1_saveAs_fns = {save_rafunctional1_fn, save_rafunctional2_fn, save_rafunctional3_fn};
+            saveAs_transform_fns = [saveAs_transform_fns, run1_saveAs_fns];
+
+            % Nothing to do for combined timeseries of task rest run 1 (they dont exist)
             disp('------------')
             disp(['Skipping Combined files for: Task = ' task ';  Run = ' run])
             disp('------------')
@@ -213,12 +205,6 @@ for t = 1:numel(tasks)
                 [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_fns{i});
                 bold_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
                 bold_montage = fmrwhy_util_createStatsOverlayMontage(bold_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, bold_pngs{i});
-%                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_fns{i});
-%                bold_img = fmrwhy_util_maskImage(p.nii.img(:,:,:,volume_nr), mask_img_oriented);
-%                bold_montage = fmrwhy_util_createMontage(bold_img, 9, 1, ['Echo ' num2str(i)], 'gray', 'off', 'max', 0);
-%                fmrwhy_util_stretchAx(bold_montage.ax)
-%                fmrwhy_util_removeTicksAx(bold_montage.ax)
-%                print(bold_montage.f, bold_pngs{i},'-dpng', '-r0');
             end
         end
         % Create image outputs for combined multi-echo data
@@ -229,13 +215,6 @@ for t = 1:numel(tasks)
                 [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_combined_fns{i});
                 combined_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
                 combined_montage = fmrwhy_util_createStatsOverlayMontage(combined_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, combined_pngs{i});
-
-%                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(bold_combined_fns{i});
-%                combined_img = fmrwhy_util_maskImage(p.nii.img(:,:,:,volume_nr), mask_img_oriented);
-%                combined_montage = fmrwhy_util_createMontage(combined_img, 9, 1, ['Combined - ' combined_str{i+1}], 'gray', 'off', 'max', 0);
-%                fmrwhy_util_stretchAx(combined_montage.ax)
-%                fmrwhy_util_removeTicksAx(combined_montage.ax)
-%                print(combined_montage.f, combined_pngs{i},'-dpng', '-r0');
             end
         end
 
@@ -253,6 +232,7 @@ for t = 1:numel(tasks)
         tsnr_fns{2} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEt2star_tsnr.nii']);
         tsnr_fns{3} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEtsnr_tsnr.nii']);
         tsnr_fns{4} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEte_tsnr.nii']);
+        % Create filenames for tsnr and percdiff pngs; and add filenames for tranforms to cell array
         tsnr_pngs = {};
         percdiff_pngs = {};
         distr_png = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-tsnrPercdiffRainclouds.png']);
@@ -261,8 +241,12 @@ for t = 1:numel(tasks)
             if i > 1
                 percdiff_pngs{i-1} = strrep(tsnr_fns{i}, '_tsnr.nii', '_percdiff.png');
             end
+            % transform filenames
+            toTransform_fns = [toTransform_fns, {tsnr_fns{i}}];
+            saveAs_transform_fn = strrep(tsnr_fns{i}, '_desc-', '_space-MNI152_desc-');
+            saveAs_transform_fns = [saveAs_transform_fns, {saveAs_transform_fn}];
         end
-
+        % Call function to calculate and output all comparisons, montages, raincloud plots, etc
         fmrwhy_util_compareTSNR(tsnr_fns, mask_fn, roi_fns, compare_roi_txt , tsnr_pngs, percdiff_pngs, distr_png);
 
 
@@ -310,4 +294,52 @@ for t = 1:numel(tasks)
         end
     end
 end
+
+% -------
+% STEP 5: Warping
+% -------
+% Output:
+%   - tSNR images warped to MNI152 space
+% -------
+fmrwhy_batch_normaliseWrite(toTransform_fns, transformation_fn, template_fn, saveAs_transform_fns)
+
+
+% -------
+% STEP 6: Delineate tSNR values per tissue type and ROI
+% -------
+%   - TSVs with tsnr values extracted per tissue mask (GM, WM, CSF, whole brain) and ROI
+
+for i = 1:numel(toTransform_fns)
+    [p_tsnr, frm, rg, dim] = fmrwhy_util_readOrientNifti(toTransform_fns{i});
+    tsnr_img = p_tsnr.nii.img(:);
+    for j = 1:4
+        vals = tsnr_img(masks_oriented.([masks_oriented.field_names{j} '_mask_I']));
+        tsnr_output_fn = strrep(toTransform_fns{i}, '_tsnr.nii', ['_' masks_oriented.field_names{j} 'tsnr.tsv']);
+        temp_txt_fn = strrep(tsnr_output_fn, '.tsv', '_temp.txt');
+        data_table = array2table(vals,'VariableNames', {'tsnr'});
+        writetable(data_table, temp_txt_fn, 'Delimiter','\t');
+        [status, msg, msgID] = movefile(temp_txt_fn, tsnr_output_fn);
+    end
+
+    for k = 1:numel(roi_fns)
+        [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(roi_fns{k});
+        roi_img = fmrwhy_util_createBinaryImg(p.nii.img, 0.1);
+        roi_img_2D = roi_img(:);
+        I_roi = find(roi_img_2D);
+        masked_tsnr_img = fmrwhy_util_maskImage(p_tsnr.nii.img, roi_img);
+
+        for j = 1:4
+            overlap = masks_oriented.([masks_oriented.field_names{j} '_mask_2D']) & roi_img_2D;
+            vals = tsnr_img(find(overlap));
+            tsnr_output_fn = strrep(toTransform_fns{i}, '_tsnr.nii', ['_' roi_desc_txt{k} masks_oriented.field_names{j} 'tsnr.tsv']);
+            temp_txt_fn = strrep(tsnr_output_fn, '.tsv', '_temp.txt');
+            data_table = array2table(vals,'VariableNames', {'tsnr'});
+            writetable(data_table, temp_txt_fn, 'Delimiter','\t');
+            [status, msg, msgID] = movefile(temp_txt_fn, tsnr_output_fn);
+        end
+    end
+end
+
+
+
 
