@@ -1,4 +1,4 @@
-function spm_estimateModel_jsh(stats_dir)
+function fmrwhy_batch_estimate1stlevel(stats_dir)
 
 % SETUP BATCH JOB STRUCTURE
 spm('defaults','fmri');
