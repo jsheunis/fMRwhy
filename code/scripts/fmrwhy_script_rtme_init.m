@@ -18,9 +18,9 @@
 
 sub = '001';
 ses = '';
-task = 'motor';
-%task = 'emotion';
-run = '1';
+%task = 'motor';
+task = 'emotion';
+run = '2';
 echo = '2';
 
 

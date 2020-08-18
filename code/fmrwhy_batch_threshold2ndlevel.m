@@ -18,10 +18,10 @@ results.matlabbatch{1}.spm.stats.results.conspec = conspec;
 % units
 results.matlabbatch{1}.spm.stats.results.units = 1;
 % export
-%results.matlabbatch{1}.spm.stats.results.export{1}.ps = 1;
-%results.matlabbatch{1}.spm.stats.results.export{2}.jpg = 1;
-%results.matlabbatch{1}.spm.stats.results.export{3}.binary.basename = 'binary_clusters';
-%results.matlabbatch{1}.spm.stats.results.export{4}.nary.basename = 'nary_clusters';
+results.matlabbatch{1}.spm.stats.results.export{1}.ps = 1;
+results.matlabbatch{1}.spm.stats.results.export{2}.jpg = 1;
+results.matlabbatch{1}.spm.stats.results.export{3}.binary.basename = 'binary_clusters';
+results.matlabbatch{1}.spm.stats.results.export{4}.nary.basename = 'nary_clusters';
 
 % RUN BATCH JOB
 spm_jobman('run',results.matlabbatch);

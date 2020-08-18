@@ -32,6 +32,7 @@ norm_percValues = nan(N_roi, Ndyn);
 F = cell(Ne,1);
 F_dyn_denoised = F;
 rF = F;
+srF = nan(Nx*Ny*Nz,Ndyn);
 realign_params = F;
 fdyn_fn = F;
 F_dyn_img = F;
@@ -299,18 +300,18 @@ for i = 1:Nt
             combined_tsnr_pre(:,j) = combined_tsnr_pre_3D(:);
             combined_te_pre(:,j) = combined_te_pre_3D(:);
 
-            signals_raw_3D{1}(:,j) = combined_t2s_pre_3D;
-            signals_raw_3D{2}(:,j) = combined_t2s_rt_3D;
-            signals_raw_3D{3}(:,j) = combined_tsnr_pre_3D;
-            signals_raw_3D{4}(:,j) = combined_te_pre_3D;
-            signals_raw_3D{5}(:,j) = reslVol{2};
-            signals_raw_3D{6}(:,j) = me_params.T2star_3D_thresholded
-            signals_raw{1}(:,j) = combined_t2s_pre(:,j);
-            signals_raw{2}(:,j) = combined_t2s_rt(:,j);
-            signals_raw{3}(:,j) = combined_tsnr_pre(:,j);
-            signals_raw{4}(:,j) = combined_te_pre(:,j);
-            signals_raw{5}(:,j) = reslVol{2}(:);
-            signals_raw{6}(:,j) = T2star_pv_corrected(:,j);
+            signals_raw_3D{1,j} = reslVol{2};                       % Echo 2
+            signals_raw_3D{2,j} = combined_tsnr_pre_3D;             % Pre-tSNR combined
+            signals_raw_3D{3,j} = combined_t2s_pre_3D;              % Pre-T2* combined
+            signals_raw_3D{4,j} = combined_te_pre_3D;               % Pre-TE combined
+            signals_raw_3D{5,j} = combined_t2s_rt_3D;               % RT-T2* combined
+            signals_raw_3D{6,j} = me_params.T2star_3D_thresholded;  % T2* FIT
+            signals_raw{1,j} = reslVol{2}(:);
+            signals_raw{2,j} = combined_tsnr_pre(:,j);
+            signals_raw{3,j} = combined_t2s_pre(:,j);
+            signals_raw{4,j} = combined_te_pre(:,j);
+            signals_raw{5,j} = combined_t2s_rt(:,j);
+            signals_raw{6,j} = T2star_pv_corrected(:,j);
 
             rf = combined_tsnr_pre_3D;
         else
@@ -321,271 +322,266 @@ for i = 1:Nt
         rf = rF{1}(:,j);
     end
 
+    % STEP 5: SMOOTH REALIGNED VOLUME
+    % Using OpenNFT functionality and SPM
+    srf = zeros(Nx, Ny, Nz);
+    gKernel = smoothing_kernel ./ dicomInfoVox;
+    spm_smooth(rf, srf, gKernel);
+    srF(:,j) = srf(:);
+%    signals_smoothed{s}(:,j) = srf(:);
 
-    for s = 1:numel(signals_raw)
-
-        rf = signals_raw_3D{s};
-
-        % STEP 5: SMOOTH REALIGNED VOLUME
-        % Using OpenNFT functionality and SPM
-        srf = zeros(Nx, Ny, Nz);
-        gKernel = smoothing_kernel ./ dicomInfoVox;
-        spm_smooth(rf, srf, gKernel);
-%        srF(:,j) = srf(:);
-        signals_smoothed{s}(:,j) = srf(:);
-
-        % STEP 6: AR(1) FILTERING OF SMOOTHED VOLUME
-        if iglmAR1
-            if j == 1
-                % initalize first AR(1) volume
-                asrF(:,j) = (1 - aAR1) * srF(:,j);
-            else
-                asrF(:,j) = srF(:,j) - aAR1 * asrF(:,j-1);
-            end
+    % STEP 6: AR(1) FILTERING OF SMOOTHED VOLUME
+    if iglmAR1
+        if j == 1
+            % initalize first AR(1) volume
+            asrF(:,j) = (1 - aAR1) * srF(:,j);
         else
-            asrF(:,j) = srF(:,j);
+            asrF(:,j) = srF(:,j) - aAR1 * asrF(:,j-1);
         end
+    else
+        asrF(:,j) = srF(:,j);
+    end
 
-        % STEP 7: iGLM FOR VOLUME
-        if isIGLM
-            % Scaling settings
-            if fLockedTempl
-                if j == 1
-                    % Only set the scaling settings based on first iteration
-                    max_smReslVol = max(asrF(:,j));
-                    min_smReslVol = min(asrF(:,j));
-                    normSmReslVol = (asrF(:,j)-min_smReslVol) / (max_smReslVol-min_smReslVol);
-                end
-            else
-                % Update scaling settings on each iteration
+    % STEP 7: iGLM FOR VOLUME
+    if isIGLM
+        % Scaling settings
+        if fLockedTempl
+            if j == 1
+                % Only set the scaling settings based on first iteration
                 max_smReslVol = max(asrF(:,j));
                 min_smReslVol = min(asrF(:,j));
                 normSmReslVol = (asrF(:,j)-min_smReslVol) / (max_smReslVol-min_smReslVol);
             end
-
-            % Constant regressor is always included
-            constRegr = constRegrFull(1:j);
-            if isRegrIGLM
-                % Create empty nuisance regressors
-                motRegr = [];
-                linRegr = [];
-                highPassRegr = [];
-                % Set regressor content if they need to be included in design
-                % matrix
-                if isMotionRegr
-                    if Ne > 1
-                        motRegr = zscore(MP(1:j,:));
-                    else
-                        motRegr = zscore(MP(1:j,:));
-                    end
-                end
-                if isLinRegr
-                    linRegr = linRegrFull(1:j);
-                end
-                if isHighPass
-                    highPassRegr = cosine_basis_set(1:j, :);
-                end
-                % Construct design matrix without task/baseline conditions, i.e.
-                % including nuisance and constant regressors
-                tmpRegr = horzcat(motRegr, linRegr, highPassRegr, constRegr);
-            else
-                tmpRegr = constRegr;
-            end
-            nrBasFctRegr = size(tmpRegr, 2);
-
-            % AR(1) for regressors of no interest
-            if iglmAR1
-                tmpRegr = arRegr_opennft(aAR1,tmpRegr);
-            end
-            % combine with prepared basFct design regressors
-            basFctRegr = [basFct(1:j,:), tmpRegr];
-
-            % estimate iGLM
-            [idxActVoxIGLM, dyntTh, tTh, Cn, Dn, s2n, tn, neg_e2n] = ...
-                onlineBrain_iGLM(Cn, Dn, s2n, tn, asrF(:,j), j, ...
-                (nrBasFct+nrBasFctRegr), tContr, basFctRegr, pVal, ...
-                dyntTh, tTh, spmMaskTh);
-
-            % catch negative iGLM estimation error message for log
-            NEG_e2n{j} = neg_e2n;
-            if ~isempty(neg_e2n)
-                disp('HERE THE NEGATIVE e2n!!!')
-            end
-            I_activeVoxels{j} = idxActVoxIGLM;
         else
-            idxActVoxIGLM = [];
-        end
-        % handle empty activation map and division by 0
-        if ~isempty(idxActVoxIGLM) && max(tn) > 0
-            maskedStatMapVect = tn(idxActVoxIGLM);
-            maxTval = max(maskedStatMapVect);
-            statMapVect = maskedStatMapVect;
-            statMap3D(idxActVoxIGLM) = statMapVect;
-            statMap4D{j} = statMap3D;
+            % Update scaling settings on each iteration
+            max_smReslVol = max(asrF(:,j));
+            min_smReslVol = min(asrF(:,j));
+            normSmReslVol = (asrF(:,j)-min_smReslVol) / (max_smReslVol-min_smReslVol);
         end
 
-        % STEP 8 + 9 + 10: cGLM NUISANCE REGRESSION, KALMAN FILTERING AND SCALING OF SIGNAL IN ROI(s)
-        if isPhysRegr
-            rawTimeSeriesREF(N_ROI_REF,j) = mean(asrF(I_roi{N_ROI_REF},j));
-        end
-        for roi = 1:numel(ROI_img)
-
-            rawTimeSeries(roi,j) = mean(asrF(I_roi{roi},j));
-
-            % Limits for scaling
-            initLim(roi) = 0.005*mean(rawTimeSeries(roi,1:j));
-
-            % Raw for Display (STEPHAN: FIGURE OUT WHY THIS IS DONE)
-            displRawTimeSeries(roi,j) = rawTimeSeries(roi, j)-rawTimeSeries(roi, 1);
-
-            % To avoid NaNs given algnment to zero, see preprVol()
-            motCorrParam(1,:) = 0.00001;
-
-            % Get full time series up to current iteration
-            tmp_rawTimeSeries = rawTimeSeries(roi, 1:j)';
-            % tmp_rawTimeSeriesREF = rawTimeSeriesREF(roi, 1:j)';
-
-            % Time-series AR(1) filtering
-            if cglmAR1
-                % initalize first AR(1) value
-                if j == 1
-                    tmp_rawTimeSeriesAR1(roi,j) = (1 - aAR1) * tmp_rawTimeSeries(j);
-                else
-                    tmp_rawTimeSeriesAR1(roi,j) = tmp_rawTimeSeries(j) - aAR1 * tmp_rawTimeSeriesAR1(roi,j-1);
-                end
-                % replace raw ime-series with AR(1) time-series
-                clear tmp_rawTimeSeries
-                tmp_rawTimeSeries = tmp_rawTimeSeriesAR1(roi, :)';
-            end
-
-            % Setup design matrix regressors
-            constRegrC = constRegrFull(1:j); % Constant regressor is always included
-            linRegrC = [];
-            motRegrC = [];
-            designRegrC = [];
-            physRegrC = [];
-
-            % Step-wise addition of regressors, step = total nr of regressors,
-            % which may require a justification for particular project
-            regrStep = nrRegrToCorrect + nrRegrDesign; % 1 + 1 + 6 + 1 = 9
-            if j < regrStep
-                % only include constant regressor
-            elseif (j >= regrStep) && (j < 2*regrStep)
-                % include constant and linear regressors
-                linRegrC = linRegrFull(1:j);
-            else %(j >= 2*regrStep)
-                % include constant, linear and motion correction regressors
-                linRegrC = linRegrFull(1:j);
+        % Constant regressor is always included
+        constRegr = constRegrFull(1:j);
+        if isRegrIGLM
+            % Create empty nuisance regressors
+            motRegr = [];
+            linRegr = [];
+            highPassRegr = [];
+            % Set regressor content if they need to be included in design
+            % matrix
+            if isMotionRegr
                 if Ne > 1
-                    motRegrC = zscore(MP(1:j,:));
+                    motRegr = zscore(MP(1:j,:));
                 else
-                    motRegrC = zscore(MP(1:j,:));
-                end
-                if isPhysRegr
-                    physRegrC = rawTimeSeriesREF(N_ROI_REF,1:j)';
+                    motRegr = zscore(MP(1:j,:));
                 end
             end
-
-            % Concatenate regressors of no interest
-            tmpRegr = horzcat(constRegrC, linRegrC, motRegrC);
-            if isPhysRegr
-                tmpRegr = horzcat(constRegrC, linRegrC, motRegrC, physRegrC);
+            if isLinRegr
+                linRegr = linRegrFull(1:j);
             end
-
-            % AR(1) for regressors of no interest
-            if cglmAR1
-                tmpRegr = arRegr_opennft(aAR1,tmpRegr); %TODO, rename and move this function?
+            if isHighPass
+                highPassRegr = cosine_basis_set(1:j, :);
             end
-
-            % Create final design matrix and estimate GLM parameters
-            if j < 3*regrStep
-                % estimate GLM parameters for case where task regressor is not
-                % included
-                cX = tmpRegr;
-                beta = pinv(cX) * tmp_rawTimeSeries;
-                tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX * beta)';
-            else
-                % First include task regressor into design matrix
-                cX = [tmpRegr spmDesign(1:j,:)];
-                beta = pinv(cX) * tmp_rawTimeSeries;
-                tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX * [beta(1:end-1); zeros(1,1)])';
-            end
-
-            glmProcTimeSeries(roi, j) = tmp_glmProcTimeSeries(end);
-
-            % Modified Kalman low-pass filter + spike identification & correction
-            tmpStd = std(glmProcTimeSeries(roi,1:j));
-            S(roi).Q = tmpStd^2;
-            S(roi).R = 1.95*tmpStd^2;
-            kalmThreshold = 0.9*tmpStd;
-            [kalmanProcTimeSeries(roi,j), S(roi), fPositDerivSpike(roi), fNegatDerivSpike(roi)] = ...
-                onlineBrain_modifKalman(kalmThreshold, glmProcTimeSeries(roi,j), S(roi), fPositDerivSpike(roi), fNegatDerivSpike(roi));
-
-            % Scaling
-            slWind = basBlockLength * nrBlocksInSlidingWindow;
-            [scalProcTimeSeries(roi, j), tmp_posMin(roi), tmp_posMax(roi)] = ...
-                onlineBrain_scaleTimeSeries(kalmanProcTimeSeries(roi,1:j), j, slWind, basBlockLength, initLim(roi), vectEncCond(1:j), tmp_posMin(roi), tmp_posMax(roi));
-            posMin(roi,j)=tmp_posMin(roi);
-            posMax(roi,j)=tmp_posMax(roi);
-        end
-        % calcualte average limits for 2 ROIs, e.g. for bilateral NF
-        % NF extensions with >2 ROIs requires an additional justification
-        mposMax(j)= mean(posMax(:, j));
-        mposMin(j)= mean(posMin(:, j));
-
-        % STEP 11: NEUROFEEDBACK SIGNAL CALCULATION / PRESENTATION
-        if baseline_design(j) == 1
-            % If the current iteration is in a baseline block, feedback value
-            % is zero for all ROIs
-            NFB(:,j) = 0;
-            NFB_disp(:,j) = 0;
+            % Construct design matrix without task/baseline conditions, i.e.
+            % including nuisance and constant regressors
+            tmpRegr = horzcat(motRegr, linRegr, highPassRegr, constRegr);
         else
-            % If the current iteration is in a task block, feedback value
-            % is calculated as PSC of current value compared to cumulative
-            % basline mean/median. This is done per ROI
-            i_bas = I_baseline(I_baseline<j);
-            for roi = 1:numel(ROI_img)
-                mBas = median(scalProcTimeSeries(roi,i_bas));
-                mCond = scalProcTimeSeries(roi,j);
-                norm_percValues(roi, j) = mCond - mBas;
-                % tmp_fbVal = median(norm_percValues); ==> OpenNFT calculates
-                % median over ROIs, e.g. when interested in signal in multiple
-                % ROIs like bilateral occipital cortices
-                NFB(roi,j) = norm_percValues(roi, j);
-                NFB_disp(roi,j) = round(10000 * NFB(roi,j)) /100;
-                % [1...100], for Display
-                if NFB_disp(roi,j) < 1
-                    NFB_disp(roi,j) = 1;
-                end
-                if NFB_disp(roi,j) > 100
-                    NFB_disp(roi,j) = 100;
-                end
-            end
+            tmpRegr = constRegr;
         end
+        nrBasFctRegr = size(tmpRegr, 2);
 
-        % STEP 12: UPDATE PLOTS
-        % TODO: ROIPOLY to draw a polygon for user-specified roi (e.g. extract signal)
-        % TODO: INPOLYGON to check if buttonpress is inside mask/ROI boundary
-        if showMontage
-        else
-            if ~isempty(idxActVoxIGLM)
-                tmap = statMap4D{j};
-                tmap_masked = zeros(size(tmap));
-                tmap_masked(I_mask) = tmap(I_mask);
-                tmap_rot = rot90(squeeze(tmap_masked(:,:,Nslice)),rotateVal);
-                normA = tmap_rot - min(tmap_rot(:));
-                normA = normA ./ max(normA(:));
-                set(im2, 'AlphaData', normA);
-            end
+        % AR(1) for regressors of no interest
+        if iglmAR1
+            tmpRegr = arRegr_opennft(aAR1,tmpRegr);
         end
-        set(ln1, 'XData', [j j]);
-        set(pl2, 'YData', rawTimeSeries(roi1,:));
-        set(pl22, 'YData', rawTimeSeries(roi2,:));
-        set(pl3, 'YData', kalmanProcTimeSeries(roi1,:));
-        set(pl32, 'YData', kalmanProcTimeSeries(roi2,:));
-        set(b_handle, 'Ydata', NFB_disp(roi1,j))
-        drawnow;
+        % combine with prepared basFct design regressors
+        basFctRegr = [basFct(1:j,:), tmpRegr];
+
+        % estimate iGLM
+        [idxActVoxIGLM, dyntTh, tTh, Cn, Dn, s2n, tn, neg_e2n] = ...
+            onlineBrain_iGLM(Cn, Dn, s2n, tn, asrF(:,j), j, ...
+            (nrBasFct+nrBasFctRegr), tContr, basFctRegr, pVal, ...
+            dyntTh, tTh, spmMaskTh);
+
+        % catch negative iGLM estimation error message for log
+        NEG_e2n{j} = neg_e2n;
+        if ~isempty(neg_e2n)
+            disp('HERE THE NEGATIVE e2n!!!')
+        end
+        I_activeVoxels{j} = idxActVoxIGLM;
+    else
+        idxActVoxIGLM = [];
     end
+    % handle empty activation map and division by 0
+    if ~isempty(idxActVoxIGLM) && max(tn) > 0
+        maskedStatMapVect = tn(idxActVoxIGLM);
+        maxTval = max(maskedStatMapVect);
+        statMapVect = maskedStatMapVect;
+        statMap3D(idxActVoxIGLM) = statMapVect;
+        statMap4D{j} = statMap3D;
+    end
+
+    % STEP 8 + 9 + 10: cGLM NUISANCE REGRESSION, KALMAN FILTERING AND SCALING OF SIGNAL IN ROI(s)
+    if isPhysRegr
+        rawTimeSeriesREF(N_ROI_REF,j) = mean(asrF(I_roi{N_ROI_REF},j));
+    end
+    for roi = 1:numel(ROI_img)
+
+        rawTimeSeries(roi,j) = mean(asrF(I_roi{roi},j));
+
+        % Limits for scaling
+        initLim(roi) = 0.005*mean(rawTimeSeries(roi,1:j));
+
+        % Raw for Display (STEPHAN: FIGURE OUT WHY THIS IS DONE)
+        displRawTimeSeries(roi,j) = rawTimeSeries(roi, j)-rawTimeSeries(roi, 1);
+
+        % To avoid NaNs given algnment to zero, see preprVol()
+        motCorrParam(1,:) = 0.00001;
+
+        % Get full time series up to current iteration
+        tmp_rawTimeSeries = rawTimeSeries(roi, 1:j)';
+        % tmp_rawTimeSeriesREF = rawTimeSeriesREF(roi, 1:j)';
+
+        % Time-series AR(1) filtering
+        if cglmAR1
+            % initalize first AR(1) value
+            if j == 1
+                tmp_rawTimeSeriesAR1(roi,j) = (1 - aAR1) * tmp_rawTimeSeries(j);
+            else
+                tmp_rawTimeSeriesAR1(roi,j) = tmp_rawTimeSeries(j) - aAR1 * tmp_rawTimeSeriesAR1(roi,j-1);
+            end
+            % replace raw ime-series with AR(1) time-series
+            clear tmp_rawTimeSeries
+            tmp_rawTimeSeries = tmp_rawTimeSeriesAR1(roi, :)';
+        end
+
+        % Setup design matrix regressors
+        constRegrC = constRegrFull(1:j); % Constant regressor is always included
+        linRegrC = [];
+        motRegrC = [];
+        designRegrC = [];
+        physRegrC = [];
+
+        % Step-wise addition of regressors, step = total nr of regressors,
+        % which may require a justification for particular project
+        regrStep = nrRegrToCorrect + nrRegrDesign; % 1 + 1 + 6 + 1 = 9
+        if j < regrStep
+            % only include constant regressor
+        elseif (j >= regrStep) && (j < 2*regrStep)
+            % include constant and linear regressors
+            linRegrC = linRegrFull(1:j);
+        else %(j >= 2*regrStep)
+            % include constant, linear and motion correction regressors
+            linRegrC = linRegrFull(1:j);
+            if Ne > 1
+                motRegrC = zscore(MP(1:j,:));
+            else
+                motRegrC = zscore(MP(1:j,:));
+            end
+            if isPhysRegr
+                physRegrC = rawTimeSeriesREF(N_ROI_REF,1:j)';
+            end
+        end
+
+        % Concatenate regressors of no interest
+        tmpRegr = horzcat(constRegrC, linRegrC, motRegrC);
+        if isPhysRegr
+            tmpRegr = horzcat(constRegrC, linRegrC, motRegrC, physRegrC);
+        end
+
+        % AR(1) for regressors of no interest
+        if cglmAR1
+            tmpRegr = arRegr_opennft(aAR1,tmpRegr); %TODO, rename and move this function?
+        end
+
+        % Create final design matrix and estimate GLM parameters
+        if j < 3*regrStep
+            % estimate GLM parameters for case where task regressor is not
+            % included
+            cX = tmpRegr;
+            beta = pinv(cX) * tmp_rawTimeSeries;
+            tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX * beta)';
+        else
+            % First include task regressor into design matrix
+            cX = [tmpRegr spmDesign(1:j,:)];
+            beta = pinv(cX) * tmp_rawTimeSeries;
+            tmp_glmProcTimeSeries = (tmp_rawTimeSeries - cX * [beta(1:end-1); zeros(1,1)])';
+        end
+
+        glmProcTimeSeries(roi, j) = tmp_glmProcTimeSeries(end);
+
+        % Modified Kalman low-pass filter + spike identification & correction
+        tmpStd = std(glmProcTimeSeries(roi,1:j));
+        S(roi).Q = tmpStd^2;
+        S(roi).R = 1.95*tmpStd^2;
+        kalmThreshold = 0.9*tmpStd;
+        [kalmanProcTimeSeries(roi,j), S(roi), fPositDerivSpike(roi), fNegatDerivSpike(roi)] = ...
+            onlineBrain_modifKalman(kalmThreshold, glmProcTimeSeries(roi,j), S(roi), fPositDerivSpike(roi), fNegatDerivSpike(roi));
+
+        % Scaling
+        slWind = basBlockLength * nrBlocksInSlidingWindow;
+        [scalProcTimeSeries(roi, j), tmp_posMin(roi), tmp_posMax(roi)] = ...
+            onlineBrain_scaleTimeSeries(kalmanProcTimeSeries(roi,1:j), j, slWind, basBlockLength, initLim(roi), vectEncCond(1:j), tmp_posMin(roi), tmp_posMax(roi));
+        posMin(roi,j)=tmp_posMin(roi);
+        posMax(roi,j)=tmp_posMax(roi);
+    end
+    % calcualte average limits for 2 ROIs, e.g. for bilateral NF
+    % NF extensions with >2 ROIs requires an additional justification
+    mposMax(j)= mean(posMax(:, j));
+    mposMin(j)= mean(posMin(:, j));
+
+    % STEP 11: NEUROFEEDBACK SIGNAL CALCULATION / PRESENTATION
+    if baseline_design(j) == 1
+        % If the current iteration is in a baseline block, feedback value
+        % is zero for all ROIs
+        NFB(:,j) = 0;
+        NFB_disp(:,j) = 0;
+    else
+        % If the current iteration is in a task block, feedback value
+        % is calculated as PSC of current value compared to cumulative
+        % basline mean/median. This is done per ROI
+        i_bas = I_baseline(I_baseline<j);
+        for roi = 1:numel(ROI_img)
+            mBas = median(scalProcTimeSeries(roi,i_bas));
+            mCond = scalProcTimeSeries(roi,j);
+            norm_percValues(roi, j) = mCond - mBas;
+            % tmp_fbVal = median(norm_percValues); ==> OpenNFT calculates
+            % median over ROIs, e.g. when interested in signal in multiple
+            % ROIs like bilateral occipital cortices
+            NFB(roi,j) = norm_percValues(roi, j);
+            NFB_disp(roi,j) = round(10000 * NFB(roi,j)) /100;
+            % [1...100], for Display
+            if NFB_disp(roi,j) < 1
+                NFB_disp(roi,j) = 1;
+            end
+            if NFB_disp(roi,j) > 100
+                NFB_disp(roi,j) = 100;
+            end
+        end
+    end
+
+    % STEP 12: UPDATE PLOTS
+    % TODO: ROIPOLY to draw a polygon for user-specified roi (e.g. extract signal)
+    % TODO: INPOLYGON to check if buttonpress is inside mask/ROI boundary
+    if showMontage
+    else
+        if ~isempty(idxActVoxIGLM)
+            tmap = statMap4D{j};
+            tmap_masked = zeros(size(tmap));
+            tmap_masked(I_mask) = tmap(I_mask);
+            tmap_rot = rot90(squeeze(tmap_masked(:,:,Nslice)),rotateVal);
+            normA = tmap_rot - min(tmap_rot(:));
+            normA = normA ./ max(normA(:));
+            set(im2, 'AlphaData', normA);
+        end
+    end
+    set(ln1, 'XData', [j j]);
+    set(pl2, 'YData', rawTimeSeries(roi1,:));
+    set(pl22, 'YData', rawTimeSeries(roi2,:));
+    set(pl3, 'YData', kalmanProcTimeSeries(roi1,:));
+    set(pl32, 'YData', kalmanProcTimeSeries(roi2,:));
+    set(b_handle, 'Ydata', NFB_disp(roi1,j))
+    drawnow;
+
 
 
 end

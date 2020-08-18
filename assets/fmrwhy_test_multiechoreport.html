@@ -1,0 +1,446 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="assets/fmrwhy_test_multiechoreport.css">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="assets/fmrwhy_test_multiechoreport.js"></script>
+        <script>
+            window.onload = function() {
+                document.getElementById("button1").click();
+                document.getElementById("button2").click();
+                document.getElementById("button3").click();
+                document.getElementById("button4").click();
+                document.getElementById("button5").click();
+                document.getElementById("button6").click();
+                document.getElementById('runselector').value="motor_run-1";
+                $('#runselector').trigger('change');
+            };
+        </script>
+    </head>
+    <body>
+        <div class="topnav" >
+          <a class="active" href="#summary">Summary</a>
+          <a href="#anat">Template data</a>
+          <a href="#func">Combined data</a>
+          <div class="topnav-centered">
+            <img src="assets/fmrwhy_logo.jpeg" alt="Avatar" class="avatar">
+          </div>
+          <div class="topnav-right">
+              <a href="#home">fMRwhy Multi-echo Report</a>
+          </div>
+        </div>
+        <br>
+        <div id="summary" style="padding-left:3%; max-width:94%">
+            <h2>Summary: sub-001</h2>
+            <br>
+            <table class="qcsummary">
+              <tr>
+                <td>Study</td>
+                <td>NEUFEP-ME: neurofeedback, epilepsy, multi-echo</td>
+              </tr>
+              <tr>
+                <td>Subject ID</td>
+                <td>001</td>
+              </tr>
+              <tr>
+                <td>Report date/time</td>
+                <td>18-August-2020</td>
+              </tr>
+              <tr>
+                <td>Anatomical resolution</td>
+                <td>1x1x1 mm (100x100x100 voxels)</td>
+              </tr>
+              <tr>
+                <td>Functional resolution</td>
+                <td>3.5x3.5x3.5 mm (64x64x34 voxels)</td>
+              </tr>
+              <tr>
+                <td>Functional acquisition</td>
+                <td>Multi-echo (TE = 14,28,42 ms)</td>
+              </tr>
+              <tr>
+                <td>Functional tasks</td>
+                <td>3 (rest, motor, emotion)</td>
+              </tr>
+              <tr>
+                <td>Functional runs</td>
+                <td>6 (2 per task)</td>
+              </tr>
+            </table>
+            <br>
+            <h2>Data descriptor</h2>
+
+            <p>
+                For each participant, data collected during a single scanning session consists of 7 individual scans, depicted below.
+                The session started with a T1-weighted sequence to acquire a high resolution anatomical image.
+                This was followed by multi-echo functional MRI scans that were completed in two consecutive runs, each run consisting of 3 scans:
+                1 resting state scan, 1 motor task scan, and one emotion task scan.
+                For functional Run 1, the motor task is a block paradigm with alternating blocks of rest and right-hand finger tapping,
+                while the emotion task is an adapted Hariri block paradigm (citation) with alternating blocks of shape and face matching tasks.
+                For functional Run 2, the motor and emotion tasks are mentalised versions of those in functional Run 1, using the same block timing.
+            </p>
+            <img src="assets/data_descriptor.png" alt="no picture" style="width:100%;">
+            <br>
+            <br>
+            <h2>Real-time multi-echo fMRI</h2>
+            <p>
+                In a typical neurofeedback session, a set of anatomical and functional scans are usually acquired before the training starts.
+                These mostly undergo standard, minimal preprocessing steps to generate registration, segmentation, and localisation templates in the participant functional space,
+                which assist real-time realignment, extraction of region-based neurofeedback (or tissue compartment) signals, and serves to minimise the required per-volume processing time.
+                For this dataset, template data are required for extracting the neurofeedback signals from the applicable regions of interest: the motor cortex and the amygdala.
+                Both the anatomical scan (together with an appropriately selected atlas) and the task scans of functional Run 1 can be used to generate, respectively,
+                anatomically and functionally localised regions of interest.
+            </p>
+            <p>
+                To facilitate the development of real-time multi-echo processing methods, all functional scans collected for Run 1 and Run 2 use a multi-echo EPI sequence with 3 echoes.
+                The resting state scan of Run 1 can be used to calculate quantitative multi-echo related data such as T2* or S0 maps, which can in turn be used for echo combination or other use cases during the subsequent scans.
+            </p>
+
+        </div>
+        <br>
+        <hr>
+        <div id="anat" style="padding-left:3%; max-width:94%">
+            <h2>Template data</h2>
+            <p>
+                For real-time multi-echo fMRI methods, template data is required before the real-time session starts.
+                For multi-echo data specifically, template data can be used for offline or real-time echo combination methods.
+                In this study we investigate several echo combination methods including:
+                <ul>
+                    <li>tSNR-weighted, for which a tSNR map is required per echo time series</li>
+                    <li>T2*-weighted, for which a T2* map is required</li>
+                    <li>Linear-weighted, for which a linear factor is required (in this case the echo time TE)</li>
+                </ul>
+                Resting state Run 1 was used to calculate decay parameters, T2* and S0, and tSNR maps.
+                First, the mean and standard deviation of each echo time series were calculated, resulting in 3 mean images and 3 standard deviation images.
+                tSNR maps were calculated per echo time series by dividing mean by standard deviation images.
+                Then, T2* and S0 were calculated per voxel from these 3 images, using log-linear regression as follows:
+            </p>
+
+            <img src="assets/me_math2.png" alt="no picture" style="width:60%;">
+
+            <p>
+                Below are displays of:
+                <ul>
+                    <li>Echoes 1, 2 and 3 from an arbitrarily chosen volume in Resting Run 1</li>
+                    <li>tSNR maps of echo 1, 2 and 3 time series from Resting Run 1</li>
+                    <li>T2*, thresholded at 500 ms (cf. <a target="_blank" href="https://tedana.readthedocs.io/en/latest/">tedana</a>)</li>
+                    <li>S0</li>
+                </ul>
+                These are all masked with the previously calculated brain mask, which includes grey matter, white matter and CSF.
+            </p>
+
+            <div class="tab3">
+              <button id="button3" class="tablinks3 active" onclick="openTab3(event, 'e1')">Echo 1</button>
+              <button class="tablinks3" onclick="openTab3(event, 'e2')">Echo 2</button>
+              <button class="tablinks3" onclick="openTab3(event, 'e3')">Echo 3</button>
+                <button class="tablinks3" onclick="openTab3(event, 't1')">tSNR 1</button>
+              <button class="tablinks3" onclick="openTab3(event, 't2')">tSNR 2</button>
+                <button class="tablinks3" onclick="openTab3(event, 't3')">tSNR 3</button>
+              <button class="tablinks3" onclick="openTab3(event, 't2s')">T2*</button>
+              <button class="tablinks3" onclick="openTab3(event, 's0')">S0</button>
+            </div>
+            <!-- Tab content -->
+            <div id="e1" class="tabcontent3">
+                <br>
+              <img src="img/sub-001_task-rest_run-1_echo-1_desc-rapreproc_bold.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="e2" class="tabcontent3">
+                <br>
+              <img src="img/sub-001_task-rest_run-1_echo-2_desc-rapreproc_bold.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="e3" class="tabcontent3">
+                <br>
+              <img src="img/sub-001_task-rest_run-1_echo-3_desc-rapreproc_bold.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="t1" class="tabcontent3">
+                <br>
+              <img src="img/sub-001_task-rest_run-1_echo-1_desc-rapreproc_tsnr.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="t2" class="tabcontent3">
+                <br>
+              <img src="img/sub-001_task-rest_run-1_echo-2_desc-rapreproc_tsnr.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="t3" class="tabcontent3">
+                <br>
+              <img src="img/sub-001_task-rest_run-1_echo-3_desc-rapreproc_tsnr.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="t2s" class="tabcontent3">
+                <br>
+              <img src="img/sub-001_task-rest_run-1_desc-MEparams_t2star.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="s0" class="tabcontent3">
+                <br>
+              <img src="img/sub-001_task-rest_run-1_desc-MEparams_s0.png" alt="no picture" style="width:95%;">
+            </div>
+        </div>
+
+
+
+        <br>
+        <div id="func" style="padding-left:3%; max-width:94%">
+
+            <hr>
+            <h2>Combined data</h2>
+            <p>
+                Time series data from all runs (excluding the template run, i.e. Rest Run 1) were then combined using three echo combination methods (see <a target="_blank" href="https://onlinelibrary.wiley.com/doi/full/10.1002/mrm.20900">Poser et al. 2006</a>):
+                <ul>
+                    <li>tSNR-weighted (voxel based)</li>
+                    <li>T2*-weighted (voxel based)</li>
+                    <li>TE-weighted (same weights applied to all voxels)</li>
+                </ul>
+                To compare these combined timeseries, the following was done for each functional run:
+                <ol type="A">
+                    <li><b>BOLD:</b> BOLD images were created for an arbitrary volume from each echo time series and each combined time series.</li>
+                    <li><b>tSNR:</b> The tSNR maps of the middle echo time series and each combined time series were calculated. The distributions of these tSNR maps within the brain mask were plotted.</li>
+                    <li><b>PercDiff:</b> The percentage difference maps were calculated for each combined time series tSNR map versus the middle echo time series tSNR map.</li>
+                    <li><b>ROI:</b> For the task runs, grayplots were created from the ROI-voxels, using the ROI related to the specific task. The distributions of tSNR maps and percentage difference in tSNR maps were also plotted, both for these ROIs. Relevant ROIs are the left motor cortex and the bilateral amygdala.</li>
+                </ol>
+            </p>
+
+            <br>
+            <div style="text-align:center;">
+            <h3>Select a functional run</h3>
+            <h6><i>This will update all images displayed below to those of the selected run</i></h6>
+                <br>
+                <div>
+              <select id="runselector" style="width:30%; height:40px">
+                 <option value="motor_run-1">Motor - Run 1</option>
+                  <option value="emotion_run-1">Emotion - Run 1</option>
+                  <option value="rest_run-2">Rest - Run 2</option>
+                  <option value="motor_run-2">Motor - Run 2</option>
+                  <option value="emotion_run-2">Emotion - Run 2</option>
+              </select>
+            </div>
+            </div>
+            <br>
+<!--            <br>-->
+
+<!--            <h4 id="funcsummary" style="text-align:center;">Functional QC metrics summary</h4>-->
+<!--                <table class="qcsummary" style="margin-left:auto;margin-right:auto;">-->
+<!--                  <tr>-->
+<!--                    <th>Metric</th>-->
+<!--                      <th>Echo 2 (TE = 28 ms)</th>-->
+<!--                      <th>Combined (tSNR)</th>-->
+<!--                      <th>Combined (T2*)</th>-->
+<!--                      <th>Combined (TE)</th>-->
+<!--                  </tr>-->
+<!--                    <tr>-->
+<!--                    <td>Mean tSNR (bilateral amygdala)</td>-->
+<!--                      <td align="right">87.54</td>-->
+<!--                      <td align="right">89.65</td>-->
+<!--                      <td align="right">85.80</td>-->
+<!--                      <td align="right">90.65</td>-->
+<!--                  </tr>-->
+<!--                    <tr>-->
+<!--                    <td>Mean tSNR (left motor cortex)</td>-->
+<!--                      <td align="right">87.54</td>-->
+<!--                      <td align="right">89.65</td>-->
+<!--                      <td align="right">85.80</td>-->
+<!--                      <td align="right">90.65</td>-->
+<!--                  </tr>-->
+<!--                  <tr>-->
+<!--                    <td>Mean tSNR (GM)</td>-->
+<!--                      <td align="right">87.54</td>-->
+<!--                      <td align="right">89.65</td>-->
+<!--                      <td align="right">85.80</td>-->
+<!--                      <td align="right">90.65</td>-->
+<!--                  </tr>-->
+<!--                  <tr>-->
+<!--                    <td>Mean tSNR (WM)</td>-->
+<!--                      <td align="right">108.17</td>-->
+<!--                      <td align="right">110.45</td>-->
+<!--                      <td align="right">107.72</td>-->
+<!--                      <td align="right">111.24</td>-->
+<!--                  </tr>-->
+<!--                  <tr>-->
+<!--                    <td>Mean tSNR (CSF)</td>-->
+<!--                      <td align="right">36.05</td>-->
+<!--                      <td align="right">37.80</td>-->
+<!--                      <td align="right">34.81</td>-->
+<!--                      <td align="right">37.87</td>-->
+<!--                  </tr>-->
+<!--                  <tr>-->
+<!--                    <td>Mean tSNR (brain)</td>-->
+<!--                      <td align="right">81.68</td>-->
+<!--                      <td align="right">83.75</td>-->
+<!--                      <td align="right">80.40</td>-->
+<!--                      <td align="right">84.49</td>-->
+<!--                  </tr>-->
+<!--                </table>-->
+<!--            <br>-->
+<!--            <br>-->
+            <h4 id="boldtabsheading">BOLD</h4>
+            <div class="tab1">
+              <button id="button1" class="tablinks1 active" onclick="openTab1(event, 'bold1')">Echo 1</button>
+              <button class="tablinks1" onclick="openTab1(event, 'bold2')">Echo 2</button>
+              <button class="tablinks1" onclick="openTab1(event, 'bold3')">Echo 3</button>
+              <button class="tablinks1" onclick="openTab1(event, 'bold4')">Combined tSNR</button>
+              <button class="tablinks1" onclick="openTab1(event, 'bold5')">Combined T2*</button>
+              <button class="tablinks1" onclick="openTab1(event, 'bold6')">Combined TE</button>
+            </div>
+            <!-- Tab content -->
+            <div id="bold1" class="tabcontent1">
+                <br>
+              <img id="bold1_img" src="img/sub-001_task-motor_run-1_echo-1_desc-rapreproc_bold.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="bold2" class="tabcontent1">
+                <br>
+              <img id="bold2_img" src="img/sub-001_task-motor_run-1_echo-2_desc-rapreproc_bold.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="bold3" class="tabcontent1">
+                <br>
+              <img id="bold3_img" src="img/sub-001_task-motor_run-1_echo-3_desc-rapreproc_bold.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="bold4" class="tabcontent1">
+                <br>
+              <img id="bold4_img" src="img/sub-001_task-motor_run-1_desc-combinedMEtsnr_bold.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="bold5" class="tabcontent1">
+                <br>
+              <img id="bold5_img" src="img/sub-001_task-motor_run-1_desc-combinedMEt2star_bold.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="bold6" class="tabcontent1">
+                <br>
+              <img id="bold6_img" src="img/sub-001_task-motor_run-1_desc-combinedMEte_bold.png" alt="no picture" style="width:95%;">
+            </div>
+
+
+            <br>
+            <br>
+            <h4 id="tsnrtabsheading">tSNR</h4>
+            <div class="tab2">
+                <button id="button2" class="tablinks2 active" onclick="openTab2(event, 'tsnr1')">Echo 2</button>
+                <button class="tablinks2" onclick="openTab2(event, 'tsnr2')">Combined tSNR</button>
+                <button class="tablinks2" onclick="openTab2(event, 'tsnr3')">Combined T2*</button>
+                <button class="tablinks2" onclick="openTab2(event, 'tsnr4')">Combined TE</button>
+                <button class="tablinks2" onclick="openTab2(event, 'tsnr5')">Distributions</button>
+            </div>
+            <!-- Tab content -->
+            <div id="tsnr1" class="tabcontent2">
+                <br>
+              <img id="tsnr1_img" src="img/sub-001_task-motor_run-1_echo-2_desc-rapreproc_tsnr.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="tsnr2" class="tabcontent2">
+                <br>
+              <img id="tsnr2_img" src="img/sub-001_task-motor_run-1_desc-combinedMEtsnr_tsnr.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="tsnr3" class="tabcontent2">
+                <br>
+              <img id="tsnr3_img" src="img/sub-001_task-motor_run-1_desc-combinedMEt2star_tsnr.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="tsnr4" class="tabcontent2">
+                <br>
+              <img id="tsnr4_img" src="img/sub-001_task-motor_run-1_desc-combinedMEte_tsnr.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="tsnr5" class="tabcontent2">
+                <br>
+              <img id="tsnr5_img" src="img/sub-001_task-motor_run-1_desc-tsnrPercdiffRainclouds_brain.png" alt="no picture" style="width:95%;">
+            </div>
+
+            <br>
+            <br>
+            <h4 id="percdifftabsheading">Percentage difference in tSNR</h4>
+            <div class="tab4">
+              <button id="button4" class="tablinks4 active" onclick="openTab4(event, 'percdiff1')">Combined tSNR</button>
+              <button class="tablinks4" onclick="openTab4(event, 'percdiff2')">Combined T2*</button>
+              <button class="tablinks4" onclick="openTab4(event, 'percdiff3')">Combined TE</button>
+            </div>
+            <!-- Tab content -->
+            <div id="percdiff1" class="tabcontent4">
+                <br>
+              <img id="percdiff1_img" src="img/sub-001_task-motor_run-1_desc-combinedMEtsnr_percdiff.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="percdiff2" class="tabcontent4">
+                <br>
+              <img id="percdiff2_img" src="img/sub-001_task-motor_run-1_desc-combinedMEt2star_percdiff.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="percdiff3" class="tabcontent4">
+                <br>
+              <img id="percdiff3_img" src="img/sub-001_task-motor_run-1_desc-combinedMEte_percdiff.png" alt="no picture" style="width:95%;">
+            </div>
+
+            <br>
+            <br>
+            <h4 id="roitabsheading">Region of interest</h4>
+            <div class="tab5">
+              <button id="button5" class="tablinks5 active" onclick="openTab5(event, 'roi1')">Echo 2</button>
+              <button class="tablinks5" onclick="openTab5(event, 'roi2')">Combined tSNR</button>
+              <button class="tablinks5" onclick="openTab5(event, 'roi3')">Combined T2*</button>
+                <button class="tablinks5" onclick="openTab5(event, 'roi4')">Combined TE</button>
+              <button class="tablinks5" onclick="openTab5(event, 'roi5')">Distribution Plots</button>
+            </div>
+            <!-- Tab content -->
+            <div id="roi1" class="tabcontent5">
+                <br>
+              <img id="roi1_img" src="img/sub-001_task-motor_run-1_echo-2_desc-srapreproc_tsplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="roi2" class="tabcontent5">
+                <br>
+              <img id="roi2_img" src="img/sub-001_task-motor_run-1_desc-scombinedMEtsnr_tsplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="roi3" class="tabcontent5">
+                <br>
+              <img id="roi3_img" src="img/sub-001_task-motor_run-1_desc-scombinedMEt2star_tsplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="roi4" class="tabcontent5">
+                <br>
+              <img id="roi4_img" src="img/sub-001_task-motor_run-1_desc-scombinedMEte_tsplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="roi5" class="tabcontent5">
+                <br>
+              <img id="roi5_img" src="img/sub-001_task-motor_run-1_desc-tsnrPercdiffRainclouds_roi.png" alt="no picture" style="width:95%;">
+            </div>
+
+
+            <br>
+            <br>
+            <h4 id="statstabsheading">Region of interest</h4>
+            <div class="tab6">
+              <button id="button6" class="tablinks5 active" onclick="openTab6(event, 'stats1')">Echo 2</button>
+              <button class="tablinks6" onclick="openTab6(event, 'stats2')">Comb tSNR</button>
+              <button class="tablinks6" onclick="openTab6(event, 'stats3')">Comb T2*</button>
+                <button class="tablinks6" onclick="openTab6(event, 'stats4')">Comb TE</button>
+              <button class="tablinks6" onclick="openTab6(event, 'stats5')">Echo 2 (noFWE)</button>
+                <button class="tablinks6" onclick="openTab6(event, 'stats6')">Comb tSNR (noFWE)</button>
+                <button class="tablinks6" onclick="openTab6(event, 'stats7')">Comb T2* (noFWE)</button>
+              <button class="tablinks6" onclick="openTab6(event, 'stats8')">Comb TE (noFWE)</button>
+            </div>
+            <!-- Tab content -->
+            <div id="stats1" class="tabcontent6">
+                <br>
+              <img id="stats1_img" src="img/sub-001_task-motor_run-1_echo-2_desc-srapreproc_tsplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="stats2" class="tabcontent6">
+                <br>
+              <img id="stats2_img" src="img/sub-001_task-motor_run-1_desc-scombinedMEtsnr_tsplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="stats3" class="tabcontent6">
+                <br>
+              <img id="stats3_img" src="img/sub-001_task-motor_run-1_desc-scombinedMEt2star_tsplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="stats4" class="tabcontent6">
+                <br>
+              <img id="stats4_img" src="img/sub-001_task-motor_run-1_desc-scombinedMEte_tsplot.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="stats5" class="tabcontent6">
+                <br>
+              <img id="stats5_img" src="img/sub-001_task-motor_run-1_desc-tsnrPercdiffRainclouds_roi.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="stats6" class="tabcontent6">
+                <br>
+              <img id="stats6_img" src="img/sub-001_task-motor_run-1_desc-tsnrPercdiffRainclouds_roi.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="stats7" class="tabcontent6">
+                <br>
+              <img id="stats7_img" src="img/sub-001_task-motor_run-1_desc-tsnrPercdiffRainclouds_roi.png" alt="no picture" style="width:95%;">
+            </div>
+            <div id="stats8" class="tabcontent6">
+                <br>
+              <img id="stats8_img" src="img/sub-001_task-motor_run-1_desc-tsnrPercdiffRainclouds_roi.png" alt="no picture" style="width:95%;">
+            </div>
+
+
+        </div>
+    </body>
+</html>

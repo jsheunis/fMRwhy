@@ -24,16 +24,16 @@ options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
 options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
-subs = {'001', '002', '003', '004', '005'};
-%subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
+%subs = {'001', '002', '003', '004', '005'};
+subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 %sub = '002';
 ses = '';
-tasks = {'motor'};
-%tasks = {'motor', 'emotion'};
-runs = {'1'};
-%runs = {'1', '2'};
-echoes = {'2'};
-%echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
+%tasks = {'motor'};
+tasks = {'motor', 'emotion'};
+%runs = {'1'};
+runs = {'1', '2'};
+%echoes = {'2'};
+echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
 
 stats_deriv_dir = options.stats_dir;
 second_lvl_stats_dir = fullfile(stats_deriv_dir, '2ndlevel');
@@ -76,12 +76,12 @@ for t = 1:numel(tasks)
                 fmrwhy_batch_specify2ndlevel(stats_dir, con_fns, []);
                 fmrwhy_batch_estimate1stlevel(stats_dir);
                 consess = {};
-                consess{1}.tcon.name = 'FingerTapping';
+                consess{1}.tcon.name = [task ' - ' run];
                 consess{1}.tcon.weights = [1];
                 consess{1}.tcon.sessrep = 'none';
                 fmrwhy_batch_contrast1stlevel(stats_dir, consess)
                 conspec = struct;
-                conspec(1).titlestr = 'FingerTapping';
+                conspec(1).titlestr = [task ' - ' run];
                 conspec(1).contrasts = 1;
                 conspec(1).threshdesc = 'none';
                 conspec(1).thresh = 0.001;
@@ -89,6 +89,24 @@ for t = 1:numel(tasks)
                 conspec(1).conjunction = 1;
                 conspec(1).mask.none = 1;
                 fmrwhy_batch_threshold2ndlevel(stats_dir, conspec)
+
+                % -------
+                % Tmap montage
+                % -------
+                background_fn = options.rcoregest_anatomical_fn;
+                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(background_fn);
+                background_img = p.nii.img;
+
+                for k = 1:numel(consess)
+                    tmap_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '.nii']);
+                    tmap_clusters_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
+                    [ptmap, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_fn);
+                    [ptmapc, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_clusters_fn);
+                    stats_img = fmrwhy_util_maskImage(double(ptmap.nii.img), double(ptmapc.nii.img));
+                    str = consess{k}.tcon.name;
+                    saveAs_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str '_threshtmap.png']);
+                    overlaymontage = fmrwhy_util_createStatsOverlayMontage(p.nii.img, stats_img, [], 9, 1, '', 'gray', 'off', 'max', [], 'hot', [], true, saveAs_fn)
+                end
             end
         end
     end
