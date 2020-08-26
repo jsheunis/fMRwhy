@@ -1,4 +1,4 @@
-% fmrwhy_script_createNewTmapMontages
+% fmrwhy_script_neufepDetermineROIoverlap
 
 % A custom workflow that runs 1st level analysis for all runs of all tasks of specified subjects
 
@@ -17,8 +17,8 @@
 options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
-%bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
-bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS';
+bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
+%bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -28,8 +28,8 @@ options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
 %subs = {'016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-%subs = {'001'};
+%subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
+subs = {'001'};
 ses = '';
 %tasks = {'motor', 'emotion'};
 %runs = {'1', '2'};
@@ -70,6 +70,7 @@ for t = 1:numel(tasks)
 
             % Update workflow params with subject anatomical derivative filenames
             options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
+            background_fn = options.rcoregest_anatomical_fn;
 
             if strcmp(task, 'motor')
                 roi_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
@@ -92,25 +93,30 @@ for t = 1:numel(tasks)
 
                 consess = options.firstlevel.(task).(['run' run]).contrast_params.consess;
                 if numel(consess) > 1
-                    str = consess{3}.tcon.name;
                     k = 3;
                 else
-                    str = consess{1}.tcon.name;
                     k = 1;
                 end
 
-                fn1 = fullfile(FWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii'])
-                output = fmrwhy_util_getBinaryOverlap({roi_fn, fn1});
+                str = consess{k}.tcon.name;
+                template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
+                saveAs_overlap_fn1 = fullfile(FWE_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str 'Overlaps' options.roi.(task).desc{1} 'FWE_roi.nii']);
+                saveAs_overlap_fn2 = fullfile(noFWE_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str 'Overlaps' options.roi.(task).desc{1} 'noFWE_roi.nii']);
+                saveAs_montage_fn1 = strrep(saveAs_overlap_fn1, '.nii', '.png');
+                saveAs_montage_fn2 = strrep(saveAs_overlap_fn2, '.nii', '.png');
+
+                fn1 = fullfile(FWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
+                output = fmrwhy_util_getBinaryOverlap({roi_fn, fn1}, saveAs_overlap_fn1, template_fn, saveAs_montage_fn1, background_fn);
                 data(s, 2*e) = output.size_overlap;
 
-                fn2 = fullfile(noFWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii'])
-                output = fmrwhy_util_getBinaryOverlap({roi_fn, fn2});
+                fn2 = fullfile(noFWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
+                output = fmrwhy_util_getBinaryOverlap({roi_fn, fn2}, saveAs_overlap_fn2, template_fn, saveAs_montage_fn2, background_fn);
                 data(s, 2*e+1) = output.size_overlap;
             end
         end
 
-        data_table = array2table(data,'VariableNames', col_names);
-        writetable(data_table, temp_txt_fn, 'Delimiter','\t');
-        [status, msg, msgID] = movefile(temp_txt_fn, overlap_summary_fn);
+%        data_table = array2table(data,'VariableNames', col_names);
+%        writetable(data_table, temp_txt_fn, 'Delimiter','\t');
+%        [status, msg, msgID] = movefile(temp_txt_fn, overlap_summary_fn);
     end
 end

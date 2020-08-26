@@ -11,64 +11,17 @@
 % It also runs some code/scripts to calculate variables necessary for
 % online use from the initialised data/variables.
 
+% TODO: NOTE - EVERYTHING IS READ IN AND SAVED WITH SPM_VOL (ETC) AND NOT USING NII_TOOL
 
 % -------
-% STEP 1: Define run details
+% STEP 3: Directories, files, parameters (from fmrwhy output) to be used during rt processing
 % -------
-
-sub = '001';
-ses = '';
-%task = 'motor';
-task = 'emotion';
-run = '2';
-echo = '2';
-
-
-% -------
-% STEP 2: fMRwhy setup
-% -------
-
-bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
-options = struct;
-
-% Setup fmrwhy BIDS-derivatuve directories on workflow level
-options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
-
-% Grab parameters from workflow settings file
-options = fmrwhy_settings_preprocQC(bids_dir, options);
-
-% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
-
-% Update workflow params with subject anatomical derivative filenames
-options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
-
-% Update workflow params with subject functional derivative filenames
-options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
-
-% -------
-% STEP 3: Directories and files (from fmrwhy output) to be used during rt processing
-% -------
-% Multi-echo derivatives
 Ne = options.Ne; % number of echoes per volume
-options.me_dir = fullfile(options.deriv_dir, 'fmrwhy-multiecho');
-options.sub_dir_me = fullfile(options.me_dir, ['sub-' sub]);
-% Create derivatives directory for rt output
-options.rt_dir = fullfile(options.deriv_dir, 'fmrwhy-rt');
-if ~exist(options.rt_dir, 'dir')
-    mkdir(options.rt_dir);
-end
-% Create sub/run directory for rt output
-options.sub_dir_rt = fullfile(options.rt_dir, ['sub-' sub]);
-if ~exist(options.sub_dir_rt, 'dir')
-    mkdir(options.sub_dir_rt);
-end
 % Templates
 functional0_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
 funcref_spm = spm_vol(functional0_fn);
 funcref_3D  = spm_read_vols(funcref_spm);
 [Nx, Ny, Nz] = size(funcref_3D);
-
 t2star_fn = fullfile(options.sub_dir_me, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_desc-MEparams_t2star.nii']);
 t2star_img = spm_read_vols(spm_vol(t2star_fn));
 s0_fn = fullfile(options.sub_dir_me, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_desc-MEparams_s0.nii']);
@@ -79,8 +32,6 @@ for e = 1:Ne
     tsnr_fn{e} = fullfile(options.sub_dir_me, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_echo-' num2str(e) '_desc-rapreproc_tsnr.nii']);
     tsnr_data(:,:,:,e) = spm_read_vols(spm_vol(tsnr_fn{e}));
 end
-%structural_fn = fullfile(options.sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-coregEstResl_T1w.nii']);
-%structural_fn = fullfile(options.sub_dir_preproc, 'anat', ['sub-' sub '_T1w.nii']);
 % Raw bold volumes to process in real-time
 boldts_fn = {};
 for e = 1:Ne
@@ -96,32 +47,67 @@ end
 masks = fmrwhy_util_loadMasksSPM(bids_dir, sub);
 N_tissuemasks = 4;
 % Get task-based regions of interest (resliced and in subject functional space)
-N_taskROIs = numel(options.roi.(task).rroi_fn);
+N_taskROIs = 2; %numel(options.roi.(task).rroi_fn);
 N_ROIs = N_taskROIs + N_tissuemasks;
 ROI_fns = cell(1,N_ROIs);
 ROI_img = cell(1,N_ROIs);
 I_roi = cell(1,N_ROIs);
 ROI_names = cell(1,N_ROIs);
-for r = 1:N_taskROIs
-    ROI_fns{r} = options.roi.(task).rroi_fn{r};
-    ROI_img{r} = spm_read_vols(spm_vol(ROI_fns{r}));
-    ROI_img{r}(isnan(ROI_img{r})) = 0;
-    ROI_img{r} = (ROI_img{r} >= 0.1);
-    I_roi{r} = find(ROI_img{r}(:)); % find(ROI_img{r}(:) & GM_img_bin(:)); TODO, investigate which masking to use here, if any
-    ROI_names{r} = options.roi.(task).desc{r};
+noFWE_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run '_echo-2_noFWEp001e20']);
+if strcmp(task, 'motor')
+    roi_anat_fn = fullfile(options.sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
+    anat_desc = 'rleftMotor';
+    if strcmp(run, '1')
+        funcAnat_desc = 'FingerTappingOverlapsleftMotornoFWE';
+    else
+        funcAnat_desc = 'MentalFingerTappingOverlapsleftMotornoFWE';
+    end
+    roi_funcAnat_fn = fullfile(noFWE_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-' funcAnat_desc '_roi.nii']);
+
+else
+    roi_anat_fn = fullfile(options.sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-rbilateralAmygdala_roi.nii']);
+    anat_desc = 'rbilateralAmygdala';
+    if strcmp(run, '1')
+        funcAnat_desc = 'Faces>ShapesOverlapsbilateralAmygdalanoFWE';
+    else
+        funcAnat_desc = 'MentalEmotionOverlapsbilateralAmygdalanoFWE';
+    end
+    roi_funcAnat_fn = fullfile(noFWE_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-' funcAnat_desc '_roi.nii']);
 end
+
+% Anatomical ROI
+r = 1;
+ROI_fns{r} = roi_anat_fn;
+ROI_img{r} = spm_read_vols(spm_vol(ROI_fns{r}));
+ROI_img{r}(isnan(ROI_img{r})) = 0;
+ROI_img{r} = (ROI_img{r} > 0.1);
+I_roi{r} = find(ROI_img{r}(:)); % find(ROI_img{r}(:) & GM_img_bin(:)); TODO, investigate which masking to use here, if any
+ROI_names{r} = anat_desc;
+% Functionally localised and anatomically constrained ROI
+r = 2;
+ROI_fns{r} = roi_funcAnat_fn;
+ROI_img{r} = spm_read_vols(spm_vol(ROI_fns{r}));
+ROI_img{r}(isnan(ROI_img{r})) = 0;
+ROI_img{r} = (ROI_img{r} > 0.1);
+I_roi{r} = find(ROI_img{r}(:)); % find(ROI_img{r}(:) & GM_img_bin(:)); TODO, investigate which masking to use here, if any
+ROI_names{r} = funcAnat_desc;
+% Gray matter ROI
 ROI_names{r+1} = 'GM';
 ROI_img{r+1} = masks.GM_mask_3D;
 I_roi{r+1} = masks.GM_mask_I;
+% White matter ROI
 ROI_names{r+2} = 'WM';
 ROI_img{r+2} = masks.WM_mask_3D;
 I_roi{r+2} = masks.WM_mask_I;
+% CSF ROI
 ROI_names{r+3} = 'CSF';
 ROI_img{r+3} = masks.CSF_mask_3D;
 I_roi{r+3} = masks.CSF_mask_I;
+% Whole brain ROI
 ROI_names{r+4} = 'brain';
 ROI_img{r+4} = masks.brain_mask_3D;
 I_roi{r+4} = masks.brain_mask_I;
+% Main brain mask
 I_mask = masks.brain_mask_I;
 N_maskvox = numel(I_mask);
 
@@ -135,7 +121,7 @@ ROI_native = true; % are ROIs already in native space with matching resolution?
 TE = options.TE; % Echo times in ms
 use_echo = 0; % specify if only a single echo should be used for real-time; set to 0 to use all echoes
 template_echo = 2; % echo to be used for motion parameters, for ME
-T2star_thresh = 100; % threshold for maximum T2star after estimation (= T2* of CSF at 3T, Cesar)
+T2star_thresh = 120; % threshold for maximum T2star after estimation (= T2* of CSF at 3T, Cesar)
 voxel_size = [3.5 3.5 3.5];
 smoothing_kernel    = [7 7 7];
 Nt =   options.Nscans; % NrOfVolumes % VolumesNumber
@@ -169,7 +155,6 @@ end
 % -------
 % STEP 4: Define parameters for real-time processing (from OpenNFT)
 % -------
-
 % Processing steps to include: AR(1), cGLM, iGLM
 isIGLM = false;
 iglmAR1 = false;
@@ -206,8 +191,10 @@ fNegatDerivSpike(1:N_ROIs) = fNegatDerivSpike;
 % Scaling settings
 fLockedTempl = 0; % 0 = update, 1 = fixed
 
-tmp_posMin(1:N_ROIs) = 0;
-tmp_posMax(1:N_ROIs) = 0;
+for sig = 1:7
+    tmp_posMin{sig}(1:N_ROIs) = 0;
+    tmp_posMax{sig}(1:N_ROIs) = 0;
+end
 
 % Empty variables init
 rawTimeSeries = [];
@@ -293,6 +280,7 @@ dicomInfoVox   = sqrt(sum((funcref_spm.mat(1:3,1:3)).^2));
 fwhm = smoothing_kernel ./ dicomInfoVox;
 A0=[];x1=[];x2=[];x3=[];wt=[];deg=[];b=[];
 % MULTI-ECHO TODO
+R = struct;
 R(1,1).mat = funcref_spm.mat;
 R(1,1).dim = funcref_spm.dim;
 R(1,1).Vol = funcref_3D;

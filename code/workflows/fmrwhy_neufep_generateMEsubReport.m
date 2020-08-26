@@ -1,4 +1,4 @@
-function fmrwhy_neufep_generateMEsubReport(bids_dir, sub)
+function report_dir = fmrwhy_neufep_generateMEsubReport(bids_dir, sub)
 
 % TODO: note, this report is built in a simpler/stupider? way than the QC report.
 % Just copy all data to new report folder, then replace 'sub-001' with the current subject name
@@ -48,7 +48,6 @@ js_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_test_multiechoreport.js'
 avatar_template_fn = fullfile(fmrwhy_dir, 'img', 'fmrwhy_logo.jpeg');
 data_descriptor_fn = fullfile(fmrwhy_dir, 'assets', 'data_descriptor.png');
 me_math_fn = fullfile(fmrwhy_dir, 'assets', 'me_math2.png');
-
 
 options.sub_dir_me = fullfile(options.deriv_dir, 'fmrwhy-multiecho', ['sub-' sub]);
 options.func_dir_me = fullfile(options.sub_dir_me, 'func');

@@ -41,7 +41,7 @@
               </tr>
               <tr>
                 <td>Subject ID</td>
-                <td>001</td>
+                <td>sub-001</td>
               </tr>
               <tr>
                 <td>Report date/time</td>
@@ -195,6 +195,7 @@
                     <li><b>tSNR:</b> The tSNR maps of the middle echo time series and each combined time series were calculated. The distributions of these tSNR maps within the brain mask were plotted.</li>
                     <li><b>PercDiff:</b> The percentage difference maps were calculated for each combined time series tSNR map versus the middle echo time series tSNR map.</li>
                     <li><b>ROI:</b> For the task runs, grayplots were created from the ROI-voxels, using the ROI related to the specific task. The distributions of tSNR maps and percentage difference in tSNR maps were also plotted, both for these ROIs. Relevant ROIs are the left motor cortex and the bilateral amygdala.</li>
+                    <li><b>Statistical maps:</b> 1st level statistical analysis was done for each of the task runs on all combined time series. Two thresholds were applied in parallel: 1) FWE, p=0.05, no extent th, and 2) no FWE, p=0.001, 20 voxel extent th</li>
                 </ol>
             </p>
 
@@ -397,7 +398,7 @@
             <br>
             <h4 id="statstabsheading">Region of interest</h4>
             <div class="tab6">
-              <button id="button6" class="tablinks5 active" onclick="openTab6(event, 'stats1')">Echo 2</button>
+              <button id="button6" class="tablinks6 active" onclick="openTab6(event, 'stats1')">Echo 2</button>
               <button class="tablinks6" onclick="openTab6(event, 'stats2')">Comb tSNR</button>
               <button class="tablinks6" onclick="openTab6(event, 'stats3')">Comb T2*</button>
                 <button class="tablinks6" onclick="openTab6(event, 'stats4')">Comb TE</button>
