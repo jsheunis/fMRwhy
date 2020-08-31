@@ -23,6 +23,7 @@ options = fmrwhy_defaults;
 % Main input: BIDS root folder
 %bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS';
+bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -32,9 +33,9 @@ options.me_dir = fullfile(options.deriv_dir, 'fmrwhy-multiecho');
 options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
+
+subs = {'002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 %subs = {'001'};
-%subs = {'002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-subs = {'021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 %sub = '002';
 ses = '';
 
@@ -45,6 +46,7 @@ rgb_onparula = [255, 115, 236];
 
 
 for s = 1:numel(subs)
+    tic;
     sub = subs{s};
 
     options.sub_dir_me = fullfile(options.me_dir, ['sub-' sub]);
@@ -113,7 +115,7 @@ for s = 1:numel(subs)
     % -------
     tasks = {'rest', 'motor', 'emotion'};
     runs = {'1', '2'};
-    combined_str = {'Echo 2', 'T2star', 'tSNR', 'TE'};
+    combined_str = {'Echo 2', 'T2star', 'tSNR', 'TE', 'T2starFIT', 't2sfit'};
     roi_text = {'', 'left motor cortex', 'bilateral amygdala'};
     task_names = {'rest', 'Right finger tapping', 'Hariri task'}
     toTransform_fns = {};
@@ -188,7 +190,7 @@ for s = 1:numel(subs)
             % -------
             % Output:
             %   - Montages of single volumes of: echo 1, 2, 3
-            %   - Montages of single combined volumes of combined timeseries using methods: 1, 2, 3
+            %   - Montages of single combined volumes of combined timeseries using methods: 1, 2, 3, 4
             % -------
             % Grab filenames for bold and combined
             bold_fns = {};
@@ -198,7 +200,9 @@ for s = 1:numel(subs)
             bold_combined_fns{1} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEt2star_bold.nii']);
             bold_combined_fns{2} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEtsnr_bold.nii']);
             bold_combined_fns{3} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEte_bold.nii']);
-            main_fns = [bold_fns{2}, bold_combined_fns];
+            bold_combined_fns{4} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEt2starFIT_bold.nii']);
+            fit_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-t2starFIT_bold.nii']);
+            main_fns = [bold_fns{2}, bold_combined_fns, fit_fn];
             % use arbitrary volume number
             volume_nr = 5;
             % Create image outputs for original multi-echo data
@@ -222,6 +226,13 @@ for s = 1:numel(subs)
                     combined_montage = fmrwhy_util_createStatsOverlayMontage(combined_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, combined_pngs{i});
                 end
             end
+            % Create image outputs for combined multi-echo data
+            fit_png = strrep(fit_fn, '.nii', '.png');
+            if ~exist(fit_png, 'file')
+                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(fit_fn);
+                fit_img = fmrwhy_util_maskImage(double(p.nii.img(:,:,:,volume_nr)), mask_img_oriented);
+                fit_montage = fmrwhy_util_createStatsOverlayMontage(fit_img, [], overlay_img, 9, 1, '', 'gray', 'off', 'max', [], [], rgb_ongray, false, fit_png);
+            end
 
             % -------
             % STEP 4.2: tSNR outputs
@@ -237,6 +248,8 @@ for s = 1:numel(subs)
             tsnr_fns{2} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEt2star_tsnr.nii']);
             tsnr_fns{3} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEtsnr_tsnr.nii']);
             tsnr_fns{4} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEte_tsnr.nii']);
+            tsnr_fns{5} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEt2starFIT_tsnr.nii']);
+            tsnr_fns{6} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-t2starFIT_tsnr.nii']);
             % Create filenames for tsnr and percdiff pngs; and add filenames for tranforms to cell array
             tsnr_pngs = {};
             percdiff_pngs = {};
@@ -252,8 +265,9 @@ for s = 1:numel(subs)
                 saveAs_transform_fns = [saveAs_transform_fns, {saveAs_transform_fn}];
             end
             % Call function to calculate and output all comparisons, montages, raincloud plots, etc
-            fmrwhy_util_compareTSNR(tsnr_fns, mask_fn, roi_fns, compare_roi_txt , tsnr_pngs, percdiff_pngs, distr_png);
+            fmrwhy_util_compareTSNRrt(tsnr_fns, mask_fn, roi_fns, compare_roi_txt , tsnr_pngs, percdiff_pngs, distr_png);
 
+            % TODO: FIX THE CODE IN fmrwhy_util_compareTSNRrt WHERE THERE ARE TESTS TO SEE IF PNG EXIST BEFORE SAVING IT
 
             % -------
             % STEP 4.3: ROI Timeseries plot outputs
@@ -263,11 +277,6 @@ for s = 1:numel(subs)
                 smooth_fns{i} = strrep(main_fns{i}, 'desc-', 'desc-s');
             end
             if ~strcmp(task, 'rest')
-                str1 = [task_names{t} ' - ' roi_text{t} ' - ' combined_str{1}];
-                str2 = [task_names{t} ' - ' roi_text{t} ' - Multi-echo combined ' combined_str{2}];
-                str3 = [task_names{t} ' - ' roi_text{t} ' - Multi-echo combined ' combined_str{3}];
-                str4 = [task_names{t} ' - ' roi_text{t} ' - Multi-echo combined ' combined_str{4}];
-                title_str = {str1, str2, str3, str4};
 
                 if strcmp(task, 'motor')
                     roi_fn = roi_fns{1};
@@ -289,12 +298,14 @@ for s = 1:numel(subs)
                     task_info.onsets = options.firstlevel.(task).(['run' run]).plot_params.cond_onset;
                     task_info.durations = options.firstlevel.(task).(['run' run]).plot_params.cond_duration;
                     task_info.precision = 1;
-                    if ~exist(saveAs_fn, 'file')
-                        trace_info = [];
-                        fmrwhy_util_thePlotROI(functional_fn, mask_fn, roi_fn, task_info, trace_info, saveAs_fn)
-                    else
-                        disp(['File already exists: ' saveAs_fn])
-                    end
+                    % TODO: FIX THE CODE IN fmrwhy_util_thePlotROI WHERE THERE ARE TESTS TO SEE IF PNG EXIST BEFORE SAVING IT
+                    % TODO: ALSO FIX CODE BELOW
+%                    if ~exist(saveAs_fn, 'file')
+                    trace_info = [];
+                    fmrwhy_util_thePlotROI(functional_fn, mask_fn, roi_fn, task_info, trace_info, saveAs_fn)
+%                    else
+%                        disp(['File already exists: ' saveAs_fn])
+%                    end
                 end
             end
         end
@@ -342,6 +353,7 @@ for s = 1:numel(subs)
             end
         end
     end
+    toc;
 end
 
 

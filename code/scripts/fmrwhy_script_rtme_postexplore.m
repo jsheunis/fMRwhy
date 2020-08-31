@@ -68,13 +68,32 @@ for s = 1:numel(subs)
             smoothed_s0 = fullfile(options.sub_dir_rt, ['sub-' sub '_task-' task '_run-' run '_desc-srRTs0FIT_bold.nii']);
 
             t2star_nii = nii_tool('load', realigned_t2star);
-            t2star_4D = t2star_nii.img;
+            t2star_4D = double(t2star_nii.img);
             [Nx, Ny, Nz, Nt] = size(t2star_4D);
-            t2star_2D = reshape(t2star_4D, Nx*Ny*Nz, Nt);
+            Nvox = Nx*Ny*Nz;
+            t2star_2D = reshape(t2star_4D, Nvox, Nt);
+            t2star_2D = t2star_2D';
 
             s0_nii = nii_tool('load', realigned_s0);
-            s0_4D = s0_nii.img;
-            s0_2D = reshape(s0_4D, Nx*Ny*Nz, Nt);
+            s0_4D = double(s0_nii.img);
+            s0_2D = reshape(s0_4D, Nvox, Nt);
+            s0_2D = s0_2D';
+
+            corr_mat_r = nan(1, Nvox);
+            corr_mat_p = nan(1, Nvox);
+            for i = 1:Nvox
+                [rho,pval] = corr(t2star_2D(:,i), s0_2D(:,i));
+                corr_mat_r(i) = rho;
+                corr_mat_p(i) = pval;
+            end
+            rho_3D = reshape(corr_mat_r, Nx, Ny, Nz);
+            pval_3D = reshape(corr_mat_p, Nx, Ny, Nz);
+
+            rho_fn = fullfile(options.sub_dir_rt, ['sub-' sub '_task-' task '_run-' run '_desc-t2starS0corr_rmap.nii']);
+            pval_fn = fullfile(options.sub_dir_rt, ['sub-' sub '_task-' task '_run-' run '_desc-t2starS0corr_pmap.nii']);
+            fmrwhy_util_saveNifti(rho_fn, rho_3D, options.template_fn, 1)
+            fmrwhy_util_saveNifti(pval_fn, pval_3D, options.template_fn, 1)
+
 
 
 %            for sig = 1:numel(sig_desc)

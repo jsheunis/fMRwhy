@@ -15,7 +15,8 @@
 options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
-bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
+%bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
+bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -25,23 +26,23 @@ options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
 %subs = {'016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-%subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-subs = {'001'};
+subs = {'002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
+%subs = {'001'};
 ses = '';
 %tasks = {'motor', 'emotion'};
 %runs = {'1', '2'};
 %echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
 
 tasks = {'motor', 'emotion'};
-tasks = {'emotion'};
+%tasks = {'motor'};
 runs = {'1', '2'};
-runs = {'2'};
-echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
-echoes = {'2'};
+%runs = {'1'};
+%echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
+echoes = {'combinedMEt2starFIT', 't2starFIT'};
+%echoes = {'2'};
 rgb_onhot = [148, 239, 255];
 
 
-tic;
 for s = 1:numel(subs)
     sub = subs{s};
     % Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
@@ -96,7 +97,7 @@ for s = 1:numel(subs)
                     mkdir(run_dir_stats_new);
                 end
 %                spm_fn = fullfile(run_dir_stats, 'SPM.mat');
-%                copyfile(run_dir_stats, run_dir_stats_new);
+                copyfile(run_dir_stats, run_dir_stats_new);
                 spm_mat = load(fullfile(run_dir_stats_new, 'SPM.mat'));
 
                 [Ntt, Nregr] = size(spm_mat.SPM.xX.X);
@@ -176,4 +177,3 @@ for s = 1:numel(subs)
 %    template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
 %    fmrwhy_batch_normaliseWrite(toTransform_fns, transformation_fn, template_fn, saveAs_transform_fns)
 end
-toc;

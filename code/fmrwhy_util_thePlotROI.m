@@ -209,6 +209,6 @@ h_txt(1) = text(ax3, 2, 1.2, 'Task', 'Color', colors_rgb{1},'FontSize',14);
 h_txt(2) = text(ax4, 2, 1.5, 'ROI signal', 'Color', colors_rgb{3},'FontSize',14);
 
 % Save figure
-if ~exist(saveAs_fn, 'file')
+%if ~exist(saveAs_fn, 'file')
     print(f, saveAs_fn,'-dpng')
-end
+%end

@@ -21,8 +21,9 @@ options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
 %bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
-bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/';
+%bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/';
 bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS/';
+%bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -36,7 +37,7 @@ options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
 subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-%subs = {'001'};
+subs = {'011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 ses = '';
 
 
@@ -178,7 +179,7 @@ for s = 1:numel(subs)
             end
 
             % -------
-            % STEP 4.1: Prepare template data and run multi-echo combination functions
+            % STEP 4.1.1: Prepare template data and run multi-echo combination functions
             % -------
             disp('------------')
             disp(['Task: ' task ';  Run: ' run])
@@ -211,20 +212,14 @@ for s = 1:numel(subs)
                     echo = num2str(e);
                     rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii'])
                     func_data(:,:,:,:,e) = spm_read_vols(spm_vol(rafunctional_fn));
-    %                nii = nii_tool('load', rafunctional_fn);
-    %                func_data(:,:,:,:,e) = double(nii.img);
                 end
                 % Loading weight images
                 t2star_img = spm_read_vols(spm_vol(t2star_fn));
-    %            nii = nii_tool('load', t2star_fn);
-    %            t2star_img = double(nii.img);
                 tsnr_data = zeros([template_dim numel(TE)]);
                 for e = 1:numel(TE)
                     echo = num2str(e);
                     tsnr_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_echo-' echo '_desc-rapreproc_tsnr.nii']);
                     tsnr_data(:,:,:,e) = spm_read_vols(spm_vol(tsnr_fn));
-    %                nii = nii_tool('load', tsnr_fn);
-    %                tsnr_data(:,:,:,e) = double(nii.img);
                 end
                 % Mult-echo combination
                 disp('Combining multiple echoes with different combination methods')
@@ -255,10 +250,83 @@ for s = 1:numel(subs)
             end
 
             % -------
+            % STEP 4.1.2: Prepare template data and run FIT multi-echo combination
+            % -------
+            combined_t2sFIT_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-combinedMEt2starFIT_bold.nii']);
+            t2sFIT_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-t2starFIT_bold.nii']);
+            s0FIT_fn = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-s0FIT_bold.nii']);
+            fit_fns = {combined_t2sFIT_fn, t2sFIT_fn, s0FIT_fn};
+            run_combine = 0;
+            % If at least one of the files do not exist, run the combination routine
+            for x = numel(fit_fns)
+                if ~exist(fit_fns{x}, 'file')
+                    run_combine = 1;
+                else
+                    disp(['Timeseries exists: ' fit_fns{x}])
+                end
+            end
+            if run_combine
+                TE = options.TE;
+                template_spm = spm_vol(options.template_fn);
+                template_dim = template_spm.dim;
+                Nt = options.Nscans;
+                sz = [template_dim Nt numel(TE)];
+                func_data = zeros(sz);
+                % Concatenating functional data
+                for e = 1:numel(TE)
+                    echo = num2str(e);
+                    rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-rapreproc_bold.nii']);
+                    func_data(:,:,:,:,e) = spm_read_vols(spm_vol(rafunctional_fn));
+                end
+
+                % TODO: replace this with dicm2nii equivalent (ask on github repo)
+                rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-rapreproc_bold.nii']);
+                new_spm_combined_t2sFIT = spm_vol(rafunctional_fn);
+                new_spm_t2sFIT = new_spm_combined_t2sFIT;
+                new_spm_s0FIT = new_spm_combined_t2sFIT;
+                masksSPM = fmrwhy_util_loadMasksSPM(bids_dir, sub);
+                I_mask = masksSPM.brain_mask_I;
+
+                for i = 1:Nt
+
+                    func_data_pv = {};
+                    for e = 1:numel(TE)
+                        func_data_pv{e} = squeeze(func_data(:,:,:,i,e));
+                    end
+
+                    me_params = fmrwhy_realtime_estimateMEparams(func_data_pv, TE, I_mask);
+
+                    func_pv = zeros([template_dim numel(TE)]);
+                    for e = 1:numel(TE)
+                        func_pv(:,:,:,e) = func_data_pv{e};
+                    end
+
+                    combined_t2sFIT_3D = fmrwhy_me_combineEchoes(func_pv, TE, 0, 1, me_params.T2star_3D_thresholded);
+
+                    new_spm_combined_t2sFIT(i).fname = combined_t2sFIT_fn;
+                    new_spm_combined_t2sFIT(i).private.dat.fname = combined_t2sFIT_fn;
+                    spm_write_vol(new_spm_combined_t2sFIT(i), combined_t2sFIT_3D);
+
+                    new_spm_t2sFIT(i).fname = t2sFIT_fn;
+                    new_spm_t2sFIT(i).private.dat.fname = t2sFIT_fn;
+                    new_spm_t2sFIT(i).pinfo(1) = 1;
+                    spm_write_vol(new_spm_t2sFIT(i), me_params.T2star_3D_thresholded);
+
+                    new_spm_s0FIT(i).fname = s0FIT_fn;
+                    new_spm_s0FIT(i).private.dat.fname = s0FIT_fn;
+                    spm_write_vol(new_spm_s0FIT(i), me_params.S0_3D_thresholded);
+
+                end
+            end
+
+
+
+            % -------
             % STEP 4.2: Calculate tSNR for each combined timeseries
             % -------
             rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-rapreproc_bold.nii']);
             main_fns = {rafunctional_fn, combined_t2s_fn, combined_tsnr_fn, combined_te_fn};
+            main_fns = [main_fns, fit_fns];
             tsnr_fns = {};
             tsnr_output = {};
             for i = 1:numel(main_fns)
@@ -281,7 +349,7 @@ for s = 1:numel(subs)
             smooth_fns = {};
             for i = 1:numel(main_fns)
                 smooth_fns{i} = strrep(main_fns{i}, 'desc-', 'desc-s')
-                if ~exist(smooth_fns{i}, 'file')
+                if (~exist(smooth_fns{i}, 'file')) && (i<7)
                     fmrwhy_batch_smooth(main_fns{i}, smooth_fns{i}, options.fwhm);
                 else
                     disp(['Spatial smoothing already completed for timeseries: ' smooth_fns{i}])

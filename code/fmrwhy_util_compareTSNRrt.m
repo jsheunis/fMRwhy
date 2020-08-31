@@ -40,20 +40,20 @@ end
 % Output 1: Montage plots of tsnr with ROI overlays
 % ---
 for i = 1:numel(tsnr_img)
-    if ~exist(tsnr_saveAs_fns{i}, 'file')
+%    if ~exist(tsnr_saveAs_fns{i}, 'file')
 %        overlaymontage = fmrwhy_util_createOverlayMontage(tsnr_img{i}, overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [33, 168, 10], tsnr_saveAs_fns{i});
         overlaymontage = fmrwhy_util_createStatsOverlayMontage(tsnr_img{i}, [], overlay_img, 9, 1, '', 'hot', 'off', 'max', [0 250], [], [148, 239, 255], true, tsnr_saveAs_fns{i});
-    end
+%    end
 end
 
 % ---
 % Output 2: Montage plots of perc diff with ROI overlays
 % ---
 for i = 1:numel(perc_diff)
-    if ~exist(perc_saveAs_fns{i}, 'file')
+%    if ~exist(perc_saveAs_fns{i}, 'file')
 %        overlaymontage = fmrwhy_util_createOverlayMontage(perc_diff{i}, overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 300], [215,25,28], perc_saveAs_fns{i});
         overlaymontage = fmrwhy_util_createStatsOverlayMontage(perc_diff{i}, [], overlay_img, 9, 1, '', 'parula', 'off', 'max', [0 300], [], [255, 115, 236], true, perc_saveAs_fns{i});
-    end
+%    end
 end
 
 % ---
@@ -89,9 +89,9 @@ hold(ax1, 'off')
 box off
 
 brain_saveAs_fn = [d filesep f '_brain' e];
-if ~exist(brain_saveAs_fn, 'file')
+%if ~exist(brain_saveAs_fn, 'file')
     print(f1, brain_saveAs_fn,'-dpng', '-r0');
-end
+%end
 
 f2 = figure('units','normalized','outerposition',[0 0 1 1], 'visible', 'off');
 % tSNR distribution in ROI 1
@@ -183,6 +183,6 @@ hold(ax5, 'off')
 box off
 
 roi_saveAs_fn = [d filesep f '_roi' e];
-if ~exist(roi_saveAs_fn, 'file')
+%if ~exist(roi_saveAs_fn, 'file')
     print(f2, roi_saveAs_fn,'-dpng', '-r0');
-end
+%end
