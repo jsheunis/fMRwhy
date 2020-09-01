@@ -15,7 +15,8 @@
 options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
-bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS';
+%bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS';
+bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -33,7 +34,8 @@ tasks = {'motor', 'emotion'};
 %runs = {'1'};
 runs = {'1', '2'};
 %echoes = {'2'};
-echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
+%echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
+echoes = {'combinedMEt2starFIT', 't2starFIT'};
 
 stats_deriv_dir = options.stats_dir;
 second_lvl_stats_dir = fullfile(stats_deriv_dir, '2ndlevel');
@@ -90,23 +92,23 @@ for t = 1:numel(tasks)
                 conspec(1).mask.none = 1;
                 fmrwhy_batch_threshold2ndlevel(stats_dir, conspec)
 
-                % -------
-                % Tmap montage
-                % -------
-                background_fn = options.rcoregest_anatomical_fn;
-                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(background_fn);
-                background_img = p.nii.img;
-
-                for k = 1:numel(consess)
-                    tmap_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '.nii']);
-                    tmap_clusters_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
-                    [ptmap, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_fn);
-                    [ptmapc, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_clusters_fn);
-                    stats_img = fmrwhy_util_maskImage(double(ptmap.nii.img), double(ptmapc.nii.img));
-                    str = consess{k}.tcon.name;
-                    saveAs_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str '_threshtmap.png']);
-                    overlaymontage = fmrwhy_util_createStatsOverlayMontage(p.nii.img, stats_img, [], 9, 1, '', 'gray', 'off', 'max', [], 'hot', [], true, saveAs_fn)
-                end
+%                % -------
+%                % Tmap montage
+%                % -------
+%                background_fn = options.rcoregest_anatomical_fn;
+%                [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(background_fn);
+%                background_img = p.nii.img;
+%
+%                for k = 1:numel(consess)
+%                    tmap_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '.nii']);
+%                    tmap_clusters_fn = fullfile(run_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
+%                    [ptmap, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_fn);
+%                    [ptmapc, ~, ~, ~] = fmrwhy_util_readOrientNifti(tmap_clusters_fn);
+%                    stats_img = fmrwhy_util_maskImage(double(ptmap.nii.img), double(ptmapc.nii.img));
+%                    str = consess{k}.tcon.name;
+%                    saveAs_fn = fullfile(run_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str '_threshtmap.png']);
+%                    overlaymontage = fmrwhy_util_createStatsOverlayMontage(p.nii.img, stats_img, [], 9, 1, '', 'gray', 'off', 'max', [], 'hot', [], true, saveAs_fn)
+%                end
             end
         end
     end

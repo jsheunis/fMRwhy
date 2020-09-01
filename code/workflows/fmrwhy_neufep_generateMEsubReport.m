@@ -89,7 +89,7 @@ end
 % copy statistical Tmap montages
 tasks = {'motor', 'emotion'};
 runs = {'1', '2'};
-echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
+echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte', 'combinedMEt2starFIT', 't2starFIT'};
 ses = '';
 % Loop through sessions, tasks, runs, echoes.
 for t = 1:numel(tasks)

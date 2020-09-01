@@ -45,7 +45,7 @@ if N_imgs == 2
 end
 
 % For each image: calculate the fraction of the overlap vs the image roi size
-output.fraction = {}
+output.fraction = {};
 for i = 1:N_imgs
     output.fraction{i} = output.size_overlap / output.size_imgs{i};
 end

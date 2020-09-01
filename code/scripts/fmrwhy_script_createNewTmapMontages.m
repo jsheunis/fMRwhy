@@ -18,7 +18,7 @@ options = fmrwhy_defaults;
 
 % Main input: BIDS root folder
 %bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
-bids_dir = '/Users/jheunis/Desktop/NEUFEPME_data_BIDS';
+bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -28,7 +28,7 @@ options = fmrwhy_settings_preprocQC(bids_dir, options);
 
 % Loop through subjects, sessions, tasks, runs, etc
 %subs = {'016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
+subs = {'002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 %subs = {'001'};
 ses = '';
 %tasks = {'motor', 'emotion'};
@@ -39,13 +39,14 @@ tasks = {'motor', 'emotion'};
 %tasks = {'motor'};
 runs = {'1', '2'};
 %runs = {'1'};
-echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
+echoes = {'combinedMEt2starFIT', 't2starFIT'};
 %echoes = {'2'};
 rgb_onhot = [148, 239, 255];
 
 tic;
 for s = 1:numel(subs)
     sub = subs{s};
+    disp(sub);
     % Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
     options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 

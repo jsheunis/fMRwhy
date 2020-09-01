@@ -9,6 +9,7 @@ options.deriv_dir = fullfile(bids_dir, 'derivatives');
 options.preproc_dir = fullfile(options.deriv_dir, 'fmrwhy-preproc');
 options.qc_dir = fullfile(options.deriv_dir, 'fmrwhy-qc');
 options.stats_dir = fullfile(options.deriv_dir, 'fmrwhy-stats');
+options.me_dir = fullfile(options.deriv_dir, 'fmrwhy-multiecho');
 
 % Subject directories
 options.sub_dir_preproc = fullfile(options.preproc_dir, ['sub-' sub]);
