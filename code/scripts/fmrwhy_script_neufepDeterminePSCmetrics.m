@@ -32,10 +32,6 @@ options = fmrwhy_settings_preprocQC(bids_dir, options);
 subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 %subs = {'001'};
 ses = '';
-%tasks = {'motor', 'emotion'};
-%runs = {'1', '2'};
-%echoes = {'2', 'combinedMEtsnr', 'combinedMEt2star', 'combinedMEte'};
-
 tasks = {'motor', 'emotion'};
 %tasks = {'motor'};
 runs = {'1', '2'};
@@ -47,6 +43,7 @@ rgb_onhot = [148, 239, 255];
 col_names = {'anat_roi', 'echo2_FWE', 'echo2_noFWE', 'combTSNR_FWE', 'combTSNR_noFWE', 'combT2STAR_FWE', 'combT2STAR_noFWE', 'combTE_FWE', 'combTE_noFWE', 'combT2STARfit_FWE', 'combT2STARfit_noFWE', 'T2STARfit_FWE', 'T2STARfit_noFWE'};
 
 tmap_colnames = {'echo2_FWE', 'echo2_noFWE', 'combTSNR_FWE', 'combTSNR_noFWE', 'combT2STAR_FWE', 'combT2STAR_noFWE', 'combTE_FWE', 'combTE_noFWE', 'combT2STARfit_FWE', 'combT2STARfit_noFWE', 'T2STARfit_FWE', 'T2STARfit_noFWE'};
+psc_ts_colnames = {'echo2', 'combTSNR', 'combT2STAR', 'combTE', 'combT2STARfit', 'T2STARfit'};
 
 N_subs = numel(subs);
 
@@ -81,19 +78,31 @@ for t = 1:numel(tasks)
             options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
             background_fn = options.rcoregest_anatomical_fn;
 
+            % Grab mask fn
+            mask_fn = options.brain_mask_fn;
+
+            % Grab ROIs
             if strcmp(task, 'motor')
                 roi_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
             else
                 roi_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rbilateralAmygdala_roi.nii']);
             end
-            nii = nii_tool('load', roi_fn);
-            roi_img = fmrwhy_util_createBinaryImg(double(nii.img), 0.1);
-            size_anat_roi = sum(roi_img(:));
+%            nii = nii_tool('load', roi_fn);
+%            roi_img = fmrwhy_util_createBinaryImg(double(nii.img), 0.1);
+%            size_anat_roi = sum(roi_img(:));
 
-            % Initialize data for tmap vals per subject
+            % Initialize data per subject
             data_pscvals = {};
-            data_pscts = {};
+            data_pscts = nan(options.Nscans, numel(echoes));
             max_voxels = 0;
+            options.func_dir_me = fullfile(options.me_dir, ['sub-' sub], 'func' );
+            functional_fns = {};
+            functional_fns{1} = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-srapreproc_bold.nii']);
+            functional_fns{2} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEt2star_bold.nii']);
+            functional_fns{3} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEtsnr_bold.nii']);
+            functional_fns{4} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEte_bold.nii']);
+            functional_fns{5} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-scombinedMEt2starFIT_bold.nii']);
+            functional_fns{6} = fullfile(options.func_dir_me, ['sub-' sub '_task-' task '_run-' run '_desc-st2starFIT_bold.nii']);
 
             for e = 1:numel(echoes)
                 echo = echoes{e};
@@ -113,21 +122,31 @@ for t = 1:numel(tasks)
                     k = 1;
                 end
 
-                str = consess{k}.tcon.name;
-                template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
+%                str = consess{k}.tcon.name;
+%                template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
 
-                % Get binary clusters
-                fn1 = fullfile(FWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
-                fn2 = fullfile(noFWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
-
-                % Calculate PSC values and timeseries
+                % Get binary clusters, and get max
+                cluster_fn1 = fullfile(FWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
+                cluster_fn2 = fullfile(noFWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
+                nii_cluster1 = nii_tool('load', cluster_fn1);
+                binary_cluster1 = fmrwhy_util_createBinaryImg(double(nii_cluster1.img), 0.1);
+                I_cluster1 = find(binary_cluster1(:));
+                if numel(I_cluster1) > max_voxels
+                    max_voxels = numel(I_cluster1);
+                end
+                nii_cluster2 = nii_tool('load', cluster_fn2);
+                binary_cluster2 = fmrwhy_util_createBinaryImg(double(nii_cluster2.img), 0.1);
+                I_cluster2 = find(binary_cluster2(:));
+                if numel(I_cluster2) > max_voxels
+                    max_voxels = numel(I_cluster2);
+                end
 
                 % Calculate scaling factor for PSC: see (1) http://www.sbirc.ed.ac.uk/cyril/bold_percentage/BOLD_percentage.html and (2) https://www.frontiersin.org/articles/10.3389/fnins.2014.00001/full
                 spm_fn = fullfile(FWE_dir_stats, 'SPM.mat');
                 spm = load(spm_fn);
                 block_length = 20; % seconds
                 ntime = block_length*(1/spm.SPM.xBF.dt);
-                reference_block =  conv(ones(1,ntime),spm.SPM.xBF.bf(:,1))'
+                reference_block =  conv(ones(1,ntime),spm.SPM.xBF.bf(:,1))';
                 scale_factor = max(reference_block);
 
                 % Grab beta map of constant regressor
@@ -138,9 +157,10 @@ for t = 1:numel(tasks)
                 nii = nii_tool('load', beta_constant_fn);
                 constant_vals = double(nii.img);
 
+                % Load con maps, calculate PSC, create nifti, save TSV
                 PSC = {};
                 CON = {};
-                % Load con maps, calculate PSC, create nifti
+                PSC_2d = {};
                 for i = 1:k
                     con_fn{i} = fullfile(FWE_dir_stats, ['con_' sprintf('%04d', i) '.nii']);
                     nii = nii_tool('load', con_fn{i});
@@ -149,63 +169,32 @@ for t = 1:numel(tasks)
                     psc_img_fn = fullfile(FWE_dir_stats, ['PSC_' sprintf('%04d', i) '.nii']);
                     no_scaling = 1;
                     fmrwhy_util_saveNifti(psc_img_fn, PSC{i}, con_fn{i}, no_scaling)
+                    PSC_2d{i} = PSC{i}(:);
                 end
 
                 % FWE
-                tmap_fn1 = fullfile(FWE_dir_stats, ['spmT_' sprintf('%04d', k) '.nii']);
-                cmap_fn1 = fullfile(FWE_dir_stats, ['con_' sprintf('%04d', k) '.nii']);
-                cluster_fn1 = fn1;
-                nii_tmap = nii_tool('load', tmap_fn1);
-                nii_tmap = double(nii_tmap.img(:));
-                nii_cmap = nii_tool('load', cmap_fn1);
-                nii_cmap = double(nii_cmap.img(:));
-                nii_cluster = nii_tool('load', cluster_fn1);
-                binary_cluster = fmrwhy_util_createBinaryImg(double(nii_cluster.img), 0.1);
-                I_cluster = find(binary_cluster(:));
-                data_tmapvals{2*e-1} = nii_tmap(I_cluster);
-                data_cmapvals{2*e-1} = nii_cmap(I_cluster);
-                if numel(I_cluster) > max_voxels
-                    max_voxels = numel(I_cluster);
-                end
-                % No FWE
-                tmap_fn2 = fullfile(noFWE_dir_stats, ['spmT_' sprintf('%04d', k) '.nii']);
-                cmap_fn2 = fullfile(noFWE_dir_stats, ['con_' sprintf('%04d', k) '.nii']);
-                cluster_fn2 = fn2;
-                nii_tmap = nii_tool('load', tmap_fn2);
-                nii_tmap = double(nii_tmap.img(:));
-                nii_cmap = nii_tool('load', cmap_fn2);
-                nii_cmap = double(nii_cmap.img(:));
-                nii_cluster = nii_tool('load', cluster_fn2);
-                binary_cluster = fmrwhy_util_createBinaryImg(double(nii_cluster.img), 0.1);
-                I_cluster = find(binary_cluster(:));
-                data_tmapvals{2*e} = nii_tmap(I_cluster);
-                data_cmapvals{2*e} = nii_cmap(I_cluster);
-                if numel(I_cluster) > max_voxels
-                    max_voxels = numel(I_cluster);
-                end
+                data_pscvals{2*e-1} = PSC_2d{k}(I_cluster1);
+                % noFWE
+                data_pscvals{2*e} = PSC_2d{k}(I_cluster2);
 
+                % ROI time series
+                data_pscts(:, e) = fmrwhy_util_getROItimeseries(functional_fns{e}, mask_fn, roi_fn);
             end
 
-            data_tmapvals_mat = nan(max_voxels, numel(data_tmapvals));
-            data_cmapvals_mat = nan(max_voxels, numel(data_cmapvals));
-
-            for e = 1:numel(data_tmapvals)
-                n = numel(data_tmapvals{e});
-                data_tmapvals_mat(1:n, e) = data_tmapvals{e};
-                data_cmapvals_mat(1:n, e) = data_cmapvals{e};
+            % Write PSC values to tsv
+            data_pscvals_mat = nan(max_voxels, numel(data_pscvals));
+            for e = 1:numel(data_pscvals)
+                n = numel(data_pscvals{e});
+                data_pscvals_mat(1:n, e) = data_pscvals{e};
             end
+            T2 = array2table(data_pscvals_mat, 'VariableNames', tmap_colnames);
+            writetable(T2, temp_pscvals_fn, 'Delimiter','\t');
+            [status, msg, msgID] = movefile(temp_pscvals_fn, psc_values_fn);
 
-%            T = array2table(data_tmapvals_mat, 'VariableNames', tmap_colnames);
-%            writetable(T, temp_tmapvals_fn, 'Delimiter','\t');
-%            [status, msg, msgID] = movefile(temp_tmapvals_fn, tmap_values_fn);
-
-            T2 = array2table(data_cmapvals_mat, 'VariableNames', tmap_colnames);
-            writetable(T2, temp_cmapvals_fn, 'Delimiter','\t');
-            [status, msg, msgID] = movefile(temp_cmapvals_fn, cmap_values_fn);
+            % Write PSC timeseries to tsv
+            T3 = array2table(data_pscts, 'VariableNames', psc_ts_colnames);
+            writetable(T3, temp_pscts_fn, 'Delimiter','\t');
+            [status, msg, msgID] = movefile(temp_pscts_fn, psc_timeseries_fn);
         end
-
-%        data_table = array2table(data,'VariableNames', col_names);
-%        writetable(data_table, temp_txt_fn, 'Delimiter','\t');
-%        [status, msg, msgID] = movefile(temp_txt_fn, overlap_summary_fn);
     end
 end
