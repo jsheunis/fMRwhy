@@ -1,4 +1,4 @@
-% fmrwhy_script_neufepDetermineROIoverlap
+% fmrwhy_script_neufepDeterminePSCmetrics
 
 % A custom workflow that runs 1st level analysis for all runs of all tasks of specified subjects
 
@@ -8,7 +8,7 @@
 
 %--------------------------------------------------------------------------
 
-
+% TODO: build this pipeline into the fmrwhy_script_neufepDetermineROImetrics script
 % -------
 % STEP 0.1 -- Load defaults, filenames and parameters
 % -------
@@ -61,12 +61,6 @@ for t = 1:numel(tasks)
 
         disp(['task-' task '_run-' run])
 
-        overlap_summary_fn = fullfile(options.stats_dir, ['sub-all_task-' task '_run-' run '_desc-roiOverlap.tsv']);
-        [d, f, e] = fileparts(overlap_summary_fn);
-        temp_txt_fn = fullfile(d, [f '.txt']);
-
-        data = nan(N_subs, numel(col_names));
-
         for s = 1:numel(subs)
             sub = subs{s};
             disp(sub)
@@ -74,13 +68,14 @@ for t = 1:numel(tasks)
             % Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
             options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 
-            % Create text file for saving tmap + effect size (con maps) values
-            tmap_values_fn = fullfile(options.stats_dir, ['sub-' sub '_task-' task '_run-' run '_desc-tmapvalues.tsv']);
-            cmap_values_fn = fullfile(options.stats_dir, ['sub-' sub '_task-' task '_run-' run '_desc-cmapvalues.tsv']);
-            [d1, f1, e1] = fileparts(tmap_values_fn);
-            [d2, f2, e2] = fileparts(cmap_values_fn);
-            temp_tmapvals_fn = fullfile(d1, [f1 '.txt']);
-            temp_cmapvals_fn = fullfile(d2, [f2 '.txt']);
+            % Create text file for saving PSC values
+            psc_values_fn = fullfile(options.stats_dir, ['sub-' sub '_task-' task '_run-' run '_desc-PSCvalues.tsv']);
+            psc_timeseries_fn = fullfile(options.stats_dir, ['sub-' sub '_task-' task '_run-' run '_desc-PSCtimeseries.tsv']);
+
+            [d1, f1, e1] = fileparts(psc_values_fn);
+            [d2, f2, e2] = fileparts(psc_timeseries_fn);
+            temp_pscvals_fn = fullfile(d1, [f1 '.txt']);
+            temp_pscts_fn = fullfile(d2, [f2 '.txt']);
 
             % Update workflow params with subject anatomical derivative filenames
             options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
@@ -94,11 +89,10 @@ for t = 1:numel(tasks)
             nii = nii_tool('load', roi_fn);
             roi_img = fmrwhy_util_createBinaryImg(double(nii.img), 0.1);
             size_anat_roi = sum(roi_img(:));
-            data(s, 1) = size_anat_roi;
 
             % Initialize data for tmap vals per subject
-            data_tmapvals = {};
-            data_cmapvals = {};
+            data_pscvals = {};
+            data_pscts = {};
             max_voxels = 0;
 
             for e = 1:numel(echoes)
@@ -111,29 +105,52 @@ for t = 1:numel(tasks)
                 FWE_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run '_echo-' echo]);
                 noFWE_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run '_echo-' echo '_noFWEp001e20']);
 
-                % Prepare overlap variables and filenames
+                % Prepare variables and filenames
                 consess = options.firstlevel.(task).(['run' run]).contrast_params.consess;
                 if numel(consess) > 1
                     k = 3;
                 else
                     k = 1;
                 end
+
                 str = consess{k}.tcon.name;
                 template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
-                saveAs_overlap_fn1 = fullfile(FWE_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str 'Overlaps' options.roi.(task).desc{1} 'FWE_roi.nii']);
-                saveAs_overlap_fn2 = fullfile(noFWE_dir_stats, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' str 'Overlaps' options.roi.(task).desc{1} 'noFWE_roi.nii']);
-                saveAs_montage_fn1 = strrep(saveAs_overlap_fn1, '.nii', '.png');
-                saveAs_montage_fn2 = strrep(saveAs_overlap_fn2, '.nii', '.png');
 
-%                % Calculate overlap (and create montages)
+                % Get binary clusters
                 fn1 = fullfile(FWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
-%                output = fmrwhy_util_getBinaryOverlap({roi_fn, fn1}, saveAs_overlap_fn1, template_fn, saveAs_montage_fn1, background_fn);
-%                data(s, 2*e) = output.size_overlap;
                 fn2 = fullfile(noFWE_dir_stats, ['spmT_' sprintf('%04d', k) '_binary_clusters.nii']);
-%                output = fmrwhy_util_getBinaryOverlap({roi_fn, fn2}, saveAs_overlap_fn2, template_fn, saveAs_montage_fn2, background_fn);
-%                data(s, 2*e+1) = output.size_overlap;
 
-                % Extract T-map values:
+                % Calculate PSC values and timeseries
+
+                % Calculate scaling factor for PSC: see (1) http://www.sbirc.ed.ac.uk/cyril/bold_percentage/BOLD_percentage.html and (2) https://www.frontiersin.org/articles/10.3389/fnins.2014.00001/full
+                spm_fn = fullfile(FWE_dir_stats, 'SPM.mat');
+                spm = load(spm_fn);
+                block_length = 20; % seconds
+                ntime = block_length*(1/spm.SPM.xBF.dt);
+                reference_block =  conv(ones(1,ntime),spm.SPM.xBF.bf(:,1))'
+                scale_factor = max(reference_block);
+
+                % Grab beta map of constant regressor
+                beta_constant_fn = fullfile(FWE_dir_stats, ['beta_' sprintf('%04d', 19) '.nii']);
+                if k == 3
+                    beta_constant_fn = fullfile(FWE_dir_stats, ['beta_' sprintf('%04d', 20) '.nii']);
+                end
+                nii = nii_tool('load', beta_constant_fn);
+                constant_vals = double(nii.img);
+
+                PSC = {};
+                CON = {};
+                % Load con maps, calculate PSC, create nifti
+                for i = 1:k
+                    con_fn{i} = fullfile(FWE_dir_stats, ['con_' sprintf('%04d', i) '.nii']);
+                    nii = nii_tool('load', con_fn{i});
+                    CON{i} = double(nii.img);
+                    PSC{i} = CON{i} * SF ./ constant_vals * 100;
+                    psc_img_fn = fullfile(FWE_dir_stats, ['PSC_' sprintf('%04d', i) '.nii']);
+                    no_scaling = 1;
+                    fmrwhy_util_saveNifti(psc_img_fn, PSC{i}, con_fn{i}, no_scaling)
+                end
+
                 % FWE
                 tmap_fn1 = fullfile(FWE_dir_stats, ['spmT_' sprintf('%04d', k) '.nii']);
                 cmap_fn1 = fullfile(FWE_dir_stats, ['con_' sprintf('%04d', k) '.nii']);
