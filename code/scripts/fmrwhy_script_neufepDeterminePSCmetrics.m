@@ -165,7 +165,7 @@ for t = 1:numel(tasks)
                     con_fn{i} = fullfile(FWE_dir_stats, ['con_' sprintf('%04d', i) '.nii']);
                     nii = nii_tool('load', con_fn{i});
                     CON{i} = double(nii.img);
-                    PSC{i} = CON{i} * SF ./ constant_vals * 100;
+                    PSC{i} = CON{i} * scale_factor ./ constant_vals * 100;
                     psc_img_fn = fullfile(FWE_dir_stats, ['PSC_' sprintf('%04d', i) '.nii']);
                     no_scaling = 1;
                     fmrwhy_util_saveNifti(psc_img_fn, PSC{i}, con_fn{i}, no_scaling)

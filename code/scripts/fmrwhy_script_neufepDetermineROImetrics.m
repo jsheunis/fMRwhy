@@ -1,4 +1,4 @@
-% fmrwhy_script_neufepDetermineROIoverlap
+% fmrwhy_script_neufepDetermineROImetrics
 
 % This script performs the following steps for each run of each task (i.e. * 4):
 % 1. Per subject, determine the overlap between the functional task clusters from each echo-timeseries and the anatomical task ROI, write all to file: e.g. 'sub-all_task-motor_run-1_desc-roiOverlap.tsv'
@@ -29,7 +29,7 @@ options = fmrwhy_settings_preprocQC(bids_dir, options);
 % Loop through subjects, sessions, tasks, runs, etc
 %subs = {'016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
 subs = {'001', '002', '003', '004', '005', '006', '007', '010', '011', '012', '013', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '029', '030', '031', '032'};
-%subs = {'001'};
+%subs = {'001', '002'};
 ses = '';
 %tasks = {'motor', 'emotion'};
 %runs = {'1', '2'};
@@ -199,10 +199,11 @@ for t = 1:numel(tasks)
                     binary_AND_img = binary_AND_img & binary_imgs{e};
                     binary_OR_img_noFWE = binary_OR_img_noFWE | binary_img_noFWE;
                     binary_AND_img_noFWE = binary_AND_img_noFWE & binary_img_noFWE;
+                    sum_img = sum_img + binary_imgs{e};
+                    sum_img_noFWE = sum_img_noFWE + binary_img_noFWE;
                 end
 
-                sum_img = sum_img + binary_imgs{e};
-                sum_img_noFWE = sum_img_noFWE + binary_img_noFWE;
+
             end
 
             % Calculate the overlap of cluster images as percentage
@@ -210,22 +211,22 @@ for t = 1:numel(tasks)
             sum_img_noFWE = sum_img_noFWE/numel(echoes)*100;
 
             % Save images
-            if ~exist(binary_SUM_fn, 'file')
+%            if ~exist(binary_SUM_fn, 'file')
                 no_scaling = 1;
                 fmrwhy_util_saveNifti(binary_SUM_fn, double(sum_img), template_fn, no_scaling);
                 [psum, ~, ~, ~] = fmrwhy_util_readOrientNifti(binary_SUM_fn);
                 sum_img = double(psum.nii.img);
                 binary_SUM_png = strrep(binary_SUM_fn, '.nii', '.png');
-                sum_montage = fmrwhy_util_createStatsOverlayMontage(background_img, sum_img, [], 9, 1, '', 'gray', 'off', 'max', [0 100], 'spring', [], true, binary_SUM_png);
+                sum_montage = fmrwhy_util_createStatsOverlayMontage(background_img, sum_img, [], 9, 1, '', 'gray', 'off', 'max', [], 'spring', [], true, binary_SUM_png);
 
                 fmrwhy_util_saveNifti(binary_SUM_fn_noFWE, double(sum_img_noFWE), template_fn, no_scaling);
                 [psum_noFWE, ~, ~, ~] = fmrwhy_util_readOrientNifti(binary_SUM_fn_noFWE);
                 sum_img_noFWE = double(psum_noFWE.nii.img);
                 binary_SUM_png_noFWE = strrep(binary_SUM_fn_noFWE, '.nii', '.png');
-                sum_montage_noFWE = fmrwhy_util_createStatsOverlayMontage(background_img, sum_img_noFWE, [], 9, 1, '', 'gray', 'off', 'max', [0 100], 'spring', [], true, binary_SUM_png_noFWE);
+                sum_montage_noFWE = fmrwhy_util_createStatsOverlayMontage(background_img, sum_img_noFWE, [], 9, 1, '', 'gray', 'off', 'max', [], 'spring', [], true, binary_SUM_png_noFWE);
 
-            end
-            if ~exist(binary_OR_fn, 'file') || ~exist(binary_AND_fn, 'file')
+%            end
+%            if ~exist(binary_OR_fn, 'file') || ~exist(binary_AND_fn, 'file')
                 no_scaling = 1;
                 roi_rgbcolors = [148, 239, 255];
 
@@ -254,7 +255,7 @@ for t = 1:numel(tasks)
 
                 overlapmontage = fmrwhy_util_createStatsOverlayMontage(background_img, [], or_img_noFWE, 9, 1, '', 'gray', 'off', 'max', [], [], roi_rgbcolors, false, binary_OR_png_noFWE);
                 overlapmontage = fmrwhy_util_createStatsOverlayMontage(background_img, [], and_img_noFWE, 9, 1, '', 'gray', 'off', 'max', [], [], roi_rgbcolors, false, binary_AND_png_noFWE);
-            end
+%            end
             %----------
 
 
@@ -333,7 +334,7 @@ for t = 1:numel(tasks)
                     con_fn{i} = fullfile(FWE_dir_stats, ['con_' sprintf('%04d', i) '.nii']);
                     nii = nii_tool('load', con_fn{i});
                     CON{i} = double(nii.img);
-                    PSC{i} = CON{i} * SF ./ constant_vals * 100;
+                    PSC{i} = CON{i} * scale_factor ./ constant_vals * 100;
                     psc_img_fn = fullfile(FWE_dir_stats, ['PSC_' sprintf('%04d', i) '.nii']);
                     no_scaling = 1;
                     fmrwhy_util_saveNifti(psc_img_fn, PSC{i}, con_fn{i}, no_scaling)
@@ -429,7 +430,7 @@ for t = 1:numel(tasks)
 
             % Write PSC values to tsv file
             P = array2table(data_pscvals_mat, 'VariableNames', echo_cluster_colnames);
-            writetable(T, temp_pscvals_fn, 'Delimiter','\t');
+            writetable(P, temp_pscvals_fn, 'Delimiter','\t');
             [status, msg, msgID] = movefile(temp_pscvals_fn, psc_values_fn);
 
             % Write PSC timeseries to tsv file
@@ -448,14 +449,14 @@ for t = 1:numel(tasks)
         end
 
         % Write ROI overlap data to tsv file
-        data_table = array2table(data,'VariableNames', col_names);
+        data_table = array2table(roi_overlap_data,'VariableNames', col_names);
         writetable(data_table, temp_txt_fn, 'Delimiter','\t');
         [status, msg, msgID] = movefile(temp_txt_fn, overlap_summary_fn);
 
         % Write mean/peak data to tsv file
         meanCvalue_fn = fullfile(options.stats_dir, ['sub-all_task-' task '_run-' run '_desc-meanCvalues.tsv']);
         meanTvalue_fn = fullfile(options.stats_dir, ['sub-all_task-' task '_run-' run '_desc-meanTvalues.tsv']);
-        meanPSCvalue_fn = fullfile(options.stats_dir, ['sub-all_task-' task '_run-' run '_desc-meanPSCCvalues.tsv']);
+        meanPSCvalue_fn = fullfile(options.stats_dir, ['sub-all_task-' task '_run-' run '_desc-meanPSCvalues.tsv']);
         peakCvalue_fn = fullfile(options.stats_dir, ['sub-all_task-' task '_run-' run '_desc-peakCvalues.tsv']);
         peakTvalue_fn = fullfile(options.stats_dir, ['sub-all_task-' task '_run-' run '_desc-peakTvalues.tsv']);
         peakPSCvalue_fn = fullfile(options.stats_dir, ['sub-all_task-' task '_run-' run '_desc-peakPSCvalues.tsv']);
