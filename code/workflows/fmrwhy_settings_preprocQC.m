@@ -13,6 +13,7 @@ function settings = fmrwhy_settings_preprocQC(bids_dir, settings)
 
 % Set template for functional realignment purposes
 settings.template_task = 'rest';
+settings.template_session = '';
 settings.template_run = '1';
 settings.template_echo = '2';
 
