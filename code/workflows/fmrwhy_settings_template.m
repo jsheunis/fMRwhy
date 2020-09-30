@@ -1,58 +1,16 @@
 % fmrwhy_settings_template: Settings for the fmrwhy_workflow_qc pipeline
 
+% Main data source: BIDS root folder
+options.bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
 
-
-% Main input: BIDS root folder
-bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
-
-% fMRwhy toolbox root directory
-current_path = mfilename('fullpath');
-ind = strfind(current_path,'fMRwhy');
-options.fmrwhy_dir = current_path(1:ind+5);
-
-% SPM directory
-options.spm_dir = '/Users/jheunis/Documents/MATLAB/spm12';
-
-% Setup fmrwhy BIDS-derivatuve directories on workflow level
-options = fmrwhy_defaults_setupQcDerivDirs(bids_dir, options);
-
-% BIDS structure values
-options.bids_dataset = bids.layout(bids_dir);
-options.subjects = bids.query(options.bids_dataset,'subjects');
-options.sessions = bids.query(options.bids_dataset,'sessions');
-options.runs = bids.query(options.bids_dataset,'runs');
-options.tasks = bids.query(options.bids_dataset,'tasks');
-options.types = bids.query(options.bids_dataset,'types');
-options.modalities = bids.query(options.bids_dataset,'modalities');
+% Subjects to run
+options.subjects_output = 'all';
 
 % Set template for functional realignment purposes (if not needed, set to [])
-sample_sub = options.subjects{1};
 options.template_task = 'rest';
 options.template_session = [];
 options.template_run = '1';
 options.template_echo = '2';
-
-% Derive template flags from BIDS structure
-options.has_sessions = ~isempty(options.sessions);
-options.has_runs = ~isempty(options.runs);
-if options.has_sessions
-    if options.has_runs
-        filenames = bids.query(options.bids_dataset, 'data', 'sub', sample_sub, 'task', options.template_task, 'sess', options.template_session, 'run', options.template_run, 'type', 'bold');
-    else
-        filenames = bids.query(options.bids_dataset, 'data', 'sub', sample_sub, 'task', options.template_task, 'sess', options.template_session, 'type', 'bold');
-    end
-else
-    if options.has_runs
-        filenames = bids.query(options.bids_dataset, 'data', 'sub', sample_sub, 'task', options.template_task, 'run', options.template_run, 'type', 'bold');
-    else
-        filenames = bids.query(options.bids_dataset, 'data', 'sub', sample_sub, 'task', options.template_task, 'type', 'bold');
-    end
-end
-options.N_echoes = numel(filenames);
-options.is_multiecho = false;
-if options.N_echoes > 1
-    options.is_multiecho = true;
-end
 
 % Sequence parameters
 options.TR = 2;
@@ -60,20 +18,6 @@ options.N_slices = 34;
 options.Ndummies = 5;
 options.Nscans = 210;
 options.TE = [14 28 42]; % assume for all functional runs
-options.Ne = numel(options.TE);
-
-if options.is_multiecho
-    if options.N_echoes ~= options.Ne
-        disp('ERROR: number of echoes derived from BIDS dataset (using bids-matlab) do not match the number of echo times specified in settings file. FIX!')
-    end
-end
-
-% Dataset parameters
-options.Nsessions = numel(options.sessions);
-%options.tasks = {'rest', 'motor', 'emotion'};
-options.Ntasks = numel(options.tasks);
-%options.runs = {'1', '2'};
-options.Nruns = numel(options.runs);
 
 % Settings for structFunc processing
 
@@ -98,7 +42,6 @@ options.roi.emotion.desc = {'bilateralAmygdala', 'leftAmygdala', 'rightAmygdala'
 
 %options.roi.(task).roi_fn = ROIs in subject space (not resliced)
 %options.roi.(task).rroi_fn = resliced ROIs in subject space
-
 
 % Settings for basicFunc processing
 options.fwhm = 7;
@@ -129,14 +72,12 @@ options.physio.options.output_multiple_regressors_fn = 'PhysIO_multiple_regresso
 options.physio.options.level = 0; % verbose.level = 0 ==> do not generate figure outputs
 options.physio.options.fig_output_file = ''; % unnecessary if verbose.level = 0, but still initialized here
 
-
 % Settings for QC
 options.theplot.intensity_scale = [-6 6];
 options.qc_overwrite_tissuecontours = true;
 options.qc_overwrite_ROIcontours = true;
 options.qc_overwrite_theplot = false;
 options.qc_overwrite_statsoutput = true;
-
 
 % Settings for first level analysis: steps to include/exclude
 options.firstlevel.tmap_montages = true;

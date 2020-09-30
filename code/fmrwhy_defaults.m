@@ -1,8 +1,6 @@
-function defaults = fmrwhy_defaults()
-
+function options = fmrwhy_defaults()
 
 % fMRwhy toolbox root directory
-defaults.fmrwhy_dir = '/Users/jheunis/Documents/MATLAB/fMRwhy';
-
-% SPM directory
-defaults.spm_dir = '/Users/jheunis/Documents/MATLAB/spm12';
+current_path = mfilename('fullpath');
+ind = strfind(current_path,'fMRwhy');
+options.fmrwhy_dir = current_path(1:ind+5);

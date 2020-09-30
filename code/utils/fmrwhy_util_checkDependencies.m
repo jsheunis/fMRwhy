@@ -1,4 +1,8 @@
-function fmrwhy_util_checkDependencies()
+function options = fmrwhy_util_checkDependencies(options)
+
+if isempty(options)
+    options = struct;
+end
 
 spm_url = 'https://github.com/spm/spm12/releases/tag/r7771';
 bidsmatlab_url = 'https://github.com/bids-standard/bids-matlab';
@@ -20,6 +24,7 @@ else
     pathSpm = spm('Dir');
     addpath(pathSpm)
     spm_check_installation();
+    options.spm_dir = pathSpm;
 end
 
 % Check bids-matlab
@@ -30,6 +35,7 @@ if ~bm_installed
 else
     bm_what = what('bids-matlab');
     addpath(genpath(bm_what.path))
+    options.bidsmatlab_dir = bm_what.path;
 end
 
 % Check dicm2nii
@@ -39,6 +45,7 @@ if isempty(dicm2nii_installed)
 else
     [dicm2nii_dir, f, e] = fileparts(dicm2nii_installed);
     addpath(genpath(dicm2nii_dir))
+    options.dicm2nii_dir = dicm2nii_dir;
 end
 
 % Check TAPAS physio
@@ -48,6 +55,7 @@ if isempty(tapasphysio_installed)
 else
     [tapasphysio_dir, f, e] = fileparts(tapasphysio_installed);
     addpath(genpath(tapasphysio_dir))
+    options.tapasphysio_dir = tapasphysio_dir;
 end
 
 % Check raincloudplots
@@ -57,6 +65,7 @@ if isempty(raincloud_installed)
 else
     [raincloud_dir, f, e] = fileparts(raincloud_installed);
     addpath(genpath(raincloud_dir))
+    options.raincloud_dir = raincloud_dir;
 end
 
 %-----------------
