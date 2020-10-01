@@ -1,4 +1,4 @@
-function fmrwhy_preproc_anatLocaliser(bids_dir, sub, options)
+function fmrwhy_preproc_anatLocaliser(sub, options)
 % FUNCTION:
 %--------------------------------------------------------------------------
 
@@ -31,25 +31,11 @@ disp('*** Running fmrwhy_preproc_anatLocaliser ***')
 disp('---')
 disp('---')
 
-% Setup fmrwhy BIDS-derivatuve directories on workflow level
-options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
-
-% Grab parameters from workflow settings file
-options = fmrwhy_settings_preprocQC(bids_dir, options);
-
-% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
-
-% Update workflow params with subject anatomical derivative filenames
-options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
-
-
-
 % -------
 % STEP 1: Grab inputs necessary for normalisation (template and transform)
 % -------
 % Template functional volume
-template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
+template_fn = options.template_fn;
 % Transformation from mni to individual functional template space
 transformation_fn = options.mni_to_indiv_fn;
 
@@ -68,7 +54,8 @@ for i = 1:numel(options.tasks)
         for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
             count = count + 1;
             toTransform_fns{count} = options.roi.(options.tasks{i}).orig_fn{j};
-            saveAs_fns{count} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-' options.roi.(options.tasks{i}).desc{j} '_roi.nii']);
+            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi.nii');
+            saveAs_fns{count} = fullfile(options.preproc_dir, filepath, filename);
             options.roi.(options.tasks{i}).roi_fn{j} = saveAs_fns{count}; % save normalised filename for future use
         end
     end
@@ -94,7 +81,8 @@ for i = 1:numel(options.tasks)
         for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
             count = count + 1;
             reslice_fns{count} = options.roi.(options.tasks{i}).roi_fn{j};
-            saveAs_fns{count} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-r' options.roi.(options.tasks{i}).desc{j} '_roi.nii']);
+            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', ['r' options.roi.(options.tasks{i}).desc{j}], 'ext', '_roi.nii');
+            saveAs_fns{count} = fullfile(options.preproc_dir, filepath, filename);
             options.roi.(options.tasks{i}).rroi_fn{j} = saveAs_fns{count};% save resliced normalised filename for future use
         end
     end
@@ -123,7 +111,8 @@ for i = 1:numel(options.tasks)
             [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(options.roi.(options.tasks{i}).rroi_fn{j});
             overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
             title = options.roi.(options.tasks{i}).name{j}
-            saveAs_fn = fullfile(options.anat_dir_qc, ['sub-' sub '_space-individual_desc-' options.roi.(options.tasks{i}).desc{j} '_roi_montage.png']);
+            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi_montage.png');
+            saveAs_fn = fullfile(options.qc_dir, filepath, filename);
             fmrwhy_util_createOverlayMontage(p1.nii.img, overlay_img, 9, 1, title, 'gray', 'off', 'max', [], [255, 0, 0], saveAs_fn);
         end
     end

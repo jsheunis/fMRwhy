@@ -10,6 +10,12 @@ options.tasks = bids.query(options.bids_dataset,'tasks');
 options.types = bids.query(options.bids_dataset,'types');
 options.modalities = bids.query(options.bids_dataset,'modalities');
 
+% set list of subjects for which to generate QC output
+% If options.subjects_output is set to 'all' (default), read the list from the bids.query output, otherwise leave as is 
+if strcmp(options.subjects_output, 'all')
+    options.subjects_output = options.subjects;
+end
+
 % Set template for functional realignment purposes (if not needed, set to [])
 options.template_sub = options.subjects{1};
 

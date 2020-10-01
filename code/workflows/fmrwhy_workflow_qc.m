@@ -25,15 +25,23 @@ options = fmrwhy_defaults_setupQcDerivDirs(bids_dir, options);
 % Run settings file ==> populates study/data-specific fields in the options structure, including BIDS variables
 run(settings_fn);
 
-subs = options.subjects;
+% Validate settings
+options = fmrwhy_settings_validate(options)
+
+% Load the subjects
+subs = options.subjects_output;
+
+% -------
+% QC Pipeline -- for each subject
+% -------
 
 for s = 1:numel(subs)
     sub = subs{s};
     % Setup fmrwhy derivatives directories on subject level (this copies data from the main bids_dir)
-    options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
+    options = fmrwhy_bids_setupQcSubDirs(bids_dir, sub, options);
  
     % Update workflow options with subject anatomical derivative filenames
-    options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
+    options = fmrwhy_bids_getAnatDerivs(bids_dir, sub, options);
  
     % -------
     % STEP 0.2 -- Create functional template
@@ -55,7 +63,7 @@ for s = 1:numel(subs)
     % -------
     % STEP 1 -- Structural-functional preprocessing: fmrwhy_preproc_structFunc.m
     % -------
-    % Loop through all standard output filenames and see if these files exist
+    % Loop through all standard structFunc output filenames and see if these files exist
     struct_func_out_fns = [{options.coregest_anatomical_fn} options.probseg_fns options.transform_fns options.rall_fns options.mask_fns];
     run_structFunc = 0;
     for i = 1:numel(struct_func_out_fns)
@@ -67,7 +75,7 @@ for s = 1:numel(subs)
     % If some of the files do not exist, run the fmrwhy_preproc_structFunc processing pipeline
     if run_structFunc
         disp('Running complete structural-funcional preprocessing pipeline')
-        fmrwhy_preproc_structFunc(bids_dir, sub, ses, options.template_task, options.template_run, options.template_echo, options);
+        fmrwhy_preproc_structFunc(options);
         disp('Complete!')
         disp('---')
     else
@@ -79,7 +87,6 @@ for s = 1:numel(subs)
     % STEP 2 -- Anatomical localiser: fmrwhy_preproc_anatLocaliser.m
     % TODO: add more checks to see if this was already done, and add logic to decide what to do
     % -------
- 
     if options.map_rois == 1
         anatLocaliser_fns = {};
         for i = 1:numel(options.tasks)
@@ -88,7 +95,8 @@ for s = 1:numel(subs)
                 % Loop through all ROIs for the particular task
                 for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
                     rroi_fn = options.roi.(options.tasks{i}).rroi_fn{j};
-                    montage_fn = fullfile(options.anat_dir_qc, ['sub-' sub '_space-individual_desc-' options.roi.(options.tasks{i}).desc{j} '_roi_montage.png']);
+                    [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi_montage.png');
+                    montage_fn = fullfile(options.qc_dir, filepath, filename);
                     anatLocaliser_fns = [anatLocaliser_fns {rroi_fn, montage_fn}];
                 end
             end
@@ -112,14 +120,40 @@ for s = 1:numel(subs)
     end
  
     % -------
-    % PER TASK and RUN
+    % PER SESSION, TASK and RUN
     % -------
  
-    % Loop through sessions, tasks, runs, echoes.
-    ses = '';
-    tasks = {'rest', 'motor', 'emotion'};
-    runs = {'1', '2'};
- 
+    % Loop through sessions, tasks, runs
+    % options.sessions;
+    % options.tasks;
+    % options.runs;
+    % options.has_sessions;
+    % options.has_runs;
+
+    sub_sessions = bids.query(options.bids_dataset,'sessions','sub', sub);
+
+    if ~isempty(sub_sessions)
+        for s = 1:numel(sub_sessions)
+            ses = sub_sessions{s};
+            tasks = bids.query(options.bids_dataset,'tasks','sub', sub, 'ses', ses);
+            for t = 1:numel(tasks)
+                task = tasks{t};
+                runs = bids.query(options.bids_dataset,'tasks','sub', sub, 'ses', ses, 'task', task);
+                if ~isempty(runs)
+                    
+                else
+                    for r = 1:numel(runs)
+                        run = runs{r};
+                    end
+                end
+                
+            end
+        end
+    else
+        tasks = bids.query(options.bids_dataset,'tasks','sub', sub);
+
+    end
+
     for t = 1:numel(tasks)
         task = tasks{t};
         for r = 1:numel(runs)

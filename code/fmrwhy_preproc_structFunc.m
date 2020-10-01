@@ -1,4 +1,4 @@
-function fmrwhy_preproc_structFunc(bids_dir, sub, ses, task, run, echo, options)
+function fmrwhy_preproc_structFunc(options)
 %--------------------------------------------------------------------------
 
 % Copyright statement....
@@ -7,7 +7,7 @@ function fmrwhy_preproc_structFunc(bids_dir, sub, ses, task, run, echo, options)
 % DEFINITION
 %--------------------------------------------------------------------------
 
-% Function for pre-real-time anatomical/structural to functionap
+% Function for pre-real-time anatomical/structural to functiona/
 % preprocessing for a single subject. Steps include coregistering
 % structural image to initial functional image,segmenting the coregistered
 % structural image into tissue types, and reslicing the segments to the
@@ -34,25 +34,6 @@ disp('---')
 disp('*** Running fmrwhy_preproc_structFunc ***')
 disp('---')
 disp('---')
-
-
-% Setup fmrwhy BIDS-derivatuve directories on workflow level
-options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
-
-% Grab parameters from workflow settings file
-options = fmrwhy_settings_preprocQC(bids_dir, options);
-
-% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
-
-% Update workflow params with subject anatomical derivative filenames
-options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
-
-% Update workflow params with subject functional derivative filenames
-options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
-
-
-
 
 % -------
 % STEP 1 -- Coregister (estimate) structural image to template functional image

@@ -1,11 +1,11 @@
-function options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, e, options)
+function options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, ses, task, run, e, options)
 
 if isempty(options)
     options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
 end
 
 % Template filename
-options.template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
+% options.template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
 % Outputs from basicFunc processing
 options.motion_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_desc-confounds_motion.tsv']);
 options.functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_bold.nii']);

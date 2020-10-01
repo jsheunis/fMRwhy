@@ -6,6 +6,9 @@ options.bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
 % Subjects to run
 options.subjects_output = 'all';
 
+% Set template T1w image (set to [] if a single T1w image was collected)
+options.anat_template_session = [];
+
 % Set template for functional realignment purposes (if not needed, set to [])
 options.template_task = 'rest';
 options.template_session = [];
