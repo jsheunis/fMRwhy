@@ -1,22 +1,73 @@
-function options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, ses, task, run, e, options)
+function options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, varargin)
 
-if isempty(options)
-    options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
+%-------------
+% Parse inputs
+%-------------
+filetypes = {'func'};
+descriptions = {'Session', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Echo'};
+entities = {'ses', 'acq', 'ce', 'rec', 'dir', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
+formats = {'label', 'label', 'label', 'label', 'label', 'index', 'index'};
+
+validChar = @(x) ischar(x);
+validType = @(x) any(validatestring(x,filetypes));
+
+p = inputParser;
+addRequired(p, 'bids_dir', validChar);
+addRequired(p, 'sub', validChar);
+addRequired(p, 'task', validChar);
+addRequired(p, 'options', validChar);
+for i = 1:numel(entities)
+    addParameter(p, entities{i}, '', validChar);
 end
+parse(p, bids_dir, sub, task, options, varargin{:});
+params = p.Results;
+
+options = params.options;
 
 % Template filename
 % options.template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
+
 % Outputs from basicFunc processing
-options.motion_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_desc-confounds_motion.tsv']);
-options.functional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_bold.nii']);
-options.afunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_desc-apreproc_bold.nii']);
-options.rfunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_desc-rpreproc_bold.nii']);
-options.rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_desc-rapreproc_bold.nii']);
-options.sfunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_desc-spreproc_bold.nii']);
-options.srfunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_desc-srpreproc_bold.nii']);
-options.srafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-' e '_desc-srapreproc_bold.nii']);
-options.framewise_displacement_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-confounds_fd.tsv']);
-options.tissue_regr_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-confounds_tissue.tsv']);
-options.physio_regr_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-confounds_physio.tsv']);
-options.confounds_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_desc-confounds_regressors.tsv']);
+
+fields_w_echo = {'motion_fn', 'functional_fn', 'afunctional_fn', 'rfunctional_fn', 'rafunctional_fn', 'sfunctional_fn', 'srfunctional_fn', 'srafunctional_fn'};
+fields_w_echo_desc = {'confounds', '', 'apreproc', 'rpreproc', 'rapreproc', 'spreproc', 'srpreproc', 'srapreproc'};
+fields_w_echo_ext = {'_motion.tsv', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii'};
+
+fields_wo_echo = {'framewise_displacement_fn', 'tissue_regr_fn', 'physio_regr_fn', 'confounds_fn'};
+fields_wo_echo_ext = {'_fd.tsv', '_tissue.tsv', '_physio.tsv', '_regressors.tsv'};
+
+fields_statsqc = {'mean_fn', 'std_fn', 'tsnr_fn', 'var_fn'};
+fields_statsqc_tsv = {'stats_timeseries_fn', 'stats_summary_fn'};
+fields_statsqc_ext = {'_mean.nii', '_std.nii', '_tsnr.nii', '_var.nii'};
+
+
+
+% Fields with echo included (if multiecho or not)
+[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run, 'echo', params.echo);
+options.current_functional_filename = filename;
+for i = 1:numel(fields_w_echo)
+    options.(fields_w_echo{i}) = fullfile(options.preproc_dir, filepath, [filename '_desc-' fields_w_echo_desc{i} fields_w_echo_ext{i}]);
+end
+
+% Fields with echo excluded (if multiecho or not)
+[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run);
+for i = 1:numel(fields_wo_echo)
+    options.(fields_wo_echo{i}) = fullfile(options.preproc_dir, filepath, [filename '_desc-confounds' fields_wo_echo_ext{i}]);
+end
+
+% Stats QC fields with echo excluded (if multiecho or not)
+[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run, 'space', 'individual');
+for i = 1:numel(fields_statsqc)
+    options.(fields_statsqc{i}) = fullfile(options.qc_dir, filepath, [filename fields_statsqc_ext{i}]);
+end
+
+
+for i = 1:numel(fields_statsqc_tsv)
+    [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run, 'desc', fields_statsqc_tsv{i}(1:end-3);, 'ext', '.tsv');
+    options.(fields_statsqc_tsv{i}) = fullfile(options.qc_dir, filepath, filename);
+end
+
+
 options.basic_func_out_fns = {options.motion_fn, options.afunctional_fn, options.rfunctional_fn, options.rafunctional_fn, options.sfunctional_fn, options.srfunctional_fn, options.srafunctional_fn, options.confounds_fn};
+options.stats_qc_out_fns = {options.mean_fn, options.std_fn, options.tsnr_fn, options.var_fn, options.stats_timeseries_fn, options.stats_summary_fn};
+

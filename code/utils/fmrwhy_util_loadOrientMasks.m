@@ -1,4 +1,4 @@
-function masks = fmrwhy_util_loadOrientMasks(bids_dir, sub)
+function masks = fmrwhy_util_loadOrientMasks(bids_dir, sub, options)
 % Load data for masks that were already calculated;
 % assumes standard fmrwhy-preproc directory structure
 % assumes fmrwhy_preproc_structFunc.m has been run successfully
@@ -7,16 +7,21 @@ function masks = fmrwhy_util_loadOrientMasks(bids_dir, sub)
 % It includes reorientation for RAS+ display.
 % If pure calculation purposes are intended, rather use fmrwhy_util_loadMasks!
 
-deriv_dir = fullfile(bids_dir, 'derivatives');
-preproc_dir = fullfile(deriv_dir, 'fmrwhy-preproc');
-sub_dir_preproc = fullfile(preproc_dir, ['sub-' sub]);
+if isempty(options.anat_template_session)
+    [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ext', '_T1w.nii');
+else
+    [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
+end
 
 masks = struct;
-
-masks.GM_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-GM_mask.nii']);
-masks.WM_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-WM_mask.nii']);
-masks.CSF_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-CSF_mask.nii']);
-masks.brain_mask_fn = fullfile(sub_dir_preproc, 'anat', ['sub-' sub '_space-individual_desc-brain_mask.nii']);
+masks.GM_mask_fn = fullfile(options.qc_dir, filepath, filename);
+masks.GM_mask_fn = strrep(masks.GM_mask_fn, '_T1w.nii', '_space-individual_desc-GM_mask.nii');
+masks.WM_mask_fn = fullfile(options.qc_dir, filepath, filename);
+masks.WM_mask_fn = strrep(masks.WM_mask_fn, '_T1w.nii', '_space-individual_desc-WM_mask.nii');
+masks.CSF_mask_fn = fullfile(options.qc_dir, filepath, filename);
+masks.CSF_mask_fn = strrep(masks.CSF_mask_fn, '_T1w.nii', '_space-individual_desc-CSF_mask.nii');
+masks.brain_mask_fn = fullfile(options.qc_dir, filepath, filename);
+masks.brain_mask_fn = strrep(masks.brain_mask_fn, '_T1w.nii', '_space-individual_desc-brain_mask.nii');
 
 [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(masks.GM_mask_fn);
 masks.GM_mask_3D = p.nii.img; % [Ni x Nj x Nk]

@@ -147,13 +147,13 @@ for s = 1:numel(subs)
                     for r = 1:numel(runs)
                         run = runs{r};
                         % STEP 1 -- Basic functional preprocessing: fmrwhy_bids_preprocFunc.m
-                        fmrwhy_bids_preprocFunc(bids_dir, sub, session, task, run, options);
+                        fmrwhy_bids_preprocFunc(bids_dir, sub, task, options, 'ses', session, 'run', run);
                         % STEP 2 -- Quality control pipeline: fmrwhy_qc_run.m
                         fmrwhy_qc_run(bids_dir, sub, session, task, run, options.template_echo, options);
                     end
                 else % If there are NOT runs:
                     % STEP 1 -- Basic functional preprocessing: fmrwhy_bids_preprocFunc.m
-                    fmrwhy_bids_preprocFunc(bids_dir, sub, ses, task, run, options);
+                    fmrwhy_bids_preprocFunc(bids_dir, sub, task, options, 'ses', session);
                     % STEP 2 -- Quality control pipeline: fmrwhy_qc_run.m
                     fmrwhy_qc_run(bids_dir, sub, ses, task, run, options.template_echo, options);
                 end
@@ -173,13 +173,13 @@ for s = 1:numel(subs)
                 for r = 1:numel(runs)
                     run = runs{r};
                     % STEP 1 -- Basic functional preprocessing: fmrwhy_bids_preprocFunc.m
-                    fmrwhy_bids_preprocFunc(bids_dir, sub, ses, task, run, options);
+                    fmrwhy_bids_preprocFunc(bids_dir, sub, task, options, 'run', run);
                     % STEP 2 -- Quality control pipeline: fmrwhy_qc_run.m
                     fmrwhy_qc_run(bids_dir, sub, ses, task, run, options.template_echo, options);
                 end
             else % If there are NOT runs
                 % STEP 1 -- Basic functional preprocessing: fmrwhy_bids_preprocFunc.m
-                fmrwhy_bids_preprocFunc(bids_dir, sub, ses, task, run, options);
+                fmrwhy_bids_preprocFunc(bids_dir, sub, task, options);
                 % STEP 2 -- Quality control pipeline: fmrwhy_qc_run.m
                 fmrwhy_qc_run(bids_dir, sub, ses, task, run, options.template_echo, options);
             end 

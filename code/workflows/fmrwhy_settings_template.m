@@ -25,7 +25,7 @@ options.TE = [14 28 42]; % assume for all functional runs
 % Settings for structFunc processing
 
 % Settings for anatLocaliser processing
-options.map_rois = 1;
+options.map_rois = 0;
 %options.roi_orig_dir = '/Volumes/Stephan_WD/NEUFEPME_data_templates';
 options.roi_orig_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_templates';
 options.roi = struct;
@@ -48,6 +48,8 @@ options.roi.emotion.desc = {'bilateralAmygdala', 'leftAmygdala', 'rightAmygdala'
 
 % Settings for basicFunc processing
 options.fwhm = 7;
+options.basicfunc_full = false; % if true, preprocessing will include all combinations of slice time correction, realignment and smoothing, useful for later analyses; if false, only include steps necessary for QC
+options.include_stc = false;
 
 % Settings for generateMultRegr routine
 options.confounds.include_volterra = 1;

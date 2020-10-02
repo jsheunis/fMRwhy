@@ -1,4 +1,4 @@
-function stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional_fn)
+function stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional_fn, options)
 %function stats = fmrwhy_qc_calculateStats(bids_dir, sub, ses, task, run)
 % Function to calculate multiple statistical measures from single run of (masked) fMRI timeseries data
 
@@ -12,7 +12,7 @@ data_2D = reshape(data_4D, Ni*Nj*Nk, Nt); %[voxels, time]
 data_2D = data_2D'; %[time, voxels]
 
 % Get masks
-masks = fmrwhy_util_loadMasks(bids_dir, sub);
+masks = fmrwhy_util_loadMasks(bids_dir, sub, options);
 
 % Remove linear and quadratic trend per voxel
 data_2D_detrended = fmrwhy_util_detrend(data_2D, 2); %[time, voxels]

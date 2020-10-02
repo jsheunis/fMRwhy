@@ -1,13 +1,13 @@
 function [filename, filepath] = fmrwhy_bids_constructFilename(filetype, varargin)
 % BIDS 1.4.0
-% This does not yet take into account whether an entity is OPTIONAL or REQUIRED for a specific file modality (e.g. 'func', 'anat', 'meg', etc)
+% This does not yet take into account whether an entity is OPTIONAL or REQUIRED for a specific file modality/type (e.g. 'func', 'anat', 'meg', etc)
 % It assumes all parameters are optional and just constructs the filename given the input
 % also, file extension is passed as parameter ==> should be automatically determined from file modality/type
 
 filetypes = {'anat', 'func'}; % currently supported in fMRwhy
-descriptions = {'Subject', 'Session', 'Task', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Corresponding modality', 'Echo', 'Recording', 'Processed (on device)', 'Space', 'Split', 'File extension'};
-entities = {'sub', 'ses', 'task', 'acq', 'ce', 'rec', 'dir', 'run', 'mod', 'echo', 'recording', 'proc', 'space', 'split', 'ext'};
-formats = {'label', 'label', 'label', 'label', 'label', 'label', 'label', 'index', 'label', 'index', 'label', 'label', 'label', 'index', 'label'};
+descriptions = {'Subject', 'Session', 'Task', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Corresponding modality', 'Echo', 'Recording', 'Processed (on device)', 'Space', 'Split', 'Description', 'File extension'};
+entities = {'sub', 'ses', 'task', 'acq', 'ce', 'rec', 'dir', 'run', 'mod', 'echo', 'recording', 'proc', 'space', 'split', 'desc', 'ext'};
+formats = {'label', 'label', 'label', 'label', 'label', 'label', 'label', 'index', 'label', 'index', 'label', 'label', 'label', 'index', 'label', 'label'};
 
 validChar = @(x) ischar(x);
 validType = @(x) any(validatestring(x,filetypes));
@@ -15,7 +15,7 @@ validType = @(x) any(validatestring(x,filetypes));
 p = inputParser;
 addRequired(p, 'filetype', validType);
 for i = 1:numel(entities)
-    addParameter(p, entities{i}, [], validChar);
+    addParameter(p, entities{i}, '', validChar);
 end
 parse(p, filetype, varargin{:});
 

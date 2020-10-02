@@ -1,5 +1,7 @@
 function fmrwhy_batch_sliceTiming(functional_fn, saveAs_fn, options)
 
+    % TODO: this makes a lot of assumptions, better to read STC info from bids structure, or rather pass as parameter
+
 % Load required options
 
 func_spm = spm_vol(functional_fn);
