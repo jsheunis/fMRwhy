@@ -13,13 +13,13 @@ else
 end
 
 masks = struct;
-masks.GM_mask_fn = fullfile(options.qc_dir, filepath, filename);
+masks.GM_mask_fn = fullfile(options.preproc_dir, filepath, filename);
 masks.GM_mask_fn = strrep(masks.GM_mask_fn, '_T1w.nii', '_space-individual_desc-GM_mask.nii');
-masks.WM_mask_fn = fullfile(options.qc_dir, filepath, filename);
+masks.WM_mask_fn = fullfile(options.preproc_dir, filepath, filename);
 masks.WM_mask_fn = strrep(masks.WM_mask_fn, '_T1w.nii', '_space-individual_desc-WM_mask.nii');
-masks.CSF_mask_fn = fullfile(options.qc_dir, filepath, filename);
+masks.CSF_mask_fn = fullfile(options.preproc_dir, filepath, filename);
 masks.CSF_mask_fn = strrep(masks.CSF_mask_fn, '_T1w.nii', '_space-individual_desc-CSF_mask.nii');
-masks.brain_mask_fn = fullfile(options.qc_dir, filepath, filename);
+masks.brain_mask_fn = fullfile(options.preproc_dir, filepath, filename);
 masks.brain_mask_fn = strrep(masks.brain_mask_fn, '_T1w.nii', '_space-individual_desc-brain_mask.nii');
 
 nii = nii_tool('load', masks.GM_mask_fn);

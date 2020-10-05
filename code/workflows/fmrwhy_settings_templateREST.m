@@ -16,11 +16,11 @@ options.template_run = '';
 options.template_echo = '';
 
 % Sequence parameters
-options.TR = 2;
-options.N_slices = 34;
-options.Ndummies = 5;
-options.Nscans = 210;
-options.TE = [14 28 42]; % assume for all functional runs
+options.TR = '';
+options.N_slices = 25;
+options.Ndummies = 0;
+options.Nscans = 100;
+options.TE = []; % assume for all functional runs
 
 % Settings for structFunc processing
 
@@ -47,7 +47,7 @@ options.roi.emotion.desc = {'bilateralAmygdala', 'leftAmygdala', 'rightAmygdala'
 %options.roi.(task).rroi_fn = resliced ROIs in subject space
 
 % Settings for basicFunc processing
-options.fwhm = 7;
+options.fwhm = 5;
 options.basicfunc_full = false; % if true, preprocessing will include all combinations of slice time correction, realignment and smoothing, useful for later analyses; if false, only include steps necessary for QC
 options.include_stc = false;
 
@@ -55,7 +55,7 @@ options.include_stc = false;
 options.confounds.include_volterra = 1;
 options.confounds.include_fd = 1;
 options.confounds.include_tissue = 1;
-options.confounds.include_physio = 1;
+options.confounds.include_physio = 0;
 
 % generateMultRegr: framewise displacement
 options.r = 50; % mm
@@ -79,10 +79,11 @@ options.physio.options.fig_output_file = ''; % unnecessary if verbose.level = 0,
 
 % Settings for QC
 options.theplot.intensity_scale = [-6 6];
-options.qc_overwrite_tissuecontours = true;
-options.qc_overwrite_ROIcontours = true;
-options.qc_overwrite_theplot = false;
-options.qc_overwrite_statsoutput = true;
+options.theplot.include_physio = 0;
+options.qc_overwrite_tissuecontours = false;
+options.qc_overwrite_ROIcontours = false;
+options.qc_overwrite_theplot = true;
+options.qc_overwrite_statsoutput = false;
 
 % Settings for first level analysis: steps to include/exclude
 options.firstlevel.tmap_montages = true;

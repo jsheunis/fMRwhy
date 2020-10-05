@@ -31,9 +31,9 @@ function fmrwhy_bids_qcRun(bids_dir, sub, task, options, varargin)
 % Parse inputs
 %-------------
 filetypes = {'func'};
-descriptions = {'Subject', 'Session', 'Task', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Echo'};
-entities = {'sub', 'ses', 'task', 'acq', 'ce', 'rec', 'dir', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
-formats = {'label', 'label', 'label', 'label', 'label', 'label', 'label', 'index', 'index'};
+descriptions = {'Session', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Echo'};
+entities = {'ses', 'acq', 'rec', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
+formats = {'label', 'label', 'label', 'label', 'label', 'index', 'index'};
 
 validChar = @(x) ischar(x);
 validType = @(x) any(validatestring(x,filetypes));
@@ -42,7 +42,7 @@ p = inputParser;
 addRequired(p, 'bids_dir', validChar);
 addRequired(p, 'sub', validChar);
 addRequired(p, 'task', validChar);
-addRequired(p, 'options', validChar);
+addRequired(p, 'options');
 for i = 1:numel(entities)
     addParameter(p, entities{i}, '', validChar);
 end
@@ -64,17 +64,14 @@ options = fmrwhy_bids_getAnatDerivs(bids_dir, sub, options)
 % STEP 1: Contours of tissue masks on mean EPI / template EPI (/ anatomical image?)
 % -------
 % TODO: this should hide figures and only print them to png. currently figures are popping up.
-
-if isempty(options.anat_template_session)
-    [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ext', '_T1w.nii');
-else
-    [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
-end
-
-mask_montage_fns = {'_GM_mask_montage', '_WM_mask_montage', '_CSF_mask_montage', '_brain_mask_montage'};
-for i = 1:numel(mask_montage_fns)
+mask_desc = {'GM', 'WM', 'CSF', 'brain'};
+for i = 1:numel(mask_desc)
+    if isempty(options.anat_template_session)
+        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', mask_desc{i}, 'ext', '_mask_montage.png');
+    else
+        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'space', 'individual', 'desc', mask_desc{i}, 'ext', '_mask_montage.png');
+    end
     mask_montage_fns{i} = fullfile(options.qc_dir, filepath, filename);
-    mask_montage_fns{i} = strrep(mask_montage_fns{i}, '_T1w.nii', mask_montage_fns{i});
 end
 run_montage = 0;
 for i = 1:numel(mask_montage_fns)
@@ -130,59 +127,61 @@ end
 % ------------------------
 
 % -------
-% STEP 1: Grab multiple regressors
+% STEP 1: Grab functionally relevant data, test for multi-echo
 % -------
-%motion_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_motion.tsv']);
-%framewise_displacement_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_fd.tsv']);
-%tissue_regr_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_tissue.tsv']);
-%physio_regr_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_physio.tsv']);
-%confounds_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_desc-confounds_regressors.tsv']);
+% TODO: decide if this needs to be done here, or if the single correct functional run should be sent to this function instead. Going with the latter for now.
 
 % -------
 % STEP 2: Calculate and generate statistical measures and images (tsnr, variance, std, psc, DVARS)
 % -------
+options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec);
 
-stats = fmrwhy_qc_createStatsOutput(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+stats = fmrwhy_bids_qcCreateStatsOutput(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec);
 
 % -------
 % STEP 3: Create The Plot for whole brain
 % -------
 theplot_fn = {};
-theplot_fn{1} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-RO_grayplot.png']);
-theplot_fn{2} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-GSO_grayplot.png']);
+[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', params.ses, 'task', task, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec, 'desc', 'RO', 'ext', '_grayplot.png');
+theplot_fn{1} = fullfile(options.qc_dir, filepath, filename);
+[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', params.ses, 'task', task, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec, 'desc', 'GSO', 'ext', '_grayplot.png');
+theplot_fn{2} = fullfile(options.qc_dir, filepath, filename);
 if ~exist(theplot_fn{1}, 'file') || ~exist(theplot_fn{2}, 'file') || options.qc_overwrite_theplot
-    fmrwhy_qc_createThePlot(bids_dir, sub, ses, task, run, echo, options);
+    options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec);
+    fmrwhy_bids_qcCreateThePlot(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec);
 end
 
 
 % -------
 % STEP 4: Create The Plot for rois
 % -------
+if options.map_rois
+    % Update workflow params with subject functional derivative filenames
+    options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec);
+    % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
+    if strcmp(task, 'rest') ~= 1
+        % Loop through all ROIs for the particular task
+        for j = 1:numel(options.roi.(task).orig_fn)
+            functional_fn = options.sfunctional_fn;
+            desc = options.roi.(task).desc{j};
+            [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', params.ses, 'task', task, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec, 'desc', desc, 'ext', '_grayplot.png');
+            saveAs_fn = fullfile(options.qc_dir, filepath, filename);
 
-% Update workflow params with subject functional derivative filenames
-options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
-% Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
-if strcmp(task, 'rest') ~= 1
-    % Loop through all ROIs for the particular task
-    for j = 1:numel(options.roi.(task).orig_fn)
-        functional_fn = options.sfunctional_fn;
-        desc = options.roi.(task).desc{j};
-        saveAs_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_echo-' echo '_desc-' desc '_grayplot.png']);
+            task_info.TR = options.firstlevel.(task).(['run' run]).sess_params.timing_RT;
+            task_info.onsets = options.firstlevel.(task).(['run' run]).plot_params.cond_onset;
+            task_info.durations = options.firstlevel.(task).(['run' run]).plot_params.cond_duration;
+            task_info.precision = 1;
 
-        task_info.TR = options.firstlevel.(task).(['run' run]).sess_params.timing_RT;
-        task_info.onsets = options.firstlevel.(task).(['run' run]).plot_params.cond_onset;
-        task_info.durations = options.firstlevel.(task).(['run' run]).plot_params.cond_duration;
-        task_info.precision = 1;
-
-        if ~exist(saveAs_fn, 'file') || options.qc_overwrite_theplot
-            trace_info = [];
-            fmrwhy_util_thePlotROI(functional_fn, options.brain_mask_fn, options.roi.(task).rroi_fn{j}, task_info, trace_info, saveAs_fn)
-        else
-            disp(['File already exists: ' saveAs_fn])
+            if ~exist(saveAs_fn, 'file') || options.qc_overwrite_theplot
+                trace_info = [];
+                fmrwhy_util_thePlotROI(functional_fn, options.brain_mask_fn, options.roi.(task).rroi_fn{j}, task_info, trace_info, saveAs_fn)
+            else
+                disp(['File already exists: ' saveAs_fn])
+            end
         end
+    else
+        disp('---')
+        disp('Not creating ROI timeseries plots for task = rest.')
+        disp('---')
     end
-else
-    disp('---')
-    disp('Not creating ROI timeseries plots for task = rest.')
-    disp('---')
 end

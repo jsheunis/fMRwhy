@@ -29,15 +29,15 @@ options.has_sessions = ~isempty(options.sessions);
 options.has_runs = ~isempty(options.runs);
 if options.has_sessions
     if options.has_runs
-        filenames = bids.query(options.bids_dataset, 'data', 'sub', sample_sub, 'task', options.template_task, 'sess', options.template_session, 'run', options.template_run, 'type', 'bold');
+        filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'sess', options.template_session, 'run', options.template_run, 'type', 'bold');
     else
-        filenames = bids.query(options.bids_dataset, 'data', 'sub', sample_sub, 'task', options.template_task, 'sess', options.template_session, 'type', 'bold');
+        filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'sess', options.template_session, 'type', 'bold');
     end
 else
     if options.has_runs
-        filenames = bids.query(options.bids_dataset, 'data', 'sub', sample_sub, 'task', options.template_task, 'run', options.template_run, 'type', 'bold');
+        filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'run', options.template_run, 'type', 'bold');
     else
-        filenames = bids.query(options.bids_dataset, 'data', 'sub', sample_sub, 'task', options.template_task, 'type', 'bold');
+        filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'type', 'bold');
     end
 end
 options.N_echoes = numel(filenames);

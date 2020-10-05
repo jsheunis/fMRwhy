@@ -18,12 +18,11 @@ options = fmrwhy_util_checkDependencies(options);
 % -------
 % SETUP STEP B -- Load settings, defaults, filenames and parameters
 % -------
-
-% Setup fmrwhy derivative directories on workflow level
-options = fmrwhy_defaults_setupQcDerivDirs(bids_dir, options);
-
 % Run settings file ==> populates study/data-specific fields in the options structure, including BIDS variables
 run(settings_fn);
+
+% Setup fmrwhy derivative directories on workflow level
+options = fmrwhy_bids_setupQcDerivDirs(options.bids_dir, options);
 
 % Validate settings
 options = fmrwhy_settings_validate(options)
@@ -38,10 +37,10 @@ subs = options.subjects_output;
 for s = 1:numel(subs)
     sub = subs{s};
     % Setup fmrwhy derivatives directories on subject level (this copies data from the main bids_dir)
-    options = fmrwhy_bids_setupQcSubDirs(bids_dir, sub, options);
+    options = fmrwhy_bids_setupQcSubDirs(options.bids_dir, sub, options);
  
     % Update workflow options with subject anatomical derivative filenames
-    options = fmrwhy_bids_getAnatDerivs(bids_dir, sub, options);
+    options = fmrwhy_bids_getAnatDerivs(options.bids_dir, sub, options);
  
     % -------
     % STEP 0.2 -- Create functional template
@@ -51,7 +50,7 @@ for s = 1:numel(subs)
     template_fn = fullfile(options.preproc_dir, filepath, filename);
     if ~exist(template_fn, 'file')
         disp(['Template functional image does not exist yet. Creating now: ' template_fn]);
-        [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'task', options.template_task, 'run', options.template_run, 'echo', options.template_echo, 'ext', '_bold.nii')
+        [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', options.template_session, 'task', options.template_task, 'run', options.template_run, 'echo', options.template_echo, 'ext', '_bold.nii')
         functional_fn = fullfile(options.preproc_dir, filepath, filename);
         fmrwhy_util_saveNiftiFrom4D(functional_fn, template_fn, 1)
     else
@@ -110,7 +109,7 @@ for s = 1:numel(subs)
         end
         % If some of the files do not exist, run the fmrwhy_preproc_anatLocaliser processing pipeline
         if run_anatLocaliser
-            fmrwhy_preproc_anatLocaliser(bids_dir, sub, options)
+            fmrwhy_preproc_anatLocaliser(options.bids_dir, sub, options)
             disp('Complete!')
             disp('---')
         else
@@ -141,21 +140,21 @@ for s = 1:numel(subs)
             for t = 1:numel(tasks)
                 task = tasks{t};
                 % Get runs for current task
-                runs = bids.query(options.bids_dataset,'tasks','sub', sub, 'ses', ses, 'task', task);
+                runs = bids.query(options.bids_dataset,'runs','sub', sub, 'ses', ses, 'task', task);
                 % If there are runs, loop through them
                 if ~isempty(runs)
                     for r = 1:numel(runs)
-                        run = runs{r};
+                        current_run = runs{r};
                         % STEP 1 -- Basic functional preprocessing: fmrwhy_bids_preprocFunc.m
-                        fmrwhy_bids_preprocFunc(bids_dir, sub, task, options, 'ses', session, 'run', run);
-                        % STEP 2 -- Quality control pipeline: fmrwhy_qc_run.m
-                        fmrwhy_qc_run(bids_dir, sub, session, task, run, options.template_echo, options);
+                        fmrwhy_bids_preprocFunc(options.bids_dir, sub, task, options, 'ses', session, 'run', current_run);
+                        % STEP 2 -- Quality control pipeline: fmrwhy_bids_qcRun.m
+                        fmrwhy_bids_qcRun(options.bids_dir, sub, task, options, 'ses', session, 'run', current_run, 'echo', options.template_echo);
                     end
                 else % If there are NOT runs:
                     % STEP 1 -- Basic functional preprocessing: fmrwhy_bids_preprocFunc.m
-                    fmrwhy_bids_preprocFunc(bids_dir, sub, task, options, 'ses', session);
-                    % STEP 2 -- Quality control pipeline: fmrwhy_qc_run.m
-                    fmrwhy_qc_run(bids_dir, sub, ses, task, run, options.template_echo, options);
+                    fmrwhy_bids_preprocFunc(options.bids_dir, sub, task, options, 'ses', session);
+                    % STEP 2 -- Quality control pipeline: fmrwhy_bids_qcRun.m
+                    fmrwhy_bids_qcRun(options.bids_dir, sub, task, options, 'ses', session, 'echo', options.template_echo);
                 end
             end
         end
@@ -167,21 +166,21 @@ for s = 1:numel(subs)
         for t = 1:numel(tasks)
             task = tasks{t};
             % Get runs for current task
-            runs = bids.query(options.bids_dataset,'tasks','sub', sub, 'task', task);
+            runs = bids.query(options.bids_dataset,'runs','sub', sub, 'task', task);
             % If there are runs, loop through them
             if ~isempty(runs)
                 for r = 1:numel(runs)
-                    run = runs{r};
+                    current_run = runs{r};
                     % STEP 1 -- Basic functional preprocessing: fmrwhy_bids_preprocFunc.m
-                    fmrwhy_bids_preprocFunc(bids_dir, sub, task, options, 'run', run);
-                    % STEP 2 -- Quality control pipeline: fmrwhy_qc_run.m
-                    fmrwhy_qc_run(bids_dir, sub, ses, task, run, options.template_echo, options);
+                    fmrwhy_bids_preprocFunc(options.bids_dir, sub, task, options, 'run', current_run);
+                    % STEP 2 -- Quality control pipeline: fmrwhy_bids_qcRun.m
+                    fmrwhy_bids_qcRun(options.bids_dir, sub, task, options, 'run', current_run, 'echo', options.template_echo);
                 end
             else % If there are NOT runs
                 % STEP 1 -- Basic functional preprocessing: fmrwhy_bids_preprocFunc.m
-                fmrwhy_bids_preprocFunc(bids_dir, sub, task, options);
-                % STEP 2 -- Quality control pipeline: fmrwhy_qc_run.m
-                fmrwhy_qc_run(bids_dir, sub, ses, task, run, options.template_echo, options);
+                fmrwhy_bids_preprocFunc(options.bids_dir, sub, task, options);
+                % STEP 2 -- Quality control pipeline: fmrwhy_bids_qcRun.m
+                fmrwhy_bids_qcRun(options.bids_dir, sub, task, options, 'echo', options.template_echo);
             end 
         end
     end
@@ -189,6 +188,6 @@ for s = 1:numel(subs)
     % -------
     % STEP 5 -- QC report: fmrwhy_qc_generateSubRunReport.m
     % -------
-    fmrwhy_neufep_generateSubReport(bids_dir, sub);
+    % fmrwhy_neufep_generateSubReport(options.bids_dir, sub);
 
 end

@@ -1,0 +1,280 @@
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #586F7C;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  height: 60px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Centered section inside the top navigation */
+.topnav-centered img{
+  float: none;
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Right-aligned section inside the top navigation */
+.topnav-right {
+  float: right;
+}
+
+/*!* Responsive navigation menu - display links on top of each other instead of next to each other (for mobile devices) *!*/
+/*@media screen and (max-width: 600px) {*/
+/*  .topnav a, .topnav-right {*/
+/*    float: none;*/
+/*    display: block;*/
+/*  }*/
+
+/*  .topnav-centered a {*/
+/*    position: relative;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    transform: none;*/
+/*  }*/
+/*}*/
+
+.avatar {
+  vertical-align: middle;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+}
+
+/* The dropdown container */
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+/* Dropdown button */
+.dropdown .dropbtn {
+  font-size: 30px;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit; /* Important for vertical align on mobile phones */
+  margin: 0; /* Important for vertical align on mobile phones */
+}
+
+/* Add a red background color to navbar links on hover */
+.topnav a:hover, .dropdown:hover .dropbtn {
+  background-color: #000000;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #586F7C;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  float: none;
+  color: #f2f2f2;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+/* Add a grey background color to dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #ffff00;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.qcsummary {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+}
+
+.qcsummary td, .qcsummary th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.qcsummary tr:nth-child(even){background-color: #f2f2f2;}
+
+.qcsummary tr:hover {background-color: #ddd;}
+
+.qcsummary th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #586F7C;
+  color: white;
+}
+
+/* Style the tab */
+/* Style the tab content */
+.tabcontent1 {
+  display: none;
+  /*padding: 6px 6px;*/
+  border: 1px solid #ccc;
+  border-top: none;
+  text-align: center;
+}
+
+.tab1 {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab1 button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab1 button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab1 button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent2 {
+  display: none;
+  /*padding: 6px 6px;*/
+  border: 1px solid #ccc;
+  border-top: none;
+  text-align: center;
+}
+
+/* Style the tab */
+.tab2 {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab2 button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab2 button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab2 button.active {
+  background-color: #ccc;
+}
+
+
+
+
+/* Style the tab content */
+.tabcontent3 {
+  display: none;
+  /*padding: 6px 12px;*/
+  border: 1px solid #ccc;
+  border-top: none;
+  text-align: center;
+}
+
+/* Style the tab */
+.tab3 {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab3 button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab3 button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab3 button.active {
+  background-color: #ccc;
+}
+
+
+
+/* Style the tab content */
+.tabcontent4 {
+  display: none;
+  /*padding: 6px 12px;*/
+  border: 1px solid #ccc;
+  border-top: none;
+  text-align: center;
+}
+
+/* Style the tab */
+.tab4 {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab4 button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab4 button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab4 button.active {
+  background-color: #ccc;
+}

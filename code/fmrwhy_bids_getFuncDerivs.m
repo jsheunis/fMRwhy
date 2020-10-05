@@ -5,7 +5,11 @@ function options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, varar
 %-------------
 filetypes = {'func'};
 descriptions = {'Session', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Echo'};
-entities = {'ses', 'acq', 'ce', 'rec', 'dir', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
+% entities = {'ses', 'acq', 'ce', 'rec', 'dir', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
+% looks like bids-matlab is not adhering to bids v1.4.0 and is not able to parse 'ce' and 'dir' entity.
+% for now, remove entities from fMRwhy; have to update bids-matlab in future.
+entities = {'ses', 'acq', 'rec', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
+% {'sub', 'ses', 'acq', 'ce', 'rec', 'fa', 'echo', 'inv', 'run'} % bids-matlab list seems to be pre-v1.4.0
 formats = {'label', 'label', 'label', 'label', 'label', 'index', 'index'};
 
 validChar = @(x) ischar(x);
@@ -15,7 +19,7 @@ p = inputParser;
 addRequired(p, 'bids_dir', validChar);
 addRequired(p, 'sub', validChar);
 addRequired(p, 'task', validChar);
-addRequired(p, 'options', validChar);
+addRequired(p, 'options');
 for i = 1:numel(entities)
     addParameter(p, entities{i}, '', validChar);
 end
@@ -43,27 +47,32 @@ fields_statsqc_ext = {'_mean.nii', '_std.nii', '_tsnr.nii', '_var.nii'};
 
 
 % Fields with echo included (if multiecho or not)
-[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run, 'echo', params.echo);
+[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'rec', params.rec, 'run', params.run, 'echo', params.echo);
 options.current_functional_filename = filename;
 for i = 1:numel(fields_w_echo)
-    options.(fields_w_echo{i}) = fullfile(options.preproc_dir, filepath, [filename '_desc-' fields_w_echo_desc{i} fields_w_echo_ext{i}]);
+    if isempty(fields_w_echo_desc{i})
+        options.(fields_w_echo{i}) = fullfile(options.preproc_dir, filepath, [filename fields_w_echo_ext{i}]);
+    else
+        options.(fields_w_echo{i}) = fullfile(options.preproc_dir, filepath, [filename '_desc-' fields_w_echo_desc{i} fields_w_echo_ext{i}]);
+    end
+    
 end
 
 % Fields with echo excluded (if multiecho or not)
-[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run);
+[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'rec', params.rec, 'run', params.run);
 for i = 1:numel(fields_wo_echo)
     options.(fields_wo_echo{i}) = fullfile(options.preproc_dir, filepath, [filename '_desc-confounds' fields_wo_echo_ext{i}]);
 end
 
 % Stats QC fields with echo excluded (if multiecho or not)
-[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run, 'space', 'individual');
+[filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'rec', params.rec, 'run', params.run, 'space', 'individual');
 for i = 1:numel(fields_statsqc)
     options.(fields_statsqc{i}) = fullfile(options.qc_dir, filepath, [filename fields_statsqc_ext{i}]);
 end
 
 
 for i = 1:numel(fields_statsqc_tsv)
-    [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run, 'desc', fields_statsqc_tsv{i}(1:end-3);, 'ext', '.tsv');
+    [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'rec', params.rec, 'run', params.run, 'desc', fields_statsqc_tsv{i}(1:end-3), 'ext', '.tsv');
     options.(fields_statsqc_tsv{i}) = fullfile(options.qc_dir, filepath, filename);
 end
 

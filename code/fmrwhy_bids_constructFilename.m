@@ -8,6 +8,7 @@ filetypes = {'anat', 'func'}; % currently supported in fMRwhy
 descriptions = {'Subject', 'Session', 'Task', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Corresponding modality', 'Echo', 'Recording', 'Processed (on device)', 'Space', 'Split', 'Description', 'File extension'};
 entities = {'sub', 'ses', 'task', 'acq', 'ce', 'rec', 'dir', 'run', 'mod', 'echo', 'recording', 'proc', 'space', 'split', 'desc', 'ext'};
 formats = {'label', 'label', 'label', 'label', 'label', 'label', 'label', 'index', 'label', 'index', 'label', 'label', 'label', 'index', 'label', 'label'};
+% {'sub', 'ses', 'acq', 'ce', 'rec', 'fa', 'echo', 'inv', 'run'} % SPM12 list seems to be pre-v1.4.0
 
 validChar = @(x) ischar(x);
 validType = @(x) any(validatestring(x,filetypes));

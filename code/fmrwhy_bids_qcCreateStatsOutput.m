@@ -9,7 +9,7 @@ function stats = fmrwhy_bids_qcCreateStatsOutput(bids_dir, sub, task, options, v
 %-------------
 filetypes = {'func'};
 descriptions = {'Subject', 'Session', 'Task', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Echo'};
-entities = {'sub', 'ses', 'task', 'acq', 'ce', 'rec', 'dir', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
+entities = {'ses', 'acq', 'rec', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
 formats = {'label', 'label', 'label', 'label', 'label', 'label', 'label', 'index', 'index'};
 
 validChar = @(x) ischar(x);
@@ -19,7 +19,7 @@ p = inputParser;
 addRequired(p, 'bids_dir', validChar);
 addRequired(p, 'sub', validChar);
 addRequired(p, 'task', validChar);
-addRequired(p, 'options', validChar);
+addRequired(p, 'options');
 for i = 1:numel(entities)
     addParameter(p, entities{i}, '', validChar);
 end
@@ -33,7 +33,7 @@ options = params.options;
 
 
 % Update options with subject functional derivative filenames
-options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec);
 
 % Create stats images and files if they don't exist yet
 stats_fn = {options.mean_fn, options.std_fn, options.tsnr_fn, options.var_fn, options.stats_timeseries_fn, options.stats_summary_fn};
@@ -48,7 +48,13 @@ end
 if run_stats || options.qc_overwrite_statsoutput
     disp('Computing and saving statistical images and files for fMRI timeseries data')
     % Get stats for fMRI timeseries
-    stats = fmrwhy_qc_calculateStats(bids_dir, sub, options.rafunctional_fn, options); % TODO: decide which timeseries to use, processed or not, Aug 4 2020 note: changed this from rfunctional to rafunctional when redoing QC output. Reasoning = to be consistent with multi-echo use.
+    % Get timeseries data from realigned (and slice time corrected, if done)
+    if options.include_stc
+        func_fn = options.rafunctional_fn;
+    else
+        func_fn = options.rfunctional_fn;
+    end
+    stats = fmrwhy_qc_calculateStats(bids_dir, sub, func_fn, options); % TODO: decide which timeseries to use, processed or not, Aug 4 2020 note: changed this from rfunctional to rafunctional when redoing QC output. Reasoning = to be consistent with multi-echo use.
     % save images to file: fmrwhy_util_saveNifti(template_fn, img, new_fn)
     no_scaling = 1;
     fmrwhy_util_saveNifti(options.mean_fn, double(stats.data_3D_mean), options.template_fn, no_scaling);
@@ -89,7 +95,7 @@ if run_stats || options.qc_overwrite_statsoutput
     use_rgb = {rgb_ongray, rgb_onparula, rgb_onparula, rgb_onhot};
 
     % Mask settings
-    masks_oriented = fmrwhy_util_loadOrientMasks(bids_dir, sub), options;
+    masks_oriented = fmrwhy_util_loadOrientMasks(bids_dir, sub, options);
     mask_img_oriented = masks_oriented.brain_mask_3D;
 
     for i = 1:numel(stats_image_fns)
@@ -105,8 +111,8 @@ if run_stats || options.qc_overwrite_statsoutput
             imgs.(stats_image_fieldname{i}) = double(p.nii.img);
             imgs_masked.(stats_image_fieldname{i}) = fmrwhy_util_maskImage(double(p.nii.img), mask_img_oriented);
 
-            montage = fmrwhy_util_createStatsOverlayMontage(imgs.(stats_image_fieldname{i}), [], [], 9, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max', stats_image_cxs{i}, [], use_rgb{i}, stats_image_clrbr{i}, stats_montage_fns{i});
-            montage_masked = fmrwhy_util_createStatsOverlayMontage(imgs_masked.(stats_image_fieldname{i}), [], [], 9, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max', stats_image_cxs{i}, [], use_rgb{i}, stats_image_clrbr{i}, stats_montage_masked_fns{i});
+            montage = fmrwhy_util_createStatsOverlayMontage(imgs.(stats_image_fieldname{i}), [], [], 7, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max', stats_image_cxs{i}, [], use_rgb{i}, stats_image_clrbr{i}, stats_montage_fns{i});
+            montage_masked = fmrwhy_util_createStatsOverlayMontage(imgs_masked.(stats_image_fieldname{i}), [], [], 7, 1, stats_image_txt{i}, stats_image_colormaps{i}, 'off', 'max', stats_image_cxs{i}, [], use_rgb{i}, stats_image_clrbr{i}, stats_montage_masked_fns{i});
             % fmrwhy_util_createStatsOverlayMontage(template_img, stats_img, roi_img, columns, rotate, str, clrmp, visibility, shape, cxs, stats_clrmp, roi_rgbcolors, clrbar, saveAs_fn)
         end
     end

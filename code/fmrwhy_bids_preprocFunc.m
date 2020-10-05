@@ -25,9 +25,9 @@ function fmrwhy_bids_preprocFunc(bids_dir, sub, task, options, varargin)
 % Parse inputs
 %-------------
 filetypes = {'func'};
-descriptions = {'Subject', 'Session', 'Task', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Echo'};
-entities = {'sub', 'ses', 'task', 'acq', 'ce', 'rec', 'dir', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
-formats = {'label', 'label', 'label', 'label', 'label', 'label', 'label', 'index', 'index'};
+descriptions = {'Session', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Echo'};
+entities = {'ses', 'acq', 'rec', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
+formats = {'label', 'label', 'label', 'label', 'label', 'index', 'index'};
 
 validChar = @(x) ischar(x);
 validType = @(x) any(validatestring(x,filetypes));
@@ -36,7 +36,7 @@ p = inputParser;
 addRequired(p, 'bids_dir', validChar);
 addRequired(p, 'sub', validChar);
 addRequired(p, 'task', validChar);
-addRequired(p, 'options', validChar);
+addRequired(p, 'options');
 for i = 1:numel(entities)
     addParameter(p, entities{i}, '', validChar);
 end
@@ -60,7 +60,7 @@ disp('---')
 
 
 % Grab relevant functional data
-functional_data = bids.query(options.bids_dataset,'data', 'type', 'bold' ,'sub', params.sub, 'task', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir, 'run', params.run);
+functional_data = bids.query(options.bids_dataset,'data', 'type', 'bold' ,'sub', params.sub, 'ses', params.ses, 'task', params.task, 'acq', params.acq, 'rec', params.rec, 'run', params.run);
 % First check if query returns bold data, if not throw error
 if isempty(functional_data)
     msg = 'No functional bold data found for the specified entities'
@@ -84,7 +84,7 @@ if is_multiecho
 end
 
 % Update functional derivate filenames
-options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', echo, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', echo, 'acq', params.acq, 'rec', params.rec);
 
 % Check if realignment has already been done by seeing if the tsv file with head movement parameters exist
 [d, f, e] = fileparts(options.motion_fn);
@@ -113,7 +113,7 @@ if options.include_stc
     if is_multiecho
         for e = 1:numel(N_echoes)
             % Update workflow params with subject functional derivative filenames
-            options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+            options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'rec', params.rec);
             if ~exist(options.afunctional_fn, 'file')
                 disp(['Performing slice timing correction on: ' options.current_functional_filename])
                 fmrwhy_batch_sliceTiming(options.functional_fn, options.afunctional_fn, options);
@@ -126,7 +126,7 @@ if options.include_stc
         end
     else
         % Update workflow params with subject functional derivative filenames
-        options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+        options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'acq', params.acq, 'rec', params.rec);
         if ~exist(options.afunctional_fn, 'file')
             disp(['Performing slice timing correction on: ' options.current_functional_filename])
             fmrwhy_batch_sliceTiming(options.functional_fn, options.afunctional_fn, options);
@@ -148,7 +148,7 @@ motion_params = struct2array(motion_struct);
 if is_multiecho
     for e = 1:numel(N_echoes)
         % Update workflow params with subject functional derivative filenames
-        options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+        options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'rec', params.rec);
         % Realign raw timeseries data
         if ~exist(options.rfunctional_fn, 'file')
             disp(['Performing 3D realignment on raw timeseries: ' options.current_functional_filename])
@@ -174,7 +174,7 @@ if is_multiecho
     end
 else
     % Update workflow params with subject functional derivative filenames
-    options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+    options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'acq', params.acq, 'rec', params.rec);
     % Realign raw timeseries data
     if ~exist(options.rfunctional_fn, 'file')
         disp(['Performing 3D realignment on raw timeseries: ' options.current_functional_filename])
@@ -206,7 +206,7 @@ end
 if is_multiecho
     for e = 1:numel(N_echoes)
         % Update workflow params with subject functional derivative filenames
-        options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+        options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'rec', params.rec);
         % Smooth raw timeseries data
         if ~exist(options.sfunctional_fn, 'file')
             disp(['Performing spatial smoothing on raw timeseries: ' options.current_functional_filename])
@@ -244,7 +244,7 @@ if is_multiecho
     end
 else
     % Update workflow params with subject functional derivative filenames
-    options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+    options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'acq', params.acq, 'rec', params.rec);
     % Smooth raw timeseries data
     if ~exist(options.sfunctional_fn, 'file')
         disp(['Performing spatial smoothing on raw timeseries: ' options.current_functional_filename])
@@ -255,7 +255,7 @@ else
         disp(['Spatial smoothing already completed for raw timeseries: ' options.current_functional_filename])
         disp('---')
     end
-    if basicfunc_full
+    if options.basicfunc_full
         % Smooth realigned timeseries data
         if ~exist(options.srfunctional_fn, 'file')
             disp(['Performing spatial smoothing on realigned timeseries: ' options.current_functional_filename])
@@ -288,14 +288,14 @@ end
 % -------
 if is_multiecho
     e = options.template_echo;
-    options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
 else
-    options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'acq', params.acq, 'ce', params.ce, 'rec', params.rec, 'dir', params.dir);
+    e = params.echo;
 end
+options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'rec', params.rec);
 
 if ~exist(options.confounds_fn, 'file')
     disp(['Generating multiple regressors for GLM analysis and QC'])
-    fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, options, varargin);
+    fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, options, 'ses', params.ses, 'run', params.run, 'echo', e, 'acq', params.acq, 'rec', params.rec);
     disp('Complete!')
     disp('---')
 else
