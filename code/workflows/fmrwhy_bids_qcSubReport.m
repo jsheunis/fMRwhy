@@ -23,7 +23,7 @@ echo = options.template_echo;
 
 
 % ---------------------------
-% STEP 2 -- Set up HTML files
+% STEP 2 -- Set up HTML, CSS, JS files
 % ---------------------------
 
 % Set up datetime strings for filename and content
@@ -39,7 +39,7 @@ css_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_bids_qcReport.css');
 js_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_bids_qcReport.js');
 avatar_template_fn = fullfile(fmrwhy_dir, 'img', 'logo_jsheunis_3.jpeg');
 
-report_dir = fullfile(options.sub_dir_qc, ['report_' dt_str]);
+report_dir = fullfile(options.qc_dir, ['sub-' sub], ['report_' dt_str]);
 report_assets_dir = fullfile(report_dir, 'assets');
 report_img_dir = fullfile(report_dir, 'img');
 if ~exist(report_dir, 'dir')
@@ -61,20 +61,22 @@ js_tmp_fn = 'temp.js';
 % STEP 3 -- Create structure with content to write to HTML report
 % ---------------------------------------------------------------
 % Locations of assets for html file, e.g. css, js and images.
-report.param_asset_css = fullfile('assets', 'fmrwhy_reports.css');
+report.param_asset_js = fullfile('assets', 'fmrwhy_bids_qcReport.js'); % don't copy js file yet; first to be updated.
+report.param_asset_css = fullfile('assets', 'fmrwhy_bids_qcReport.css');
 copyfile(css_template_fn, fullfile(report_dir, report.param_asset_css));
-
-report.param_asset_js = fullfile('assets', 'fmrwhy_reports.js');
 report.param_avatar = fullfile('assets', 'fmrwhy_logo.jpeg');
 copyfile(avatar_template_fn, fullfile(report_dir, report.param_avatar));
+
 % Details about study, subject, data, etc
 report.param_sub = sub;
 report.param_datetime = t;
-% Anatomical montage image locations
-brain_mask = fullfile(options.anat_dir_qc, ['sub-' sub '_brain_mask_montage.png']);
-gm_mask = fullfile(options.anat_dir_qc, ['sub-' sub '_GM_mask_montage.png']);
-wm_mask = fullfile(options.anat_dir_qc, ['sub-' sub '_WM_mask_montage.png']);
-csf_mask = fullfile(options.anat_dir_qc, ['sub-' sub '_CSF_mask_montage.png']);
+% Anatomical montage image locations - all anatomical QC outputs should be located in the 'anat' dir (in QC derivatives) of the template session; if no sessions ==> template session is the main 'anat' dir
+[filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
+
+brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_brain_mask_montage.png']);
+gm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_GM_mask_montage.png']);
+wm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_WM_mask_montage.png']);
+csf_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_CSF_mask_montage.png']);
 report.param_brain_mask = fullfile('img', ['sub-' sub '_brain_mask_montage.png']);
 report.param_gm_mask = fullfile('img', ['sub-' sub '_GM_mask_montage.png']);
 report.param_wm_mask = fullfile('img', ['sub-' sub '_WM_mask_montage.png']);
@@ -86,10 +88,10 @@ copyfile(csf_mask, fullfile(report_dir, report.param_csf_mask));
 
 % ROI montage image locations
 % TODO: the ROI filenames are hardcoded in html for now, need to change this in future
-roi_img1 = fullfile(options.anat_dir_qc, ['sub-' sub  '_space-individual_desc-leftMotor_roi_montage.png']);
-roi_img2 = fullfile(options.anat_dir_qc, ['sub-' sub  '_space-individual_desc-rightMotor_roi_montage.png']);
-roi_img3 = fullfile(options.anat_dir_qc, ['sub-' sub  '_space-individual_desc-leftAmygdala_roi_montage.png']);
-roi_img4 = fullfile(options.anat_dir_qc, ['sub-' sub  '_space-individual_desc-rightAmygdala_roi_montage.png']);
+roi_img1 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-leftMotor_roi_montage.png']);
+roi_img2 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-rightMotor_roi_montage.png']);
+roi_img3 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-leftAmygdala_roi_montage.png']);
+roi_img4 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-rightAmygdala_roi_montage.png']);
 report.param_roi_img1 = fullfile('img', ['sub-' sub  '_space-individual_desc-leftMotor_roi_montage.png']);
 report.param_roi_img2 = fullfile('img', ['sub-' sub  '_space-individual_desc-rightMotor_roi_montage.png']);
 report.param_roi_img3 = fullfile('img', ['sub-' sub  '_space-individual_desc-leftAmygdala_roi_montage.png']);

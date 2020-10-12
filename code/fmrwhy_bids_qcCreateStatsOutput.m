@@ -101,7 +101,7 @@ if run_stats || options.qc_overwrite_statsoutput
     for i = 1:numel(stats_image_fns)
         stats_montage_fns{i} = strrep(stats_image_fns{i}, '.nii', '.png');
         % stats_montage_fns{i} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_space-individual_' stats_image_txt{i} '.png']);
-        stats_montage_masked_fns{i} = strrep(stats_image_fns{i}, [stats_image_txt{i} '.nii'], ['_desc-brainMasked_' stats_image_txt{i} '.png']);
+        stats_montage_masked_fns{i} = strrep(stats_image_fns{i}, [stats_image_txt{i} '.nii'], ['desc-brainMasked_' stats_image_txt{i} '.png']);
         % stats_montage_masked_fns{i} = fullfile(options.func_dir_qc, ['sub-' sub '_task-' task '_run-' run '_space-individual_desc-brainMasked_' stats_image_txt{i} '.png']);
 
         if ~exist(stats_montage_fns{i}, 'file') || options.qc_overwrite_statsoutput
