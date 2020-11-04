@@ -45,9 +45,26 @@ zz = zeros(Nimx, Nimy);
 %green = cat(3, zz, oo, zz);
 %blue = cat(3, zz, oo, oo);
 
+% Get dimensions for figure plotting
+[Ni, Nj, Nk] = size(template_img);
+rows = floor(Nk/columns);
+Rfactor = 1.8;
+
 % Create figure with background montage and overlaid motages (stats and rois)
-f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
+if strcmp(shape, 'max')
+    f = figure('visible', visibility, 'units','normalized','outerposition',[0 0 1 1]);
+elseif strcmp(shape, 'square')
+    f = figure('visible', visibility, 'units','pixels','outerposition',[0 0 dist dist]);
+elseif strcmp(shape, 'maxwidth')
+    f = figure('visible', visibility, 'units','pixels','outerposition',[0 0 scr_size(3) floor(scr_size(3)/columns*rows*Rfactor);]);
+else
+    f = figure('visible', visibility, 'units','pixels','outerposition',[0 0 dist dist]);
+    % daspect manual;
+end
+% f = figure('units','normalized','outerposition',[0 0 1 1], 'visible', visibility);
 ax1 = axes('Parent', f);
+% daspect(ax1, [columns rows 1])
+
 im1 = imagesc(ax1, montage_template.whole_img);
 colormap(ax1, clrmp);
 if ~isempty(cxs)

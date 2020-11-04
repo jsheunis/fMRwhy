@@ -1,35 +1,58 @@
-% fmrwhy_settings_template: Settings for the fmrwhy_workflow_qc pipeline
+% fmrwhy_settings_template
+% Template settings file for the fmrwhy_bids_workflowQC pipeline
+
+% ----------
+% Section 01
+% ----------
 
 % Main data source: BIDS root folder
-options.bids_dir = '/Users/jheunis/Desktop/ds002748';
+options.bids_dir = '/Volumes/TSM/NEUFEPME_data_BIDS';
 
-% Subjects to run
-options.subjects_output = 'all';
+% ----------
+% Section 02
+% ----------
 
-% Set template T1w image (set to '' if a single T1w image was collected)
+% Subjects to run. If all ==> 'all'. If a subset, include the subject numbers/codes as a cell array.
+options.subjects_output = 'all'; % options.subjects_output = {'001', '003', '021'};
+
+% ----------
+% Section 03
+% ----------
+
+% Set the template T1w image if more than one was collected.
+% This image will be used for anatomical-to-functional registration steps
+% Set to '' if a single T1w image was collected, which is often the default
 options.anat_template_session = '';
 
-% Set template for functional realignment purposes (if not needed, set to '')
+% Set the template for functional realignment purposes (if not needed, set to '')
 options.template_task = 'rest';
 options.template_session = '';
-options.template_run = '';
-options.template_echo = '';
+options.template_run = '1';
+options.template_echo = '2';
 
-% Sequence parameters
+% ----------
+% Section 04
+% ----------
+
+% Define sequence parameters, this should be known to the user.
+% fMRwhy does not yet support deriving these parameters from the BIDS json files
 options.TR = 2;
 options.N_slices = 34;
-options.Ndummies = 5;
-options.Nscans = 210;
-options.TE = [14 28 42]; % assume for all functional runs
+options.Ndummies = 5; % Specify number of dummies, even if they have already been excluded from the BOLD timeseries images. This is important for the TAPAS PhysIO steps when processing cardiac and respiratory data.
+options.Nscans = 210; % The number of scans in the BOLD timeseries images, excluding dummies.
+options.TE = [14 28 42]; % The echo times if multi-echo. fMRwhy assumes this is the same for all functional runs. If not multi-echo, set to [].
 
-% Settings for structFunc processing
+% ----------
+% Section 05 - Settings for anatLocaliser processing
+% ----------
 
-% Settings for anatLocaliser processing
+% Should the QC pipeline also map ROIs to the subject space. Yes = 1; No = 0. If 0, the rest of this section can be ignored.
 options.map_rois = 0;
-%options.roi_orig_dir = '/Volumes/Stephan_WD/NEUFEPME_data_templates';
+% Specify directory with roi files, assumed to be in MNI152 space
 options.roi_orig_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_templates';
 options.roi = struct;
-% IMPORTANT: structure has to be named using the task name as in options.tasks: options.roi.(task).orig_fn
+% Specify the roi filenames, names, descriptions
+% IMPORTANT: structure has to be named using the task name as specified in the BIDS data structure: options.roi.(task).orig_fn
 options.roi.motor.orig_fn = {fullfile(options.roi_orig_dir, 'Left_Motor_4a_4p.nii'),
                                 fullfile(options.roi_orig_dir, 'Right_Motor_4a_4p.nii')}; % Raw ROI filenames
 
@@ -46,22 +69,31 @@ options.roi.emotion.desc = {'bilateralAmygdala', 'leftAmygdala', 'rightAmygdala'
 %options.roi.(task).roi_fn = ROIs in subject space (not resliced)
 %options.roi.(task).rroi_fn = resliced ROIs in subject space
 
-% Settings for basicFunc processing
-options.fwhm = 7;
+% ----------
+% Section 06 - Settings for basicFunc processing
+% ----------
+
+options.fwhm = 7; % FWHM of the spatial smoothing kernel, typically twice the voxel size, in mm
 options.basicfunc_full = false; % if true, preprocessing will include all combinations of slice time correction, realignment and smoothing, useful for later analyses; if false, only include steps necessary for QC
-options.include_stc = false;
+options.include_stc = false; % include slice timing correction?
 
-% Settings for generateMultRegr routine
-options.confounds.include_volterra = 1;
-options.confounds.include_fd = 1;
-options.confounds.include_tissue = 1;
-options.confounds.include_physio = 1;
+% Settings for generateMultRegr routine; specifies which regressors to generate for GLM analysis
+options.confounds.include_volterra = 1; % to generate the volterra expansion of the 6 realignment parameters ==> 1
+options.confounds.include_fd = 1; % to generate framewise displacement ==> 1
+options.confounds.include_tissue = 1; % to generate signals from GM, WM, CSF compartments ==> 1
+options.confounds.include_physio = 1; % if cardiac and respiration data are available ==> 1
 
-% generateMultRegr: framewise displacement
+% generateMultRegr: framewise displacement. No need to change these defaults unless for very specific and well-motivated reasons.
 options.r = 50; % mm
 options.FD_threshold = 0; % set as 0 to calculate with both standard thresholds 0.2 and 0.5 mm.
 
-% generateMultRegr: PhysIO
+% ----------
+% Section 07 - Settings for physiology processing
+% ----------
+
+% Parameters required by TAPAS PhysIO
+% For a better understanding of how to set these parameters, read the TAPAS PhysIO documentation
+% Parameters to set: sampling_interval, align_scan, onset_slice, cardiac_modality.
 options.physio.options.cardiac_fn = '';
 options.physio.options.respiration_fn = '';
 options.physio.options.vendor = 'BIDS';
@@ -77,14 +109,28 @@ options.physio.options.output_multiple_regressors_fn = 'PhysIO_multiple_regresso
 options.physio.options.level = 0; % verbose.level = 0 ==> do not generate figure outputs
 options.physio.options.fig_output_file = ''; % unnecessary if verbose.level = 0, but still initialized here
 
+
+% ----------
+% Section 08 - Settings for QC processing
+% ----------
+
 % Settings for QC
+% No need to change these defaults unless for very specific and well-motivated reasons.
 options.theplot.intensity_scale = [-6 6];
 options.qc_overwrite_tissuecontours = true;
 options.qc_overwrite_ROIcontours = true;
 options.qc_overwrite_theplot = false;
 options.qc_overwrite_statsoutput = true;
 
+
+% ONLY FOR TASK DATA:
+
+% ----------
+% Section 09 - Settings for first level analysis
+% ----------
+
 % Settings for first level analysis: steps to include/exclude
+% No need to change these defaults unless for very specific and well-motivated reasons.
 options.firstlevel.tmap_montages = true;
 options.firstlevel.anat_func_roi = true;
 

@@ -1,4 +1,4 @@
-function options = fmrwhy_defaults_setupQcDerivDirs(bids_dir, options)
+function options = fmrwhy_bids_setupQcDerivDirs(bids_dir, options)
 
 if nargin < 2
     options = struct;
@@ -15,4 +15,3 @@ for i = 1:numel(dirs)
         mkdir(dirs{i});
     end
 end
-

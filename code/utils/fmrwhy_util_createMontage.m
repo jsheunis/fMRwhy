@@ -94,6 +94,7 @@ elseif strcmp(shape, 'square')
     f = figure('visible', visibility, 'units','pixels','outerposition',[0 0 dist dist]);
 else
     f = figure('visible', visibility, 'units','pixels','outerposition',[0 0 dist dist]);
+    % daspect manual;
 end
 ax = subplot(1,1,1);
 im = imagesc(ax, montage.whole_img); colormap(clrmp); %colorbar;

@@ -51,12 +51,14 @@ for i = 1:numel(options.tasks)
     % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
     if strcmp(options.tasks{i}, 'rest') ~= 1
         % Loop through all ROIs for the particular task
-        for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
-            count = count + 1;
-            toTransform_fns{count} = options.roi.(options.tasks{i}).orig_fn{j};
-            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi.nii');
-            saveAs_fns{count} = fullfile(options.preproc_dir, filepath, filename);
-            options.roi.(options.tasks{i}).roi_fn{j} = saveAs_fns{count}; % save normalised filename for future use
+        if isfield(options.roi, options.tasks{i})
+            for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
+                count = count + 1;
+                toTransform_fns{count} = options.roi.(options.tasks{i}).orig_fn{j};
+                [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi.nii');
+                saveAs_fns{count} = fullfile(options.preproc_dir, filepath, filename);
+                options.roi.(options.tasks{i}).roi_fn{j} = saveAs_fns{count}; % save normalised filename for future use
+            end
         end
     end
 end
@@ -78,12 +80,14 @@ for i = 1:numel(options.tasks)
     % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
     if strcmp(options.tasks{i}, 'rest') ~= 1
         % Loop through all ROIs for the particular task
-        for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
-            count = count + 1;
-            reslice_fns{count} = options.roi.(options.tasks{i}).roi_fn{j};
-            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', ['r' options.roi.(options.tasks{i}).desc{j}], 'ext', '_roi.nii');
-            saveAs_fns{count} = fullfile(options.preproc_dir, filepath, filename);
-            options.roi.(options.tasks{i}).rroi_fn{j} = saveAs_fns{count};% save resliced normalised filename for future use
+        if isfield(options.roi, options.tasks{i})
+            for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
+                count = count + 1;
+                reslice_fns{count} = options.roi.(options.tasks{i}).roi_fn{j};
+                [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', ['r' options.roi.(options.tasks{i}).desc{j}], 'ext', '_roi.nii');
+                saveAs_fns{count} = fullfile(options.preproc_dir, filepath, filename);
+                options.roi.(options.tasks{i}).rroi_fn{j} = saveAs_fns{count};% save resliced normalised filename for future use
+            end
         end
     end
 end
@@ -106,14 +110,16 @@ for i = 1:numel(options.tasks)
     % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
     if strcmp(options.tasks{i}, 'rest') ~= 1
         % Loop through all ROIs for the particular task
-        for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
-            count = count+1;
-            [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(options.roi.(options.tasks{i}).rroi_fn{j});
-            overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
-            title = options.roi.(options.tasks{i}).name{j}
-            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi_montage.png');
-            saveAs_fn = fullfile(options.qc_dir, filepath, filename);
-            fmrwhy_util_createOverlayMontage(p1.nii.img, overlay_img, 9, 1, title, 'gray', 'off', 'max', [], [255, 0, 0], saveAs_fn);
+        if isfield(options.roi, options.tasks{i})
+            for j = 1:numel(options.roi.(options.tasks{i}).orig_fn)
+                count = count+1;
+                [p2, frm2, rg2, dim2] = fmrwhy_util_readOrientNifti(options.roi.(options.tasks{i}).rroi_fn{j});
+                overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
+                title = options.roi.(options.tasks{i}).name{j}
+                [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi_montage.png');
+                saveAs_fn = fullfile(options.qc_dir, filepath, filename);
+                fmrwhy_util_createOverlayMontage(p1.nii.img, overlay_img, 9, 1, title, 'gray', 'off', 'max', [], [255, 0, 0], saveAs_fn);
+            end
         end
     end
 end

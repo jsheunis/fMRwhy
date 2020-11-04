@@ -2,10 +2,6 @@ function options = fmrwhy_workflow_qc(settings_fn)
 
 % A custom workflow that does anatomical-to-functional and basic functional time series preprocessing and QC for all subjects in a BIDS directory
 
-% Code steps:
-
-
-
 %--------------------------------------------------------------------------
 
 options = fmrwhy_defaults();
@@ -109,7 +105,7 @@ for s = 1:numel(subs)
         end
         % If some of the files do not exist, run the fmrwhy_preproc_anatLocaliser processing pipeline
         if run_anatLocaliser
-            fmrwhy_preproc_anatLocaliser(options.bids_dir, sub, options)
+            fmrwhy_preproc_anatLocaliser(sub, options)
             disp('Complete!')
             disp('---')
         else
