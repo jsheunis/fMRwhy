@@ -90,6 +90,9 @@ function copyGunzipDirContents(srcDir, destDir)
             if contains(srcDir_contents(i).name, 'nii.gz')
                 gunzip(srcDir_file, destDir);
             else
+                if ~exist(destDir, 'dir')
+                    mkdir(destDir)
+                end
                 copyfile(srcDir_file, destDir);
             end
         end
