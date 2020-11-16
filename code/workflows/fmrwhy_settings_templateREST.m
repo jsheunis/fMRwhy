@@ -3,8 +3,6 @@
 % Main data source: BIDS root folder
 options.bids_dir = '/Users/jheunis/Desktop/ds002748';
 
-options.dataset_name = 'ds002748 - resting state fMRI in mild depression'
-
 % Subjects to run
 options.subjects_output = 'all';
 

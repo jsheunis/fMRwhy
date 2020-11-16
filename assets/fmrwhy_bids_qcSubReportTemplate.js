@@ -1,26 +1,5 @@
-bids_dataset = {
-  'sub': 'sub-14',
-  'sessions': [],
-  'tasks': ['rest', 'other'],
-  'runs': [],
-  'report_runs': ['task-rest', 'task-other'],
-  'anat_template_session': '',
-  'template_task': 'rest',
-  'template_session': '',
-  'template_run': '1',
-  'template_echo': '2',
-  'has_sessions': false,
-  'has_runs': false,
-  'is_multiecho': false,
-  'map_rois': false,
-  'roi_desc': ['leftMotor', 'biAmygdala'],
-  'include_physio': false,
-  'physio_str': '_physioQC_03.jpg',
-  'all_runs_stats':  [
-    { mean_fd: 50, total_fd: 3, fd_outliers02: 3, fd_outliers05: 6, mean_zscore: 50, gcor: 50, tsnr_gm: 33, tsnr_wm: 33, tsnr_csf: 33, tsnr_brain: 33},
-    { mean_fd: 66, total_fd: 1, fd_outliers02: 3, fd_outliers05: 2, mean_zscore: 50, gcor: 3, tsnr_gm: 22, tsnr_wm: 22, tsnr_csf: 5567, tsnr_brain: 2},
-  ],
-};
+
+param_bids_dataset;
 
 function setupReportStructure() {
 

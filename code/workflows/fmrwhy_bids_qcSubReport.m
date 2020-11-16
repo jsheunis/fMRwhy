@@ -1,26 +1,13 @@
-function fmrwhy_bids_qcSubReport(bids_dir, sub)
+function [report, js_string] = fmrwhy_bids_qcSubReport(sub, options)
 
+% Assumes options structure has already been populated from settings file
 
 % ------------------------------------
 % STEP 1 -- Load default filenames etc
 % ------------------------------------
 
-% Setup fmrwhy BIDS-derivatuve directories on workflow level
-options = fmrwhy_defaults_setupDerivDirs(bids_dir);
-
-% Grab parameters from workflow settings file
-options = fmrwhy_settings_preprocQC(bids_dir, options);
-
-% Setup fmrwhy bids directories on subject level (this copies data from bids_dir)
-options = fmrwhy_defaults_setupSubDirs(bids_dir, sub, options);
-
 % Update workflow params with subject anatomical derivative filenames
-options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
-
-% Get template echo
-echo = options.template_echo;
-
-
+options = fmrwhy_bids_getAnatDerivs(options.bids_dir, sub, options)
 
 % ---------------------------
 % STEP 2 -- Set up HTML, CSS, JS files
@@ -29,14 +16,14 @@ echo = options.template_echo;
 % Set up datetime strings for filename and content
 dt = datetime('now');
 [Y,MO,D,H,MI,S] = datevec(dt);
-dt_str = [num2str(Y) num2str(MO) num2str(D) num2str(H) num2str(MI) num2str(round(S))];
+dt_str = [num2str(Y) sprintf('%02d', MO) sprintf('%02d', D) sprintf('%02d', H) sprintf('%02d', MI) sprintf('%02d', round(S))];
 t = datestr(dt);
 
 % Set up filenames
 fmrwhy_dir = options.fmrwhy_dir;
 html_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_bids_qcSubReportTemplate.htm');
 css_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_bids_qcReport.css');
-js_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_bids_qcReport.js');
+js_template_fn = fullfile(fmrwhy_dir, 'assets', 'fmrwhy_bids_qcSubReportTemplate.js');
 avatar_template_fn = fullfile(fmrwhy_dir, 'img', 'logo_jsheunis_3.jpeg');
 
 report_dir = fullfile(options.qc_dir, ['sub-' sub], ['report_' dt_str]);
@@ -58,8 +45,11 @@ js_tmp_fn = 'temp.js';
 
 
 % ---------------------------------------------------------------
-% STEP 3 -- Create structure with content to write to HTML report
+% STEP 3 -- Create structures with content to write to HTML report
 % ---------------------------------------------------------------
+report = struct;
+bids_dataset = struct;
+
 % Locations of assets for html file, e.g. css, js and images.
 report.param_asset_js = fullfile('assets', 'fmrwhy_bids_qcReport.js'); % don't copy js file yet; first to be updated.
 report.param_asset_css = fullfile('assets', 'fmrwhy_bids_qcReport.css');
@@ -70,76 +60,121 @@ copyfile(avatar_template_fn, fullfile(report_dir, report.param_avatar));
 % Details about study, subject, data, etc
 report.param_sub = sub;
 report.param_datetime = t;
+report.param_anat_res = options.qc_anat_res;
+report.param_func_res = options.qc_func_res;
+report.param_func_acq = options.qc_func_acq;
+report.param_func_runs = options.qc_func_runs;
+
+% Populate bids_dataset structure with existing variables
+bids_dataset.sub = ['sub-' sub];
+bids_dataset.sessions = options.sessions;
+bids_dataset.tasks = options.tasks;
+bids_dataset.runs = options.runs;
+bids_dataset.anat_template_session = options.anat_template_session;
+bids_dataset.template_session = options.template_session;
+bids_dataset.template_task = options.template_task;
+bids_dataset.template_run = options.template_run;
+bids_dataset.template_echo = options.template_echo;
+bids_dataset.has_sessions = options.has_sessions;
+bids_dataset.has_runs = options.has_runs;
+bids_dataset.is_multiecho = options.is_multiecho;
+bids_dataset.map_rois = false;
+if options.map_rois
+    bids_dataset.map_rois = true;
+end
+bids_dataset.include_physio = false;
+if options.confounds.include_physio
+    bids_dataset.include_physio = true;
+end
+bids_dataset.physio_str = '_physioQC_03.jpg';
+
 % Anatomical montage image locations - all anatomical QC outputs should be located in the 'anat' dir (in QC derivatives) of the template session; if no sessions ==> template session is the main 'anat' dir
 [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
 
-brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_brain_mask_montage.png']);
-gm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_GM_mask_montage.png']);
-wm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_WM_mask_montage.png']);
-csf_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_CSF_mask_montage.png']);
-report.param_brain_mask = fullfile('img', ['sub-' sub '_brain_mask_montage.png']);
-report.param_gm_mask = fullfile('img', ['sub-' sub '_GM_mask_montage.png']);
-report.param_wm_mask = fullfile('img', ['sub-' sub '_WM_mask_montage.png']);
-report.param_csf_mask = fullfile('img', ['sub-' sub '_CSF_mask_montage.png']);
+brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
+gm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
+wm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
+csf_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
+report.param_brain_mask = fullfile('img', ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
+report.param_gm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
+report.param_wm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
+report.param_csf_mask = fullfile('img', ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
 copyfile(brain_mask, fullfile(report_dir, report.param_brain_mask));
 copyfile(gm_mask, fullfile(report_dir, report.param_gm_mask));
 copyfile(wm_mask, fullfile(report_dir, report.param_wm_mask));
 copyfile(csf_mask, fullfile(report_dir, report.param_csf_mask));
 
-% ROI montage image locations
-% TODO: the ROI filenames are hardcoded in html for now, need to change this in future
-roi_img1 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-leftMotor_roi_montage.png']);
-roi_img2 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-rightMotor_roi_montage.png']);
-roi_img3 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-leftAmygdala_roi_montage.png']);
-roi_img4 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-rightAmygdala_roi_montage.png']);
-report.param_roi_img1 = fullfile('img', ['sub-' sub  '_space-individual_desc-leftMotor_roi_montage.png']);
-report.param_roi_img2 = fullfile('img', ['sub-' sub  '_space-individual_desc-rightMotor_roi_montage.png']);
-report.param_roi_img3 = fullfile('img', ['sub-' sub  '_space-individual_desc-leftAmygdala_roi_montage.png']);
-report.param_roi_img4 = fullfile('img', ['sub-' sub  '_space-individual_desc-rightAmygdala_roi_montage.png']);
-copyfile(roi_img1, fullfile(report_dir, report.param_roi_img1));
-copyfile(roi_img2, fullfile(report_dir, report.param_roi_img2));
-copyfile(roi_img3, fullfile(report_dir, report.param_roi_img3));
-copyfile(roi_img4, fullfile(report_dir, report.param_roi_img4));
-report.param_roi_name1 = 'Left Motor';
-report.param_roi_name2 = 'Right Motor';
-report.param_roi_name3 = 'Left Amygdala';
-report.param_roi_name4 = 'Right Amygdala';
+% ROI montage image locations - not working yet
+if options.map_rois
+    roi_img1 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-leftMotor_roi_montage.png']);
+    roi_img2 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-rightMotor_roi_montage.png']);
+    roi_img3 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-leftAmygdala_roi_montage.png']);
+    roi_img4 = fullfile(options.qc_dir, filepath, ['sub-' sub  '_space-individual_desc-rightAmygdala_roi_montage.png']);
+    report.param_roi_img1 = fullfile('img', ['sub-' sub  '_space-individual_desc-leftMotor_roi_montage.png']);
+    report.param_roi_img2 = fullfile('img', ['sub-' sub  '_space-individual_desc-rightMotor_roi_montage.png']);
+    report.param_roi_img3 = fullfile('img', ['sub-' sub  '_space-individual_desc-leftAmygdala_roi_montage.png']);
+    report.param_roi_img4 = fullfile('img', ['sub-' sub  '_space-individual_desc-rightAmygdala_roi_montage.png']);
+    copyfile(roi_img1, fullfile(report_dir, report.param_roi_img1));
+    copyfile(roi_img2, fullfile(report_dir, report.param_roi_img2));
+    copyfile(roi_img3, fullfile(report_dir, report.param_roi_img3));
+    copyfile(roi_img4, fullfile(report_dir, report.param_roi_img4));
+    report.param_roi_name1 = 'Left Motor';
+    report.param_roi_name2 = 'Right Motor';
+    report.param_roi_name3 = 'Left Amygdala';
+    report.param_roi_name4 = 'Right Amygdala';
 
-% Stats summary data for specific functional run
-tasks_runs = {'rest_run-1', 'motor_run-1', 'emotion_run-1', 'rest_run-2', 'motor_run-2', 'emotion_run-2'};
+    % For report purposes, which ROIs to include in grayplots. TODO.
+    bids_dataset.roi_desc = {'leftMotor', 'biAmygdala'};
+end
+
+% Stats summary data for each specific functional run, specified in settings file
+bids_dataset.report_runs = options.qc_report_runs;
+tasks_runs = options.qc_report_runs;
+bids_dataset.all_runs_stats = cell(1,numel(tasks_runs));
+[func_filename, func_filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'task', options.template_task, 'run', options.template_run, 'space', 'individual', 'ext', '_bold.nii')
 for i = 1:numel(tasks_runs)
+
     % write summary metrics
-    stats_summary_fn = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_desc-stats_summary.tsv']);
+    stats_summary_fn = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-stats_summary.tsv']);
     stats = tdfread(stats_summary_fn);
-    framewise_displacement_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' tasks_runs{i} '_desc-confounds_fd.tsv']);
+    framewise_displacement_fn = fullfile(options.preproc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-confounds_fd.tsv']);
     fd = tdfread(framewise_displacement_fn);
-    report.(['param_fd_mean_' num2str(i)]) = sprintf('%0.2f', mean(fd.framewise_displacement));
-    report.(['param_fd_total_' num2str(i)]) = sprintf('%0.2f', sum(fd.framewise_displacement));
-    report.(['param_fd_outliers02_' num2str(i)]) = sprintf('%0.0f', numel(find(fd.framewise_displacement_censor02)));
-    report.(['param_fd_outliers05_' num2str(i)]) = sprintf('%0.0f', numel(find(fd.framewise_displacement_censor05)));
-    report.(['param_zscore_mean_' num2str(i)]) = sprintf('%0.2f', stats.zscore_mean);
-    report.(['param_gcor_' num2str(i)]) = sprintf('%0.2f', stats.gcor);
-    report.(['param_tsnr_GM_mean_' num2str(i)]) = sprintf('%0.2f', stats.tSNR_mean_GM);
-    report.(['param_tsnr_WM_mean_' num2str(i)]) = sprintf('%0.2f', stats.tSNR_mean_WM);
-    report.(['param_tsnr_CSF_mean_' num2str(i)]) = sprintf('%0.2f', stats.tSNR_mean_CSF);
-    report.(['param_tsnr_brain_mean_' num2str(i)]) = sprintf('%0.2f', stats.tSNR_mean_brain);
+
+    bids_dataset.all_runs_stats{i}.mean_fd = sprintf('%0.2f', mean(fd.framewise_displacement));
+    bids_dataset.all_runs_stats{i}.total_fd = sprintf('%0.2f', sum(fd.framewise_displacement));
+    bids_dataset.all_runs_stats{i}.fd_outliers02 = sprintf('%0.0f', numel(find(fd.framewise_displacement_censor02)));
+    bids_dataset.all_runs_stats{i}.fd_outliers05 = sprintf('%0.0f', numel(find(fd.framewise_displacement_censor05)));
+    bids_dataset.all_runs_stats{i}.mean_zscore = sprintf('%0.2f', stats.zscore_mean);
+    bids_dataset.all_runs_stats{i}.gcor = sprintf('%0.2f', stats.gcor);
+    bids_dataset.all_runs_stats{i}.tsnr_gm = sprintf('%0.2f', stats.tSNR_mean_GM);
+    bids_dataset.all_runs_stats{i}.tsnr_wm = sprintf('%0.2f', stats.tSNR_mean_WM);
+    bids_dataset.all_runs_stats{i}.tsnr_csf = sprintf('%0.2f', stats.tSNR_mean_CSF);
+    bids_dataset.all_runs_stats{i}.tsnr_brain = sprintf('%0.2f', stats.tSNR_mean_brain);
 
     % copy functional qc images
-    to_copy.mean_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_space-individual_mean.png']);
-    to_copy.tsnr_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_space-individual_tsnr.png']);
-    to_copy.var_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_space-individual_var.png']);
-    to_copy.std_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_space-individual_std.png']);
+    to_copy.mean_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_mean.png']);
+    to_copy.tsnr_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_tsnr.png']);
+    to_copy.var_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_var.png']);
+    to_copy.std_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_std.png']);
     % Functional timeseries image locations
-    to_copy.rograyplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_echo-' echo '_desc-RO_grayplot.png']);
-    to_copy.gsograyplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_echo-' echo '_desc-GSO_grayplot.png']);
+    if options.is_multiecho
+        to_copy.rograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-RO_grayplot.png']);
+        to_copy.gsograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-GSO_grayplot.png']);
+    else
+        to_copy.rograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-RO_grayplot.png']);
+        to_copy.gsograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-GSO_grayplot.png']);
+    end
+    
     % TODO: this is hardcoded for this study, need to generalise it
-    to_copy.leftMotorgrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_echo-' echo '_desc-leftMotor_grayplot.png']);
-    to_copy.rightMotorgrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_echo-' echo '_desc-rightMotor_grayplot.png']);
-    to_copy.leftAmygrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_echo-' echo '_desc-leftAmygdala_grayplot.png']);
-    to_copy.rightAmygrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_echo-' echo '_desc-rightAmygdala_grayplot.png']);
-    to_copy.biAmygrayplot_img = fullfile(options.func_dir_qc, ['sub-' sub '_task-' tasks_runs{i} '_echo-' echo '_desc-bilateralAmygdala_grayplot.png']);
+    if options.map_rois
+        to_copy.leftMotorgrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-leftMotor_grayplot.png']);
+        to_copy.rightMotorgrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-rightMotor_grayplot.png']);
+        to_copy.leftAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-leftAmygdala_grayplot.png']);
+        to_copy.rightAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-rightAmygdala_grayplot.png']);
+        to_copy.biAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-bilateralAmygdala_grayplot.png']);
+    end
     % PhysIO QC image locations
-    to_copy.physioqc_img = fullfile(options.func_dir_qc, ['PhysIO_task-' tasks_runs{i}], ['sub-' sub '_task-' tasks_runs{i} '_physioQC_03.jpg']);
+    to_copy.physioqc_img = fullfile(options.qc_dir, func_filepath, ['PhysIO_' tasks_runs{i}], ['sub-' sub '_' tasks_runs{i} '_physioQC_03.jpg']);
     % Copy all images if they exist
     cp_fields = fieldnames(to_copy);
     for x = 1:numel(cp_fields)
@@ -186,12 +221,7 @@ delete(html_tmp_fn)
 % STEP 5 -- Read, replace and write data to js file
 % -----------------------------------------------------
 
-%
-
-js_strings.param_str2 = [filesep 'sub-' sub '_task-'];
-js_strings.param_str3 = '_physioQC_03.jpg';
-
-fields = fieldnames(js_strings);
+js_string = jsonencode(bids_dataset);
 
 fid_template = fopen(js_template_fn);
 fid_tmp = fopen(js_tmp_fn, 'w');
@@ -201,9 +231,7 @@ while ischar(tline)
 %    disp(tline)
     tline = fgetl(fid_template);
     newString = tline;
-    for i = 1:numel(fields)
-        newString = strrep(newString, fields{i}, js_strings.(fields{i}));
-    end
+    newString = strrep(newString, 'param_bids_dataset', ['bids_dataset = ' js_string] );
     if ischar(tline)
         fprintf(fid_tmp,'%s\n', newString);
     end
@@ -213,26 +241,3 @@ fclose(fid_tmp);
 
 [status, msg, msgID] = movefile(js_tmp_fn, fullfile(report_dir, report.param_asset_js));
 delete(js_tmp_fn)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

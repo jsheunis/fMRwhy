@@ -7,7 +7,7 @@
 % ----------
 
 % Main data source: BIDS root folder
-options.bids_dir = '/Volumes/My Passport for Mac/rt-me-fMRI';
+options.bids_dir = '/Users/jheunis/Desktop/ds002748';
 
 % ----------
 % Section 02
@@ -28,8 +28,8 @@ options.anat_template_session = '';
 % Set the template for functional realignment purposes (if not needed, set to '')
 options.template_task = 'rest';
 options.template_session = '';
-options.template_run = '1';
-options.template_echo = '2';
+options.template_run = '';
+options.template_echo = '';
 
 % ----------
 % Section 04
@@ -37,11 +37,11 @@ options.template_echo = '2';
 
 % Define sequence parameters, this should be known to the user.
 % fMRwhy does not yet support deriving these parameters from the BIDS json files
-options.TR = 2;
-options.N_slices = 34;
-options.Ndummies = 5; % Specify number of dummies, even if they have already been excluded from the BOLD timeseries images. This is important for the TAPAS PhysIO steps when processing cardiac and respiratory data.
-options.Nscans = 210; % The number of scans in the BOLD timeseries images, excluding dummies.
-options.TE = [14 28 42]; % The echo times if multi-echo. fMRwhy assumes this is the same for all functional runs. If not multi-echo, set to [].
+options.TR = 2.5;
+options.N_slices = 25;
+options.Ndummies = 0; % Specify number of dummies, even if they have already been excluded from the BOLD timeseries images. This is important for the TAPAS PhysIO steps when processing cardiac and respiratory data.
+options.Nscans = 100; % The number of scans in the BOLD timeseries images, excluding dummies.
+options.TE = []; % The echo times if multi-echo. fMRwhy assumes this is the same for all functional runs. If not multi-echo, set to [].
 
 % ----------
 % Section 05 - Settings for anatLocaliser processing
@@ -74,7 +74,7 @@ options.roi.emotion.desc = {'bilateralAmygdala', 'leftAmygdala', 'rightAmygdala'
 % Section 06 - Settings for basicFunc processing
 % ----------
 
-options.fwhm = 7; % FWHM of the spatial smoothing kernel, typically twice the voxel size, in mm
+options.fwhm = 5; % FWHM of the spatial smoothing kernel, typically twice the voxel size, in mm
 options.basicfunc_full = false; % if true, preprocessing will include all combinations of slice time correction, realignment and smoothing, useful for later analyses; if false, only include steps necessary for QC
 options.include_stc = false; % include slice timing correction?
 
@@ -82,7 +82,7 @@ options.include_stc = false; % include slice timing correction?
 options.confounds.include_volterra = 1; % to generate the volterra expansion of the 6 realignment parameters ==> 1
 options.confounds.include_fd = 1; % to generate framewise displacement ==> 1
 options.confounds.include_tissue = 1; % to generate signals from GM, WM, CSF compartments ==> 1
-options.confounds.include_physio = 1; % if cardiac and respiration data are available ==> 1
+options.confounds.include_physio = 0; % if cardiac and respiration data are available ==> 1
 
 % generateMultRegr: framewise displacement. No need to change these defaults unless for very specific and well-motivated reasons.
 options.r = 50; % mm
@@ -118,17 +118,16 @@ options.physio.options.fig_output_file = ''; % unnecessary if verbose.level = 0,
 % Settings for QC
 % No need to change these defaults unless for very specific and well-motivated reasons.
 options.theplot.intensity_scale = [-6 6];
-options.qc_overwrite_tissuecontours = true;
-options.qc_overwrite_ROIcontours = true;
+options.qc_overwrite_tissuecontours = false;
+options.qc_overwrite_ROIcontours = false;
 options.qc_overwrite_theplot = false;
-options.qc_overwrite_statsoutput = true;
-options.qc_report_runs = {'task-rest_run-1', 'task-fingerTapping', 'task-emotionProcessing', 'task-rest_run-2', 'task-fingerTappingImagined', 'task-emotionProcessingImagined'};
-options.qc_dataset_name = 'rt-me-fMRI';
-options.qc_anat_res = '1x1x1 mm (100x100x100 voxels)';
-options.qc_func_res = '3.5x3.5x3.5 mm (64x64x34 voxels)';
-options.qc_func_acq = 'Multi-echo (TE = 14,28,42 ms), SENSE = 2.5';
-options.qc_func_runs = 'rest_run-1, fingerTapping, emotionProcessing, rest_run-2, fingerTappingImagined, emotionProcessingImagined';
-
+options.qc_overwrite_statsoutput = false;
+options.qc_report_runs = {'task-rest'};
+options.qc_dataset_name = 'ds002748';
+options.qc_anat_res = '(to be populated)';
+options.qc_func_res = '(to be populated)';
+options.qc_func_acq = '(to be populated)';
+options.qc_func_runs = 'rest';
 
 
 

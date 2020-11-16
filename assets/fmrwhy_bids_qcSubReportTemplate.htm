@@ -4,21 +4,24 @@
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="param_asset_css">
+  <link rel="stylesheet" type="text/css" href="assets/fmrwhy_bids_qcReport.css">
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="param_asset_js"></script>
+  <script src="assets/fmrwhy_bids_qcReport.js">
+  </script>
   <script>
-    window.onload = function () {
+    $( document ).ready(function() {
       document.getElementById("button1").click();
       document.getElementById("button2").click();
       document.getElementById("button3").click();
-      document.getElementById("button4").click();
-      document.getElementById('runselector').value = "rest_run-1";
+      // document.getElementById("button4").click();
+      document.getElementById('runselector').value = "task-rest";
       $('#runselector').trigger('change');
-    };
+      // alert('head')
+    });
+
   </script>
 </head>
 
@@ -38,13 +41,13 @@
   <div id="summary" style="padding-left:3%; max-width:94%">
     <h2>Summary: sub-param_sub</h2>
     <br>
-    <table class="qcsummary">
+    <table id="kaaskoek" class="qcsummary">
       <tr>
-        <td>Study</td>
-        <td>NEUFEP-ME: neurofeedback, epilepsy, multi-echo</td>
+        <td>Dataset name</td>
+        <td>param_dataset_name</td>
       </tr>
       <tr>
-        <td>Participant</td>
+        <td>Subject ID</td>
         <td>param_sub</td>
       </tr>
       <tr>
@@ -53,23 +56,19 @@
       </tr>
       <tr>
         <td>Anatomical resolution</td>
-        <td>param_anat_resolution_mm mm (param_anat_resolution_vx voxels)</td>
+        <td>param_anat_res</td>
       </tr>
       <tr>
         <td>Functional resolution</td>
-        <td>param_func_resolution_mm mm (param_func_resolution_vx voxels)</td>
+        <td>param_func_res</td>
       </tr>
       <tr>
         <td>Functional acquisition</td>
-        <td>param_functional_acquisition</td>
-      </tr>
-      <tr>
-        <td>Functional tasks</td>
-        <td>param_all_tasks</td>
+        <td>param_func_acq</td>
       </tr>
       <tr>
         <td>Functional runs</td>
-        <td>param_functional_runs</td>
+        <td>param_func_runs</td>
       </tr>
     </table>
     <br>
@@ -91,16 +90,25 @@
       thresholding - of the previous three masks).
       These are overlaid on the coregistered and resampled T1w image below, to allow visual inspection of segmentation
       and registration quality.
+
+      <br><br>
     </p>
-    <p class="anatroi">
-      Anatomical regions of interest were taken from the cytoarchitecture-based Jülich atlas in the <a target="_blank"
+    <p id="anatroitext">
+      Anatomical regions of interest were taken from the cytoarchitecture-based atlases in the <a target="_blank"
         href="https://www.fz-juelich.de/inm/inm-1/EN/Forschung/_docs/SPMAnatomyToolbox/SPMAnatomyToolbox_node.html">SPM
         Anatomy Toolbox</a>.
+      For the motor cortex, regions 4a and 4p were used. For the amygdala, regions LB, IF, SF, MF, VTM, and CM were
+      used.
       Regions of interest were transformed from MNI152 space to the subject functional space using SPM12
       <code>normalise/write</code>, as well as
       the inverse transformation field that was saved as part of the segemntation procedure mentioned above.
-    </p>
 
+      The regions of interest for this study include the left motor cortex (for the motor task runs) and the bilateral
+      amygdala (for the emotion task runs).
+      These ROIs are overlaid on the coregistered and resampled T1w image below, to allow visual inspection of
+      normalisation quality.
+
+    </p>
     <h4>T1w coregistration and segmentation</h4>
     <div class="tab3">
       <button id="button3" class="tablinks3 active" onclick="openTab3(event, 'brain')">Brain mask</button>
@@ -127,7 +135,7 @@
     </div>
 
     <br>
-    <div class="anatroi">
+    <div id="anatroiimgs">
       <h4>Anatomical localisation</h4>
       <div class="tab4">
         <button id="button4" class="tablinks4 active" onclick="openTab4(event, 'roi1')">param_roi_name1</button>
@@ -207,110 +215,24 @@
     </p>
     <br>
     <h4 id="funcsummary" style="text-align:center;">Functional QC metrics summary</h4>
-    <table class="qcsummary" style="margin-left:auto;margin-right:auto;">
+    <table id="statsTable" class="qcsummary" style="margin-left:auto;margin-right:auto;">
       <tr>
-        <th>Metric</th>
-        <th>Rest Run 1</th>
-        <th>Motor Run 1</th>
-        <th>Emotion Run 1</th>
-        <th>Rest Run 2</th>
-        <th>Motor Run 2</th>
-        <th>Emotion Run 2</th>
-      </tr>
-      <tr>
-        <td>Mean framewise displacement (mm)</td>
-        <td align="right">param_fd_mean_1</td>
-        <td align="right">param_fd_mean_2</td>
-        <td align="right">param_fd_mean_3</td>
-        <td align="right">param_fd_mean_4</td>
-        <td align="right">param_fd_mean_5</td>
-        <td align="right">param_fd_mean_6</td>
-      </tr>
-      <tr>
-        <td>Total framewise displacement (mm)</td>
-        <td align="right">param_fd_total_1</td>
-        <td align="right">param_fd_total_2</td>
-        <td align="right">param_fd_total_3</td>
-        <td align="right">param_fd_total_4</td>
-        <td align="right">param_fd_total_5</td>
-        <td align="right">param_fd_total_6</td>
-      </tr>
-      <tr>
-        <td>Framewise displacement outliers (threshold = 0.2mm)</td>
-        <td align="right">param_fd_outliers02_1</td>
-        <td align="right">param_fd_outliers02_2</td>
-        <td align="right">param_fd_outliers02_3</td>
-        <td align="right">param_fd_outliers02_4</td>
-        <td align="right">param_fd_outliers02_5</td>
-        <td align="right">param_fd_outliers02_6</td>
-      </tr>
-      <tr>
-        <td>Framewise displacement outliers (threshold = 0.5mm)</td>
-        <td align="right">param_fd_outliers05_1</td>
-        <td align="right">param_fd_outliers05_2</td>
-        <td align="right">param_fd_outliers05_3</td>
-        <td align="right">param_fd_outliers05_4</td>
-        <td align="right">param_fd_outliers05_5</td>
-        <td align="right">param_fd_outliers05_6</td>
-      </tr>
-      <tr>
-        <td>Mean Zscore</td>
-        <td align="right">param_zscore_mean_1</td>
-        <td align="right">param_zscore_mean_2</td>
-        <td align="right">param_zscore_mean_3</td>
-        <td align="right">param_zscore_mean_4</td>
-        <td align="right">param_zscore_mean_5</td>
-        <td align="right">param_zscore_mean_6</td>
-      </tr>
-      <tr>
-        <td>Global correlation</td>
-        <td align="right">param_gcor_1</td>
-        <td align="right">param_gcor_2</td>
-        <td align="right">param_gcor_3</td>
-        <td align="right">param_gcor_4</td>
-        <td align="right">param_gcor_5</td>
-        <td align="right">param_gcor_6</td>
-      </tr>
-      <tr>
-        <td>Mean tSNR (GM)</td>
-        <td align="right">param_tsnr_GM_mean_1</td>
-        <td align="right">param_tsnr_GM_mean_2</td>
-        <td align="right">param_tsnr_GM_mean_3</td>
-        <td align="right">param_tsnr_GM_mean_4</td>
-        <td align="right">param_tsnr_GM_mean_5</td>
-        <td align="right">param_tsnr_GM_mean_6</td>
-      </tr>
-      <tr>
-        <td>Mean tSNR (WM)</td>
-        <td align="right">param_tsnr_WM_mean_1</td>
-        <td align="right">param_tsnr_WM_mean_2</td>
-        <td align="right">param_tsnr_WM_mean_3</td>
-        <td align="right">param_tsnr_WM_mean_4</td>
-        <td align="right">param_tsnr_WM_mean_5</td>
-        <td align="right">param_tsnr_WM_mean_6</td>
-      </tr>
-      <tr>
-        <td>Mean tSNR (CSF)</td>
-        <td align="right">param_tsnr_CSF_mean_1</td>
-        <td align="right">param_tsnr_CSF_mean_2</td>
-        <td align="right">param_tsnr_CSF_mean_3</td>
-        <td align="right">param_tsnr_CSF_mean_4</td>
-        <td align="right">param_tsnr_CSF_mean_5</td>
-        <td align="right">param_tsnr_CSF_mean_6</td>
-      </tr>
-      <tr>
-        <td>Mean tSNR (brain)</td>
-        <td align="right">param_tsnr_brain_mean_1</td>
-        <td align="right">param_tsnr_brain_mean_2</td>
-        <td align="right">param_tsnr_brain_mean_3</td>
-        <td align="right">param_tsnr_brain_mean_4</td>
-        <td align="right">param_tsnr_brain_mean_5</td>
-        <td align="right">param_tsnr_brain_mean_6</td>
+        <th>Functional run</th>
+        <th>Mean framewise displacement (mm)</th>
+        <th>Total framewise displacement (mm)</th>
+        <th>FD outliers (thresh 0.2mm)</th>
+        <th>FD outliers (thresh 0.5mm)</th>
+        <th>Mean Zscore</th>
+        <th>Global correlation</th>
+        <th>Mean tSNR (GM)</th>
+        <th>Mean tSNR (WM)</th>
+        <th>Mean tSNR (CSF)</th>
+        <th>Mean tSNR (brain)</th>
       </tr>
     </table>
     <br>
 
-    <!--The options in this part will all be written to file in a for loop-->
+    <!--            The options in this part will all be written to file in a for loop-->
     <hr>
     <div style="text-align:center;">
       <h3>Select a functional run</h3>
@@ -318,12 +240,6 @@
       <br>
       <div>
         <select id="runselector" style="width:30%; height:40px">
-          <option value="rest_run-1">Rest - Run 1</option>
-          <option value="motor_run-1">Motor - Run 1</option>
-          <option value="emotion_run-1">Emotion - Run 1</option>
-          <option value="rest_run-2">Rest - Run 2</option>
-          <option value="motor_run-2">Motor - Run 2</option>
-          <option value="emotion_run-2">Emotion - Run 2</option>
         </select>
       </div>
     </div>
@@ -358,8 +274,6 @@
       <button id="button2" class="tablinks2 active" onclick="openTab2(event, 'grayplot_ro')">Brain (tissue type
         ordered)</button>
       <button class="tablinks2" onclick="openTab2(event, 'grayplot_gso')">Brain (global signal ordered)</button>
-      <button class="tablinks2" onclick="openTab2(event, 'grayplot_lmotor')">Left motor cortex</button>
-      <button class="tablinks2" onclick="openTab2(event, 'grayplot_biamy')">Bilateral amygdala</button>
     </div>
     <!-- Tab content -->
     <div id="grayplot_ro" class="tabcontent2">
@@ -370,18 +284,13 @@
       <br>
       <img id="grayplot_gso_img" src="param_gsograyplot_img" alt="no picture" style="width:95%;">
     </div>
-    <div id="grayplot_lmotor" class="tabcontent2">
-      <br>
-      <img id="grayplot_lmotor_img" src="param_leftMotorgrayplot_img" alt="no picture" style="width:95%;">
-    </div>
-    <div id="grayplot_biamy" class="tabcontent2">
-      <br>
-      <img id="grayplot_biamy_img" src="param_biAmygrayplot_img" alt="no picture" style="width:95%;">
-    </div>
     <br>
     <h4 id="physqcplots">PhysIO QC plots</h4>
     <img id="physqcplots_img" src="param_physioqc_img" alt="no picture" style="width:50%;">
   </div>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", setupReportStructure());
+  </script>
 </body>
 
 </html>

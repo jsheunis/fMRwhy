@@ -1,4 +1,4 @@
-function options = fmrwhy_workflow_qc(settings_fn)
+function options = fmrwhy_bids_workflowQC(settings_fn)
 
 % A custom workflow that does anatomical-to-functional and basic functional time series preprocessing and QC for all subjects in a BIDS directory
 
@@ -182,8 +182,8 @@ for s = 1:numel(subs)
     end
  
     % -------
-    % STEP 5 -- QC report: fmrwhy_qc_generateSubRunReport.m
+    % STEP 5 -- QC report: fmrwhy_bids_qcSubReport.m
     % -------
-    % fmrwhy_neufep_generateSubReport(options.bids_dir, sub);
+    fmrwhy_bids_qcSubReport(sub, options);
 
 end
