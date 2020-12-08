@@ -1,0 +1,52 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "jesperr17",
+      "name": "Jesper Pilmeyer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/54264865?v=4",
+      "profile": "https://github.com/jesperr17",
+      "contributions": [
+        "bug",
+        "ideas",
+        "userTesting"
+      ]
+    },
+    {
+      "login": "Remi-Gau",
+      "name": "Remi Gau",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/6961185?v=4",
+      "profile": "https://remi-gau.github.io/",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "jsheunis",
+      "name": "Stephan Heunis",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/10141237?v=4",
+      "profile": "https://jsheunis.github.io/",
+      "contributions": [
+        "bug",
+        "code",
+        "doc",
+        "ideas",
+        "infra",
+        "maintenance",
+        "projectManagement",
+        "question",
+        "userTesting"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "fMRwhy",
+  "projectOwner": "jsheunis",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
