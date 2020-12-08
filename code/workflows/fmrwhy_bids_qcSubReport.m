@@ -58,12 +58,14 @@ report.param_avatar = fullfile('assets', 'fmrwhy_logo.jpeg');
 copyfile(avatar_template_fn, fullfile(report_dir, report.param_avatar));
 
 % Details about study, subject, data, etc
+report.param_dataset_name = options.qc_dataset_name;
 report.param_sub = sub;
 report.param_datetime = t;
 report.param_anat_res = options.qc_anat_res;
 report.param_func_res = options.qc_func_res;
 report.param_func_acq = options.qc_func_acq;
 report.param_func_runs = options.qc_func_runs;
+report.param_first_run = options.qc_report_runs{1};
 
 % Populate bids_dataset structure with existing variables
 bids_dataset.sub = ['sub-' sub];
@@ -91,14 +93,24 @@ bids_dataset.physio_str = '_physioQC_03.jpg';
 % Anatomical montage image locations - all anatomical QC outputs should be located in the 'anat' dir (in QC derivatives) of the template session; if no sessions ==> template session is the main 'anat' dir
 [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
 
-brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
-gm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
-wm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
-csf_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
+brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_brain_mask_montage.png']);
+gm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_GM_mask_montage.png']);
+wm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_WM_mask_montage.png']);
+csf_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_CSF_mask_montage.png']);
 report.param_brain_mask = fullfile('img', ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
 report.param_gm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
 report.param_wm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
 report.param_csf_mask = fullfile('img', ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
+
+% TODO: this is the intended code for the correct version of the report, the code above is used for rt-me-fMRI dataset (beta version, v0.0.1)
+% brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
+% gm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
+% wm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
+% csf_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
+% report.param_brain_mask = fullfile('img', ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
+% report.param_gm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
+% report.param_wm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
+% report.param_csf_mask = fullfile('img', ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
 copyfile(brain_mask, fullfile(report_dir, report.param_brain_mask));
 copyfile(gm_mask, fullfile(report_dir, report.param_gm_mask));
 copyfile(wm_mask, fullfile(report_dir, report.param_wm_mask));

@@ -7,7 +7,7 @@
 % ----------
 
 % Main data source: BIDS root folder
-options.bids_dir = '/Volumes/My Passport for Mac/rt-me-fMRI';
+options.bids_dir = '/Volumes/JSH/rt-me-fMRI';
 
 % ----------
 % Section 02
