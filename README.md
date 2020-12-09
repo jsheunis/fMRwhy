@@ -1,15 +1,16 @@
 # fMRwhy - Facilitating BIDS-compatible fMRI analysis with SPM12 and Matlab
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![Documentation Status](https://readthedocs.org/projects/fmrwhy/badge/?version=latest)](https://fmrwhy.readthedocs.io/en/latest/?badge=latest)
-
-
-***CURRENTLY UNDER DEVELOPMENT***
+[![License](https://img.shields.io/badge/license-LGPL--2.1-blue)](https://opensource.org/licenses/LGPL-2.1)
 
 ---
 
 ## What is `fMRwhy`?
+
+<img src="assets/fmrwhy_logo_2020.png" alt=""/>
+
+<br>
 
 This is a Matlab- and SPM12-based toolbox with a variety of helper functions and BIDS-compatible workflows to assist in your fMRI quality checking, preprocessing and analysis journey.
 
