@@ -1,5 +1,5 @@
-Code2
-=========
+API
+===
 This is the Code2 module.
 
 .. automodule:: code

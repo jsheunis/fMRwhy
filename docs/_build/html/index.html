@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to fMRwhy’s documentation! &mdash; fMRwhy v0.0.1 documentation</title>
+  <title>fMRwhy: BIDS-compatible fMRI analysis with SPM12 &mdash; fMRwhy v0.0.1 documentation</title>
   
 
   
@@ -35,7 +35,8 @@
 
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -80,13 +81,13 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to fMRwhy’s documentation!</a></li>
-<li><a class="reference internal" href="#code2">Code2</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Code2</a></li>
 </ul>
-</div>
+
             
           
         </div>
@@ -131,7 +132,7 @@
     
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Welcome to fMRwhy’s documentation!</li>
+      <li>fMRwhy: BIDS-compatible fMRI analysis with SPM12</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -150,40 +151,48 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-fmrwhy-s-documentation">
-<h1>Welcome to fMRwhy’s documentation!<a class="headerlink" href="#welcome-to-fmrwhy-s-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-</div>
-</div>
-<div class="section" id="code2">
-<h1>Code2<a class="headerlink" href="#code2" title="Permalink to this headline">¶</a></h1>
-<p>This is the Code2 module.</p>
-<span class="target" id="module-code"></span><p><a class="reference internal" href="#module-code" title="code"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">code</span></code></a> is a really cool module.</p>
-<dl class="mat function">
-<dt id="code.fmrwhy_bids_constructFilename">
-<code class="sig-prename descclassname">code.</code><code class="sig-name descname">fmrwhy_bids_constructFilename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code.fmrwhy_bids_constructFilename" title="Permalink to this definition">¶</a></dt>
-<dd><p>BIDS 1.4.0 - This does not yet take into account whether an entity is OPTIONAL or REQUIRED for a specific file modality/type (e.g. ‘func’, ‘anat’, ‘meg’, etc). It assumes all parameters are optional and just constructs the filename given the input also, file extension is passed as parameter ==&gt; should be automatically determined from file modality/type</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>filetype</strong> – something x</p></li>
-<li><p><strong>varargin</strong> – something y</p></li>
+  <div class="section" id="fmrwhy-bids-compatible-fmri-analysis-with-spm12">
+<h1>fMRwhy: BIDS-compatible fMRI analysis with SPM12<a class="headerlink" href="#fmrwhy-bids-compatible-fmri-analysis-with-spm12" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> is a tool for facilitating BIDS-compatible fMRI analysis with SPM12 and Matlab.</p>
+<a class="reference external image-reference" href="https://opensource.org/licenses/LGPL-2.1"><img alt="License" src="http://img.shields.io/badge/license-LGPL--2.1-blue.svg" /></a>
+<a class="reference external image-reference" href="https://fmrwhy.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/fmrwhy/badge/?version=latest" /></a>
+<div class="section" id="about">
+<h2>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
+<a class="reference external image-reference" href="https://fmrwhy.readthedocs.io/"><img alt="https://github.com/jsheunis/fMRwhy/blob/master/assets/fmrwhy_logo_2020.png" src="https://github.com/jsheunis/fMRwhy/blob/master/assets/fmrwhy_logo_2020.png" /></a>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> is a Matlab- and SPM12-based toolbox with a variety of helper functions and BIDS-compatible workflows to assist in your fMRI quality checking, preprocessing and analysis journey.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> you are provided with the tools and shown <em>how</em> to calculate interesting quality metrics, <em>how</em> to visualize outcomes, <em>how</em> to analyse your data with batch scripts, and <em>how</em> to build a BIDS compatible analysis pipeline, all to flexible levels of automation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> does not help with the <em>why</em> questions, which are arguably the most important ones that need to be considered right at the start of your fMRI research journey.</p>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> currently supports:
+* fmrwhy_bids_worfklowQC:</p>
+<blockquote>
+<div><p>an automated, BIDS-compatible quality checking and reporting pipeline. It requires a settings file to be prepopulated by the user based on the data and the user’s preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs. It then generates a quality control/checking report in HMTL format for each individual functional run. <em>(further description to be populated)</em></p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Multi-echo fMRI preprocessing:
+<em>(further description to be populated)</em></p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>filename</p>
-</dd>
-</dl>
-</dd></dl>
-
+<p>Several helper functions are also available <em>(documentation pending)</em></p>
+</div>
+<div class="section" id="license-information">
+<h2>License Information<a class="headerlink" href="#license-information" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> is licensed under GNU Lesser General Public License version 2.1.</p>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Code2</a></li>
+</ul>
+</div>
 </div>
 <div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+</div>
 </div>
 
 
@@ -191,6 +200,13 @@
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
   
 
   <hr/>

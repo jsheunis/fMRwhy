@@ -1,5 +1,5 @@
 Installation
-------------
+============
 
 To run ``fMRwhy`` on your local machine, you will first need to have Matlab 2016b or a more recent version installed on your system.
 
@@ -27,11 +27,11 @@ these dependencies will be checked and you will be notified if they are not inst
 
 ``fMRwhy`` requires installation of the following toolboxes:
 
-`SPM12`_
-`bids-matlab`_
-`dicm2nii`_
-`TAPAS (PhysIO)`_
-`RainCloudPlots`_
+* `SPM12`_ 
+* `bids-matlab`_
+* `dicm2nii`_
+* `TAPAS (PhysIO)`_
+* `RainCloudPlots`_
 
 After installing each toolbox (for which the process should be very similar to the one for ``fMRwhy``),
 please remember to add each directory to the Matlab path.

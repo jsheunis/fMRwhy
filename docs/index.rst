@@ -6,8 +6,6 @@
 fMRwhy: BIDS-compatible fMRI analysis with SPM12
 ================================================
 
-``fMRwhy`` is a tool for facilitating BIDS-compatible fMRI analysis with SPM12 and Matlab.
-
 .. image:: http://img.shields.io/badge/license-LGPL--2.1-blue.svg
    :target: https://opensource.org/licenses/LGPL-2.1
    :alt: License
@@ -30,6 +28,7 @@ With ``fMRwhy`` you are provided with the tools and shown *how* to calculate int
 ``fMRwhy`` does not help with the *why* questions, which are arguably the most important ones that need to be considered right at the start of your fMRI research journey.
 
 ``fMRwhy`` currently supports:
+
 * fmrwhy_bids_worfklowQC:
   an automated, BIDS-compatible quality checking and reporting pipeline. It requires a settings file to be prepopulated by the user based on the data and the user's preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs. It then generates a quality control/checking report in HMTL format for each individual functional run. *(further description to be populated)*
 * Multi-echo fMRI preprocessing:
