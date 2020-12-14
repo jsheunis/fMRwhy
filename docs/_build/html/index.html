@@ -84,8 +84,12 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Code2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quality.html">Quality Reporting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multiecho.html">Multi-echo processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources.html">Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="codeofconduct.html">Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 
             
@@ -153,25 +157,47 @@
             
   <div class="section" id="fmrwhy-bids-compatible-fmri-analysis-with-spm12">
 <h1>fMRwhy: BIDS-compatible fMRI analysis with SPM12<a class="headerlink" href="#fmrwhy-bids-compatible-fmri-analysis-with-spm12" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> is a tool for facilitating BIDS-compatible fMRI analysis with SPM12 and Matlab.</p>
 <a class="reference external image-reference" href="https://opensource.org/licenses/LGPL-2.1"><img alt="License" src="http://img.shields.io/badge/license-LGPL--2.1-blue.svg" /></a>
 <a class="reference external image-reference" href="https://fmrwhy.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/fmrwhy/badge/?version=latest" /></a>
 <div class="section" id="about">
 <h2>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
-<a class="reference external image-reference" href="https://fmrwhy.readthedocs.io/"><img alt="https://github.com/jsheunis/fMRwhy/blob/master/assets/fmrwhy_logo_2020.png" src="https://github.com/jsheunis/fMRwhy/blob/master/assets/fmrwhy_logo_2020.png" /></a>
+<a class="reference external image-reference" href="https://fmrwhy.readthedocs.io/"><img alt="_images/fmrwhy_logo_2020.png" src="_images/fmrwhy_logo_2020.png" /></a>
 <p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> is a Matlab- and SPM12-based toolbox with a variety of helper functions and BIDS-compatible workflows to assist in your fMRI quality checking, preprocessing and analysis journey.</p>
-<p>With <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> you are provided with the tools and shown <em>how</em> to calculate interesting quality metrics, <em>how</em> to visualize outcomes, <em>how</em> to analyse your data with batch scripts, and <em>how</em> to build a BIDS compatible analysis pipeline, all to flexible levels of automation.</p>
-<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> does not help with the <em>why</em> questions, which are arguably the most important ones that need to be considered right at the start of your fMRI research journey.</p>
-<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> currently supports:
-* fmrwhy_bids_worfklowQC:</p>
-<blockquote>
-<div><p>an automated, BIDS-compatible quality checking and reporting pipeline. It requires a settings file to be prepopulated by the user based on the data and the user’s preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs. It then generates a quality control/checking report in HMTL format for each individual functional run. <em>(further description to be populated)</em></p>
-</div></blockquote>
-<ul class="simple">
-<li><p>Multi-echo fMRI preprocessing:
-<em>(further description to be populated)</em></p></li>
-</ul>
-<p>Several helper functions are also available <em>(documentation pending)</em></p>
+<p>With <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> you are provided with the tools and shown <em>how</em> to calculate interesting quality metrics, <em>how</em> to visualize outcomes, <em>how</em> to analyse your data with batch scripts, and <em>how</em> to build a BIDS compatible analysis pipeline, all to flexible levels of automation.
+<code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> does not help with the <em>why</em> questions, which are arguably the most important ones that need to be considered right at the start of your fMRI research journey.</p>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> currently has the following features:</p>
+<div class="section" id="focus-on-functional-mri">
+<h3>Focus on functional MRI<a class="headerlink" href="#focus-on-functional-mri" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> was created with a core focus on functional MRI and basic structural (i.e. T1-weighted) preprocessing applications.</p>
+</div>
+<div class="section" id="bids-compatibility">
+<h3>BIDS-compatibility<a class="headerlink" href="#bids-compatibility" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> strives to stay compatible with the <a class="reference external" href="https://bids.neuroimaging.io/">Brain Imaging Data Structure</a>.
+This includes understanding the structure of a BIDS dataset, such as the number and names of subjects, sessions, tasks, runs, and more.
+This compatibility allows automated pipelines to be run for any fMRI-based BIDS dataset.
+Additionally, <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> will output derivative data in a BIDS-compatible fashion.</p>
+</div>
+<div class="section" id="visual-fmri-quality-control">
+<h3>Visual fMRI quality control<a class="headerlink" href="#visual-fmri-quality-control" title="Permalink to this headline">¶</a></h3>
+<p>This is currently the core functionality. <code class="docutils literal notranslate"><span class="pre">fmrwhy_bids_workflowQC</span></code> is an automated, BIDS-compatible quality checking and reporting pipeline that generates subject-specific fMRI quality reports. An example is available <a class="reference external" href="https://jsheunis.github.io/fmrwhy_sample_QCreport.html">here</a>.
+It requires a settings file to be prepopulated by the user based on the data and the user’s preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs.
+Detailed usage information is available here, and the function’s API is available here.</p>
+</div>
+<div class="section" id="multi-echo-fmri-preprocessing">
+<h3>Multi-echo fMRI preprocessing<a class="headerlink" href="#multi-echo-fmri-preprocessing" title="Permalink to this headline">¶</a></h3>
+<p>Multi-echo fMRI has known benefits for improving fMRI signal recovery, increasing the signal-to-noise ratio, and separating BOLD and non-BOLD fluctuations.
+<code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> aims to make multi-echo processing methods accessible to researchers using SPM12 and Matlab.
+For this, much inspiration is drawn from the <a class="reference external" href="https://tedana.readthedocs.io/">tedana community</a>.</p>
+</div>
+<div class="section" id="accessible-and-extensible-spm12-batch-processing">
+<h3>Accessible and extensible SPM12 batch processing<a class="headerlink" href="#accessible-and-extensible-spm12-batch-processing" title="Permalink to this headline">¶</a></h3>
+<p>In an attempt to help users move from clicking through a GUI to building reproducible SPM12 analysis scripts,
+<code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> makes SPM12 batch processes and other functions available as extensible functions. This includes standard SPM12 functionality such as realignment, reslicing, smoothing, and more.</p>
+</div>
+<div class="section" id="processing-utilities">
+<h3>Processing utilities<a class="headerlink" href="#processing-utilities" title="Permalink to this headline">¶</a></h3>
+<p>Many helper functions are also available to assist with preprocessing, image calculation and visualization scripts. To find out more, please see the <a href="#id1"><span class="problematic" id="id2">`API`_</span></a>.</p>
+</div>
 </div>
 <div class="section" id="license-information">
 <h2>License Information<a class="headerlink" href="#license-information" title="Permalink to this headline">¶</a></h2>
@@ -179,9 +205,18 @@
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Code2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#step-1-download-fmrwhy">Step 1 - Download <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#step-2-download-dependencies">Step 2 - Download dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#step-3-add-tools-to-your-matlab-path">Step 3 - Add tools to your Matlab path</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quality.html">Quality Reporting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multiecho.html">Multi-echo processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources.html">Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="codeofconduct.html">Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 </div>
 </div>

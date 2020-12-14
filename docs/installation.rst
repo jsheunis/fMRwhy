@@ -3,29 +3,28 @@ Installation
 
 To run ``fMRwhy`` on your local machine, you will first need to have Matlab 2016b or a more recent version installed on your system.
 
-To install ``fMRwhy``, clone the GitHub repository to your machine:
+Installation requires a number of steps:
+
+Step 1 - Download ``fMRwhy``
+----------------------------
+
+If you are using git, clone the ``fMRwhy`` GitHub repository to your machine:
 
 .. code-block:: bash
+
   git clone https://github.com/jsheunis/fMRwhy.git
 
-Or download and extract the zipped code base from the green Code button on the GitHub repository page.
+Otherwise, download and extract the zipped code base from the green Code button on the GitHub repository page.
 
-To add ``fMRwhy`` to your Matlab path, run the following from the Matlab command window:
 
-.. code-block:: bash
-  addpath(genpath('path/to/your/fMRwhy/directory'))
-
-where you will have to replace ``path/to/your/fMRwhy/directory`` with the actual path on your system.
-This will add ``fMRwhy`` and all subdirectories to the Matlab path.
-
-Dependencies
-------------
+Step 2 - Download dependencies
+------------------------------
 
 ``fMRwhy`` also has several software dependencies, which you are required to install in order to use all of its features.
-When running the main quality checking workflow ``fmrwhy_bids_worfklowQC``,
-these dependencies will be checked and you will be notified if they are not installed or not on your Matlab path.
+These dependencies can be checked by running ``fmrwhy_util_checkDependencies`` from the Matlab command window (after adding ``fMRwhy`` to your Matlab path, see below),
+and you will be notified if a dependency is not installed or if it is not on your Matlab path.
 
-``fMRwhy`` requires installation of the following toolboxes:
+For full functionality, ``fMRwhy`` requires installation of the following toolboxes:
 
 * `SPM12`_ 
 * `bids-matlab`_
@@ -33,8 +32,22 @@ these dependencies will be checked and you will be notified if they are not inst
 * `TAPAS (PhysIO)`_
 * `RainCloudPlots`_
 
-After installing each toolbox (for which the process should be very similar to the one for ``fMRwhy``),
-please remember to add each directory to the Matlab path.
+Step 3 - Add tools to your Matlab path
+--------------------------------------
+
+To add ``fMRwhy`` to your Matlab path, run the following from the Matlab command window:
+
+.. code-block:: bash
+
+  addpath(genpath('path/to/your/fMRwhy/directory'))
+
+where you will have to replace ``path/to/your/fMRwhy/directory`` with the actual path on your system.
+
+This will add ``fMRwhy`` and all subdirectories to the Matlab path.
+
+After installing each dependent toolbox (for which the process will likely be similar to the one for ``fMRwhy``),
+please remember to add each toolbox directory to the Matlab path as well.
+
 
 .. _SPM12: https://github.com/spm/spm12/releases/tag/r7771
 .. _bids-matlab: https://github.com/bids-standard/bids-matlab
