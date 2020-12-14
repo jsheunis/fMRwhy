@@ -6,9 +6,32 @@ using the ``fmrwhy_bids_worfklowQC`` function.
 
 In order to run this function, a dataset-specific settings file needs to be populated with preferences and links to the data.
 
-``fmrwhy_bids_worfklowQC`` runs on a subset of or all subjects in your BIDS dataset and generates visual and text-based anatomical and functional QC outputs.
+``fmrwhy_bids_worfklowQC`` runs on all subjects (or a subset) in your BIDS dataset and generates visual and text-based anatomical and functional QC outputs.
 
-Outputs include 
+A sample report can be `viewed here`_.
+
+Outputs provided in the report and separately include:
+
+- **Anatomical QC images**:
+
+  - T1-weighted coregistration and segmentation maps (grey matter, white matter, CSF, and whole brain)
+
+- **Functional QC images**:
+
+  - Time series mean
+  - Time series standard deviation
+  - Temporal signal-to-noise ratio
+  - Carpet plots with traces for: framewise displacement, physiology data, tissue signals
+
+- **Functional QC metrics**:
+
+  - Mean framewise displacement
+  - Total framewise displacement
+  - Framewise displacement outliers
+  - Mean Z-score
+  - Global correlation
+  - Mean tSNR in tissue types (grey matter, white matter, CSF, and whole brain)
+
 
 
 
@@ -32,13 +55,13 @@ Several setup steps are required before using ``fmrwhy_bids_worfklowQC``:
 1. First, create a ``scripts`` directory in a location of your choice (and with a name of your choice) in which to save ``fMRwhy``-related scripts.
 2. Create a copy of the settings file ``fMRwhy/workflows/fmrwhy_settings_template.m`` and put it in our ``scripts`` directory. You can rename the settings file to make it more unique to and recognisable for your dataset or analysis.
 3. Update your new settings file with information derived from your BIDS dataset and based on your preferences for processing steps. The comments in the settings file provides guidance on the required changes, which includes (but is not limited to) aspects like:
-    - The BIDS dataset directory location
-    - The list of subjects for which you want to run the workflow
-    - The template task/session/run/volume for realignment steps
-    - Image dimensions
-    - Requirements related to regions of interest
-    - Inclusion/exclusion of physiological signal processing
-    - Inclusion/exclusion of a lis of confounds
+  - The BIDS dataset directory location
+  - The list of subjects for which you want to run the workflow
+  - The template task/session/run/volume for realignment steps
+  - Image dimensions
+  - Requirements related to regions of interest
+  - Inclusion/exclusion of physiological signal processing
+  - Inclusion/exclusion of a lis of confounds
 
 
 Usage
@@ -53,4 +76,7 @@ Run the workflow from the Matlab command window:
 where you have to replace ``path/to/your/new/settings/file`` with the actual path on your system.
 
 Progress comments will be printed via the Matlab command window.
+
+
+.. _viewed here: https://jsheunis.github.io/fmrwhy_sample_QCreport.html
 

@@ -70,6 +70,7 @@ Many helper functions are also available to assist with preprocessing, image cal
 .. _Brain Imaging Data Structure: https://bids.neuroimaging.io/
 .. _here: https://jsheunis.github.io/fmrwhy_sample_QCreport.html
 .. _tedana community: https://tedana.readthedocs.io/
+.. _API: https://fmrwhy.readthedocs.io/en/latest/#api
 
 License Information
 -------------------
@@ -84,9 +85,9 @@ License Information
    installation
    quality
    multiecho
+   preprocessing
    resources
    contributing
-   codeofconduct
    api
 
 
