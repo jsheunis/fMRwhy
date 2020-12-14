@@ -87,7 +87,6 @@ License Information
    multiecho
    resources
    contributing
-   codeofconduct
    api
 
 
