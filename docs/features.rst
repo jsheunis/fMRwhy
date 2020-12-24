@@ -18,9 +18,9 @@ Additionally, ``fMRwhy`` will output derivative data in a BIDS-compatible fashio
 Visual fMRI quality control
 ---------------------------
 
-This is currently the core functionality. ``fmrwhy_bids_workflowQC`` is an automated, BIDS-compatible quality checking and reporting pipeline that generates subject-specific fMRI quality reports. An example is available `here`_.
+This is currently the core functionality. :func:`fmrwhy_workflow_qc` is an automated, BIDS-compatible quality checking and reporting pipeline that generates subject-specific fMRI quality reports. `An example is available here`_.
 It requires a settings file to be prepopulated by the user based on the data and the user's preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs.
-Detailed usage information is available here, and the function's API is available here.
+Detailed usage information is available in the :ref:`quality_reporting` section, and the function's :ref:`api_ref`.
 
 Multi-echo fMRI preprocessing
 -----------------------------
@@ -38,10 +38,23 @@ In an attempt to help users move from clicking through a GUI to building reprodu
 Processing utilities
 --------------------
 
-Many helper functions are also available to assist with preprocessing, image calculation and visualization scripts. To find out more, please see the `API`_.
+Many helper functions are also available to assist with preprocessing, image calculation and visualization scripts. To find out more, please see the :ref:`api_ref`.
+
+
+What ``fMRwhy`` is NOT
+----------------------
+
+Importantly, while ``fMRwhy`` aims to make these features and future developments available to a wider community of MATLAB users under an open license, it is not (nor is it intended to be) a fully-fledged fMRI analysis package.
+It would not suffice nor should it be used as a replacement tool for the likes of SPM12, FSL, fmriprep, AFNI, or their constituent functionality.
+It is better positioned as an auxiliary tool for MATLAB and SPM12 users who work with BIDS-formatted fMRI datasets and who want to:
+
+1. Generate automatic, user-friendly quality reports
+2. Build reproducible SPM12-based processing pipelines
+3. Preprocess multi-echo fMRI data
+4. Build/test real-time analysis pipelines
+5. Use auxiliary tools for fMRI visualization and image manipulation
 
 
 .. _Brain Imaging Data Structure: https://bids.neuroimaging.io/
-.. _here: https://jsheunis.github.io/fmrwhy_sample_QCreport.html
+.. _An example is available here: https://jsheunis.github.io/fmrwhy_sample_QCreport.html
 .. _tedana community: https://tedana.readthedocs.io/
-.. _API: https://fmrwhy.readthedocs.io/en/latest/#api

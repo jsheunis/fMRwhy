@@ -45,7 +45,7 @@ Background
 such as calculating the temporal signal-to-noise ratio of an fMRI time series or creating a carpet plot from fMRI data.
 The core idea behind this was: if the results of our research are supported by useful quality control methods, why not implement these in a reproducible and extensible way so that the greater community can benefit from and contribute to it?
 This evolved over time into a modular set of SPM12 batch process wrapper functions that simplified the process of creating reproducible fMRI preprocessing and quality reporting scripts.
-With the goal of allowing automated quality reporting workflows, BIDS-compatibility was added using ``bids-matlab`` as a dependency. 
+With the goal of allowing automated quality reporting workflows, BIDS-compatibility was added using ``bids-matlab`` as a dependency.
 
 
 License Information

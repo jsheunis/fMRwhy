@@ -1,3 +1,5 @@
+.. _quality_reporting:
+
 Quality Reporting
 =================
 
@@ -9,30 +11,6 @@ In order to run this function, a dataset-specific settings file needs to be popu
 ``fmrwhy_bids_worfklowQC`` runs on all subjects (or a subset) in your BIDS dataset and generates visual and text-based anatomical and functional QC outputs.
 
 A sample report can be `viewed here`_.
-
-Outputs provided in the report and separately include:
-
-- **Anatomical QC images**:
-
-  - T1-weighted coregistration and segmentation maps (grey matter, white matter, CSF, and whole brain)
-
-- **Functional QC images**:
-
-  - Time series mean
-  - Time series standard deviation
-  - Temporal signal-to-noise ratio
-  - Carpet plots with traces for: framewise displacement, physiology data, tissue signals
-
-- **Functional QC metrics**:
-
-  - Mean framewise displacement
-  - Total framewise displacement
-  - Framewise displacement outliers
-  - Mean Z-score
-  - Global correlation
-  - Mean tSNR in tissue types (grey matter, white matter, CSF, and whole brain)
-
-
 
 
 Pipeline description
@@ -76,6 +54,90 @@ Run the workflow from the Matlab command window:
 where you have to replace ``path/to/your/new/settings/file`` with the actual path on your system.
 
 Progress comments will be printed via the Matlab command window.
+
+
+Output
+------
+
+Generated outputs that are provided in the report and separately include:
+
+- **Anatomical QC images**:
+
+  - T1-weighted coregistration and segmentation maps (grey matter, white matter, CSF, and whole brain)
+
+- **Functional QC images**:
+
+  - Time series mean
+  - Time series standard deviation
+  - Temporal signal-to-noise ratio
+  - Carpet plots with traces for: framewise displacement, physiology data, tissue signals
+
+- **Functional QC metrics**:
+
+  - Mean framewise displacement
+  - Total framewise displacement
+  - Framewise displacement outliers
+  - Mean Z-score
+  - Global correlation
+  - Mean tSNR in tissue types (grey matter, white matter, CSF, and whole brain)
+
+Some example images are included below:
+
+.. raw:: html
+
+    <h3 style="text-align:center;">Anatomical: brain mask</h3>
+
+.. image:: ../assets/example_brain_mask.png
+  :width: 700px
+  :align: center
+  :alt: alternate text
+
+.. raw:: html
+
+    <h3 style="text-align:center;">Anatomical: white matter mask</h3>
+
+.. image:: ../assets/example_WM_mask.png
+  :width: 700px
+  :align: center
+  :alt: alternate text
+
+.. raw:: html
+
+    <h3 style="text-align:center;">Functional: tSNR</h3>
+
+.. image:: ../assets/example_tsnr.png
+  :width: 700px
+  :align: center
+  :alt: alternate text
+
+
+.. raw:: html
+
+    <h3 style="text-align:center;">Functional: standard deviation</h3>
+  
+.. image:: ../assets/example_std.png
+  :width: 700px
+  :align: center
+  :alt: alternate text
+
+.. raw:: html
+
+    <h3 style="text-align:center;">Functional: carpet plot</h3>
+
+.. image:: ../assets/example_carpet_plot.png
+  :width: 700px
+  :align: center
+  :alt: alternate text
+
+
+.. raw:: html
+
+    <h3 style="text-align:center;">Functional: QC metrics summary table</h3>
+
+.. image:: ../assets/example_qc_metrics.png
+  :width: 700px
+  :align: center
+  :alt: alternate text
 
 
 .. _viewed here: https://jsheunis.github.io/fmrwhy_sample_QCreport.html

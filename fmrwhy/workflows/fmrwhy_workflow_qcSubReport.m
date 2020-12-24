@@ -1,6 +1,13 @@
-function [report, js_string] = fmrwhy_bids_qcSubReport(sub, options)
-
-% Assumes options structure has already been populated from settings file
+function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
+% A workflow that generates a quality report (in HTML format) for a single subject in a BIDS dataset.
+%
+% :param sub: the subject identifier for which the report is to be generated
+% :param options: the updated `options` structure
+% :type sub: character array
+% :type options: struct
+% :returns: ``[report, js_string]`` - variable array with two strings
+% 
+% .. seealso:: This workflow is called by :func:`fmrwhy_workflow_qc`
 
 % ------------------------------------
 % STEP 1 -- Load default filenames etc
