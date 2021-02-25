@@ -1,5 +1,9 @@
 function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
 % A workflow that generates a quality report (in HTML format) for a single subject in a BIDS dataset.
+% This workflow assumes that all necessary preprocessing steps have been completed,
+% including anatomical to functional coregistration, segmentation, ROI registration (if specified), 
+% functional time series preprocessing, and the generation of quality control metrics and visualizations.
+% All of these preprocessing steps are run as part of the :func:`fmrwhy_workflow_qc` workflow.
 %
 % :param sub: the subject identifier for which the report is to be generated
 % :param options: the updated `options` structure

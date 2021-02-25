@@ -24,7 +24,7 @@ It cannot help with the *why* questions, which are arguably the most important o
 
 `fMRwhy` currently supports:
 
--  `fmrwhy_bids_worfklowQC`: an automated, BIDS-compatible quality checking and reporting pipeline. It requires a settings file to be prepopulated by the user based on the data and the user's preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs. It then generates a quality control/checking report in HMTL format for each individual functional run. (*further description to be populated*)
+-  `fmrwhy_workflow_qc`: an automated, BIDS-compatible quality checking and reporting pipeline. It requires a settings file to be prepopulated by the user based on the data and the user's preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs. It then generates a quality control/checking report in HMTL format for each individual functional run. (*further description to be populated*)
 
 - Multi-echo fMRI preprocessing (*further description to be populated*)
 
@@ -42,7 +42,7 @@ git clone https://github.com/jsheunis/fMRwhy.git
 
 Or download and extract the zipped code base from the green `Code` button on this page.
 
-`fMRwhy` also has several software dependencies, which you are required to install. When running `fmrwhy_bids_worfklowQC`, these dependencies will be checked and you will be notified if they are not installed or not on your Matlab path.
+`fMRwhy` also has several software dependencies, which you are required to install. When running `fmrwhy_workflow_qc`, these dependencies will be checked and you will be notified if they are not installed or not on your Matlab path.
 
 To add `fMRwhy` to your Matlab path, run the following from the Matlab command window:
 
@@ -66,10 +66,10 @@ After installing each toolbox (for which the process should be very similar to t
 
 ## Usage
 
-In order to run `fmrwhy_bids_worfklowQC` on a BIDS-validated dataset, please follow these steps:
+In order to run `fmrwhy_workflow_qc` on a BIDS-validated dataset, please follow these steps:
 
 1. Create a `scripts` directory in a location of your choice (and with a name of your choice) in which to save `fMRwhy`-related scripts.
-2. Create a copy of the settings file `fMRwhy/workflows/fmrwhy_settings_template.m` and put it in our `scripts` directory. You can rename it to make it more unique and recognisable for your analysis.
+2. Create a copy of the settings file `fMRwhy/settings/fmrwhy_settings_template.m` and put it in our `scripts` directory. You can rename it to make it more unique and recognisable for your analysis.
 3. Update your new settings m-file with information derived from your BIDS dataset and based on your preferences for processing steps. The settings file provides guidance on the required changes, which includes (but is not limited to) aspects like:
     - The BIDS dataset directory location
     - The list of subjects for which you want to run the workflow
@@ -81,10 +81,10 @@ In order to run `fmrwhy_bids_worfklowQC` on a BIDS-validated dataset, please fol
 4. Run the workflow from the Matlab command window:
 
 ```
-fmrwhy_bids_worfklowQC('path/to/your/new/settings/file')
+fmrwhy_settings_template('path/to/your/new/settings/file')
 ```
 
-The fMRwhy `fmrwhy_bids_worfklowQC` will then do the following:
+The fMRwhy `fmrwhy_settings_template` will then do the following:
 - It creates a `derivatives` directory inside your BIDS dataset directory
 - Inside the `derivatives` directory, it creates `fMRwhy`-related output directories: `fmrwhy-preproc` and `fmrwhy-qc`
 - For each subject being processed, it copies the raw data from the BIDS directory to the `fmrwhy-preproc` directory.

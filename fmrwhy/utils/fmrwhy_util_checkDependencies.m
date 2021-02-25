@@ -1,4 +1,17 @@
 function options = fmrwhy_util_checkDependencies(options)
+% Check if all ``fMRwhy`` dependencies are installed and located on the MATLAB path.
+% Outputs warnings if dependencies are not found.
+% Dependencies include:
+% - ``SPM12``:  https://github.com/spm/spm12/releases/tag/r7771
+% - ``bids-matlab``:  https://github.com/bids-standard/bids-matlab
+% - ``dicm2nii``:  https://github.com/jsheunis/dicm2nii/releases/tag/v0.2
+% - ``TAPAS PhysIO``:  https://github.com/translationalneuromodeling/tapas/releases/tag/v4.0.0
+% - ``Raincoud Plots``:  https://github.com/RainCloudPlots/RainCloudPlots/releases/tag/v1.1
+%
+% :param options: Empty or existing `options` structure
+% :type options: struct
+% :returns: ``options`` - updated structure with directory locations of located dependencies
+
 
 if isempty(options)
     options = struct;

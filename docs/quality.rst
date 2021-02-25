@@ -4,18 +4,18 @@ Quality Reporting
 =================
 
 ``fMRwhy`` allows automated functional MRI quality checking/control (QC) and per-subject report generation of a BIDS-validated dataset,
-using the ``fmrwhy_bids_worfklowQC`` function.
+using the ``fmrwhy_workflow_qc`` function.
 
 In order to run this function, a dataset-specific settings file needs to be populated with preferences and links to the data.
 
-``fmrwhy_bids_worfklowQC`` runs on all subjects (or a subset) in your BIDS dataset and generates visual and text-based anatomical and functional QC outputs.
+``fmrwhy_workflow_qc`` runs on all subjects (or a subset) in your BIDS dataset and generates visual and text-based anatomical and functional QC outputs.
 
 A sample report can be `viewed here`_.
 
 
 Pipeline description
 --------------------
-The fMRwhy ``fmrwhy_bids_worfklowQC`` pipeline executes the following steps, in order:
+The fMRwhy ``fmrwhy_workflow_qc`` pipeline executes the following steps, in order:
 
 1. It creates a ``derivatives`` directory inside your BIDS dataset directory
 2. Inside the ``derivatives`` directory, it creates ``fMRwhy``-related output directories: ``fmrwhy-preproc`` and ``fmrwhy-qc``
@@ -28,10 +28,10 @@ The fMRwhy ``fmrwhy_bids_worfklowQC`` pipeline executes the following steps, in 
 Preparation
 -----------
 
-Several setup steps are required before using ``fmrwhy_bids_worfklowQC``:
+Several setup steps are required before using ``fmrwhy_workflow_qc``:
 
 1. First, create a ``scripts`` directory in a location of your choice (and with a name of your choice) in which to save ``fMRwhy``-related scripts.
-2. Create a copy of the settings file ``fMRwhy/workflows/fmrwhy_settings_template.m`` and put it in our ``scripts`` directory. You can rename the settings file to make it more unique to and recognisable for your dataset or analysis.
+2. Create a copy of the settings file ``fMRwhy/settings/fmrwhy_settings_template.m`` and put it in our ``scripts`` directory. You can rename the settings file to make it more unique to and recognisable for your dataset or analysis.
 3. Update your new settings file with information derived from your BIDS dataset and based on your preferences for processing steps. The comments in the settings file provides guidance on the required changes, which includes (but is not limited to) aspects like:
   - The BIDS dataset directory location
   - The list of subjects for which you want to run the workflow
@@ -49,7 +49,7 @@ Run the workflow from the Matlab command window:
 
 .. code-block:: bash
 
-  fmrwhy_bids_worfklowQC('path/to/your/new/settings/file')
+  fmrwhy_workflow_qc('path/to/your/new/settings/file')
 
 where you have to replace ``path/to/your/new/settings/file`` with the actual path on your system.
 
