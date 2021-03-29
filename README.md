@@ -1,13 +1,16 @@
 # fMRwhy - Facilitating BIDS-compatible fMRI analysis with SPM12 and Matlab
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-***CURRENTLY UNDER DEVELOPMENT***
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![Documentation Status](https://readthedocs.org/projects/fmrwhy/badge/?version=latest)](https://fmrwhy.readthedocs.io/en/latest/?badge=latest)
+[![License](https://img.shields.io/badge/license-LGPL--2.1-blue)](https://opensource.org/licenses/LGPL-2.1)
 
 ---
 
 ## What is `fMRwhy`?
+
+<img src="assets/fmrwhy_logo_2020.png" alt=""/>
+
+<br>
 
 This is a Matlab- and SPM12-based toolbox with a variety of helper functions and BIDS-compatible workflows to assist in your fMRI quality checking, preprocessing and analysis journey.
 
@@ -21,7 +24,7 @@ It cannot help with the *why* questions, which are arguably the most important o
 
 `fMRwhy` currently supports:
 
--  `fmrwhy_bids_worfklowQC`: an automated, BIDS-compatible quality checking and reporting pipeline. It requires a settings file to be prepopulated by the user based on the data and the user's preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs. It then generates a quality control/checking report in HMTL format for each individual functional run. (*further description to be populated*)
+-  `fmrwhy_workflow_qc`: an automated, BIDS-compatible quality checking and reporting pipeline. It requires a settings file to be prepopulated by the user based on the data and the user's preferences for processing steps. It can run on a full BIDS dataset with T1w and BOLD data, and will automatically derive the structure of the data in order to process all tasks, sessions and runs. It then generates a quality control/checking report in HMTL format for each individual functional run. (*further description to be populated*)
 
 - Multi-echo fMRI preprocessing (*further description to be populated*)
 
@@ -39,7 +42,7 @@ git clone https://github.com/jsheunis/fMRwhy.git
 
 Or download and extract the zipped code base from the green `Code` button on this page.
 
-`fMRwhy` also has several software dependencies, which you are required to install. When running `fmrwhy_bids_worfklowQC`, these dependencies will be checked and you will be notified if they are not installed or not on your Matlab path.
+`fMRwhy` also has several software dependencies, which you are required to install. When running `fmrwhy_workflow_qc`, these dependencies will be checked and you will be notified if they are not installed or not on your Matlab path.
 
 To add `fMRwhy` to your Matlab path, run the following from the Matlab command window:
 
@@ -63,10 +66,10 @@ After installing each toolbox (for which the process should be very similar to t
 
 ## Usage
 
-In order to run `fmrwhy_bids_worfklowQC` on a BIDS-validated dataset, please follow these steps:
+In order to run `fmrwhy_workflow_qc` on a BIDS-validated dataset, please follow these steps:
 
 1. Create a `scripts` directory in a location of your choice (and with a name of your choice) in which to save `fMRwhy`-related scripts.
-2. Create a copy of the settings file `fMRwhy/workflows/fmrwhy_settings_template.m` and put it in our `scripts` directory. You can rename it to make it more unique and recognisable for your analysis.
+2. Create a copy of the settings file `fMRwhy/settings/fmrwhy_settings_template.m` and put it in our `scripts` directory. You can rename it to make it more unique and recognisable for your analysis.
 3. Update your new settings m-file with information derived from your BIDS dataset and based on your preferences for processing steps. The settings file provides guidance on the required changes, which includes (but is not limited to) aspects like:
     - The BIDS dataset directory location
     - The list of subjects for which you want to run the workflow
@@ -78,10 +81,10 @@ In order to run `fmrwhy_bids_worfklowQC` on a BIDS-validated dataset, please fol
 4. Run the workflow from the Matlab command window:
 
 ```
-fmrwhy_bids_worfklowQC('path/to/your/new/settings/file')
+fmrwhy_settings_template('path/to/your/new/settings/file')
 ```
 
-The fMRwhy `fmrwhy_bids_worfklowQC` will then do the following:
+The fMRwhy `fmrwhy_settings_template` will then do the following:
 - It creates a `derivatives` directory inside your BIDS dataset directory
 - Inside the `derivatives` directory, it creates `fMRwhy`-related output directories: `fmrwhy-preproc` and `fmrwhy-qc`
 - For each subject being processed, it copies the raw data from the BIDS directory to the `fmrwhy-preproc` directory.
@@ -116,6 +119,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/jesperr17"><img src="https://avatars1.githubusercontent.com/u/54264865?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jesper Pilmeyer</b></sub></a><br /><a href="https://github.com/jsheunis/fMRwhy/issues?q=author%3Ajesperr17" title="Bug reports">🐛</a> <a href="#ideas-jesperr17" title="Ideas, Planning, & Feedback">🤔</a> <a href="#userTesting-jesperr17" title="User Testing">📓</a></td>
     <td align="center"><a href="https://remi-gau.github.io/"><img src="https://avatars3.githubusercontent.com/u/6961185?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Remi Gau</b></sub></a><br /><a href="#ideas-Remi-Gau" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/jsheunis/fMRwhy/commits?author=Remi-Gau" title="Code">💻</a> <a href="https://github.com/jsheunis/fMRwhy/commits?author=Remi-Gau" title="Tests">⚠️</a> <a href="#question-Remi-Gau" title="Answering Questions">💬</a> <a href="#userTesting-Remi-Gau" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://jsheunis.github.io/"><img src="https://avatars0.githubusercontent.com/u/10141237?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stephan Heunis</b></sub></a><br /><a href="https://github.com/jsheunis/fMRwhy/issues?q=author%3Ajsheunis" title="Bug reports">🐛</a> <a href="https://github.com/jsheunis/fMRwhy/commits?author=jsheunis" title="Code">💻</a> <a href="https://github.com/jsheunis/fMRwhy/commits?author=jsheunis" title="Documentation">📖</a> <a href="#ideas-jsheunis" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-jsheunis" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-jsheunis" title="Maintenance">🚧</a> <a href="#projectManagement-jsheunis" title="Project Management">📆</a> <a href="#question-jsheunis" title="Answering Questions">💬</a> <a href="#userTesting-jsheunis" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://huijbers.github.io/"><img src="https://avatars.githubusercontent.com/u/17592262?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Willem Huijbers</b></sub></a><br /><a href="https://github.com/jsheunis/fMRwhy/issues?q=author%3Ahuijbers" title="Bug reports">🐛</a> <a href="#ideas-huijbers" title="Ideas, Planning, & Feedback">🤔</a> <a href="#question-huijbers" title="Answering Questions">💬</a> <a href="#userTesting-huijbers" title="User Testing">📓</a></td>
   </tr>
 </table>
 

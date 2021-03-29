@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fMRwhy: BIDS-compatible fMRI analysis with SPM12 &mdash; fMRwhy v0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Core Features" href="features.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> fMRwhy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Core Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quality.html">Quality Reporting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multiecho.html">Multi-echo processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources.html">Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">fMRwhy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>fMRwhy: BIDS-compatible fMRI analysis with SPM12</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fmrwhy-bids-compatible-fmri-analysis-with-spm12">
+<h1>fMRwhy: BIDS-compatible fMRI analysis with SPM12<a class="headerlink" href="#fmrwhy-bids-compatible-fmri-analysis-with-spm12" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> is a MATLAB- and SPM12-based toolbox with a variety of helper functions and BIDS-compatible workflows to assist in your fMRI quality checking, preprocessing and analysis journey.</p>
+<a class="reference external image-reference" href="https://opensource.org/licenses/LGPL-2.1"><img alt="License" src="http://img.shields.io/badge/license-LGPL--2.1-blue.svg" /></a>
+<a class="reference external image-reference" href="https://fmrwhy.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/fmrwhy/badge/?version=latest" /></a>
+<div class="section" id="about">
+<h2>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
+<a class="reference external image-reference" href="https://fmrwhy.readthedocs.io/"><img alt="_images/fmrwhy_logo_2020.png" src="_images/fmrwhy_logo_2020.png" /></a>
+<p>With <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> you are provided with the tools and shown <em>how</em> to calculate interesting quality metrics, <em>how</em> to visualize outcomes, <em>how</em> to analyse your data with batch scripts, and <em>how</em> to build a BIDS compatible analysis pipeline, all to flexible levels of automation.
+<code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> does not help with the <em>why</em> questions, which are arguably the most important ones that need to be considered right at the start of your fMRI research journey.</p>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> currently has the following <a class="reference external" href="https://fmrwhy.readthedocs.io/features.html">features</a>:</p>
+<ul class="simple">
+<li><p>Focus on functional MRI</p></li>
+<li><p>BIDS-compatibility</p></li>
+<li><p>Visual fMRI quality control</p></li>
+<li><p>Multi-echo fMRI preprocessing</p></li>
+<li><p>Accessible and extensible SPM12 batch processing</p></li>
+<li><p>Processing utilities</p></li>
+</ul>
+</div>
+<div class="section" id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> started as a loose collection of MATLAB- and SPM12-based scripts created to reproduce useful quality control measures and interesting visualizations as reported in journal articles,
+such as calculating the temporal signal-to-noise ratio of an fMRI time series or creating a carpet plot from fMRI data.
+The core idea behind this was: if the results of our research are supported by useful quality control methods, why not implement these in a reproducible and extensible way so that the greater community can benefit from and contribute to it?
+This evolved over time into a modular set of SPM12 batch process wrapper functions that simplified the process of creating reproducible fMRI preprocessing and quality reporting scripts.
+With the goal of allowing automated quality reporting workflows, BIDS-compatibility was added using <code class="docutils literal notranslate"><span class="pre">bids-matlab</span></code> as a dependency.</p>
+</div>
+<div class="section" id="license-information">
+<h2>License Information<a class="headerlink" href="#license-information" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> is licensed under GNU Lesser General Public License version 2.1.</p>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Core Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="features.html#focus-on-functional-mri">Focus on functional MRI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#bids-compatibility">BIDS-compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#visual-fmri-quality-control">Visual fMRI quality control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#multi-echo-fmri-preprocessing">Multi-echo fMRI preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#accessible-and-extensible-spm12-batch-processing">Accessible and extensible SPM12 batch processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#processing-utilities">Processing utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#what-fmrwhy-is-not">What <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code> is NOT</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#step-1-download-fmrwhy">Step 1 - Download <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#step-2-download-dependencies">Step 2 - Download dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#step-3-add-tools-to-your-matlab-path">Step 3 - Add tools to your Matlab path</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quality.html">Quality Reporting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quality.html#pipeline-description">Pipeline description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quality.html#preparation">Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quality.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quality.html#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="multiecho.html">Multi-echo processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources.html">Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to <code class="docutils literal notranslate"><span class="pre">fMRwhy</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#code-of-conduct">Code of conduct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#contributing">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#fmrwhy-batch-wrapper-functions-for-spm12-batch-processes"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">fmrwhy.batch</span></code>: Wrapper functions for SPM12 batch processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#fmrwhy-bidsutils-utilities-for-bids-compatibility"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">fmrwhy.bidsutils</span></code>: Utilities for BIDS-compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#fmrwhy-multiecho-multi-echo-fmri-analysis-functions"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">fmrwhy.multiecho</span></code>: Multi-echo fMRI analysis functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#fmrwhy-qc-quality-control-functions"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">fmrwhy.qc</span></code>: Quality control functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#fmrwhy-realtime-real-time-fmri-analysis-functions"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">fmrwhy.realtime</span></code>: Real-time fMRI analysis functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#fmrwhy-settings-defaults-and-workflow-specific-settings"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">fmrwhy.settings</span></code>: Defaults and workflow-specific settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#fmrwhy-utils-common-utility-functions"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">fmrwhy.utils</span></code>: Common utility functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#fmrwhy-workflows-bids-compatible-analysis-pipelines"><code class="xref mat mat-mod docutils literal notranslate"><span class="pre">fmrwhy.workflows</span></code>: BIDS-compatible analysis pipelines</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="features.html" class="btn btn-neutral float-right" title="Core Features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, J.S. Heunis
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
