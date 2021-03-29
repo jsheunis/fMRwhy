@@ -47,6 +47,20 @@
       ]
     },
     {
+      "login": "negatoscope",
+      "name": "Luis Eudave",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38909206?v=4",
+      "profile": "https://luiseudave.netlify.app/",
+      "contributions": [
+        "bug",
+        "code",
+        "doc",
+        "ideas",
+        "question",
+        "userTesting"
+      ]
+    },
+    {
       "login": "huijbers",
       "name": "Willem Huijbers",
       "avatar_url": "https://avatars.githubusercontent.com/u/17592262?v=4",
