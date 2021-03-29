@@ -41,6 +41,19 @@
         "question",
         "userTesting"
       ]
+    },
+    {
+      "login": "negatoscope",
+      "name": "Luis Eudave",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38909206?v=4",
+      "profile": "https://luiseudave.netlify.app/",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas",
+        "question",
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
