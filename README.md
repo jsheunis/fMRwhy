@@ -81,10 +81,10 @@ In order to run `fmrwhy_workflow_qc` on a BIDS-validated dataset, please follow 
 4. Run the workflow from the Matlab command window:
 
 ```
-fmrwhy_settings_template('path/to/your/new/settings/file')
+fmrwhy_workflow_qc('path/to/your/new/settings/file')
 ```
 
-The fMRwhy `fmrwhy_settings_template` will then do the following:
+The `fmrwhy_workflow_qc` pipeline will then do the following:
 - It creates a `derivatives` directory inside your BIDS dataset directory
 - Inside the `derivatives` directory, it creates `fMRwhy`-related output directories: `fmrwhy-preproc` and `fmrwhy-qc`
 - For each subject being processed, it copies the raw data from the BIDS directory to the `fmrwhy-preproc` directory.
