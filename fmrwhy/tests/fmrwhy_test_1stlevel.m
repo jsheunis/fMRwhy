@@ -1,32 +1,31 @@
 % A custom workflow that does ...
 
-
-%%--------------------------------------------------------------------------
-%clear;
+%% --------------------------------------------------------------------------
+% clear;
 %
 %% Load/create required parameters
-%bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
+% bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 %
 %% Loop through subjects, sessions, tasks, runs, etc
-%sub = '001';
-%ses = '';
-%task = 'motor';
-%%tasks = {'motor', 'emotion'};
-%%task = 'emotion';
-%run = '1';
-%%runs = {'1', '2'};
-%echo = 'combinedMEt2star';
-%%echoes = {'combinedMEt2star', 'combinedMEte'};
+% sub = '001';
+% ses = '';
+% task = 'motor';
+%% tasks = {'motor', 'emotion'};
+%% task = 'emotion';
+% run = '1';
+%% runs = {'1', '2'};
+% echo = 'combinedMEt2star';
+%% echoes = {'combinedMEt2star', 'combinedMEte'};
 %
-%%task = 'emotion'
-%%run = '2'
-%%%echo = 'combinedMEt2star'
-%%echo = 'combinedMEte'
+%% task = 'emotion'
+%% run = '2'
+%%% echo = 'combinedMEt2star'
+%% echo = 'combinedMEte'
 %
-%options = struct;
-%fmrwhy_workflow_1stlevelRun(bids_dir, sub, ses, task, run, echo, options)
+% options = struct;
+% fmrwhy_workflow_1stlevelRun(bids_dir, sub, ses, task, run, echo, options)
 %%
-%%for t = 1:2
+%% for t = 1:2
 %%    task = tasks{t}
 %%    for r = 1:2
 %%        run = runs{t}
@@ -36,7 +35,7 @@
 %%            fmrwhy_workflow_1stlevelRun(bids_dir, sub, ses, task, run, echo, options)
 %%        end
 %%    end
-%%end
+%% end
 
 bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 sub = '001';
@@ -57,11 +56,11 @@ options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 toTransform_fns = {};
 saveAs_transform_fns = {};
 for t = 1:numel(tasks)
-    task = tasks{t}
+    task = tasks{t};
     for r = 1:numel(runs)
-        run = runs{r}
+        run = runs{r};
         for e = 1:numel(echoes)
-            echo = echoes{e}
+            echo = echoes{e};
 
             options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, options.template_echo, options);
 
@@ -81,7 +80,7 @@ for t = 1:numel(tasks)
                     toTransform_fns = [toTransform_fns, {fn1, fn2, fn3}];
                     saveAs_transform_fns = [saveAs_transform_fns, {fnsave1, fnsave2, fnsave3}];
                 else
-                    continue;
+                    continue
                 end
             end
 
@@ -91,4 +90,4 @@ end
 
 transformation_fn = options.indiv_to_mni_fn;
 template_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' options.template_task '_run-' options.template_run '_space-individual_bold.nii']);
-fmrwhy_batch_normaliseWrite(toTransform_fns, transformation_fn, template_fn, saveAs_transform_fns)
+fmrwhy_batch_normaliseWrite(toTransform_fns, transformation_fn, template_fn, saveAs_transform_fns);

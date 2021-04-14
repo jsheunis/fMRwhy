@@ -14,7 +14,7 @@ mask_fn = masks.brain_mask_fn;
 
 % Functional details
 task = 'motor';
-%task = 'emotion';
+% task = 'emotion';
 run = '1';
 echo = '2';
 
@@ -28,10 +28,10 @@ tsnr_fns{4} = fullfile(func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '
 % ROIs
 roi_fns = {};
 roi_fns{1} = fullfile(anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
-%roi_fns{1} = fullfile(anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightMotor_roi.nii']);
+% roi_fns{1} = fullfile(anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightMotor_roi.nii']);
 roi_text  = 'left motor cortex';
-%roi_fns{1} = fullfile(anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftAmygdala_roi.nii']);
-%roi_fns{2} = fullfile(anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightAmygdala_roi.nii']);
-%roi_text  = 'bilateral amygdala';
+% roi_fns{1} = fullfile(anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftAmygdala_roi.nii']);
+% roi_fns{2} = fullfile(anat_dir_preproc, ['sub-' sub '_space-individual_desc-rrightAmygdala_roi.nii']);
+% roi_text  = 'bilateral amygdala';
 
-fmrwhy_util_compareTSNR(tsnr_fns, mask_fn, roi_fns, roi_text)
+fmrwhy_util_compareTSNR(tsnr_fns, mask_fn, roi_fns, roi_text);

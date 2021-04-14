@@ -1,17 +1,17 @@
 function fmrwhy_batch_contrast1stlevel(stats_dir, params)
 
-% SETUP BATCH JOB STRUCTURE
-spm('defaults','fmri');
-spm_jobman('initcfg');
-contrast = struct;
-% spmmat
-contrast.matlabbatch{1}.spm.stats.con.spmmat = {[stats_dir filesep 'SPM.mat']};
-% consess
-contrast.matlabbatch{1}.spm.stats.con.consess = params;
-%contrast.matlabbatch{1}.spm.stats.con.consess{1}.tcon.name = params.name;
-%contrast.matlabbatch{1}.spm.stats.con.consess{1}.tcon.weights = params.weights;
-%contrast.matlabbatch{1}.spm.stats.con.consess{1}.tcon.sessrep = 'none';
-% delete
-contrast.matlabbatch{1}.spm.stats.con.delete = 0;
-% RUN BATCH JOB
-spm_jobman('run',contrast.matlabbatch);
+    % SETUP BATCH JOB STRUCTURE
+    spm('defaults', 'fmri');
+    spm_jobman('initcfg');
+    contrast = struct;
+    % spmmat
+    contrast.matlabbatch{1}.spm.stats.con.spmmat = {[stats_dir filesep 'SPM.mat']};
+    % consess
+    contrast.matlabbatch{1}.spm.stats.con.consess = params;
+    % contrast.matlabbatch{1}.spm.stats.con.consess{1}.tcon.name = params.name;
+    % contrast.matlabbatch{1}.spm.stats.con.consess{1}.tcon.weights = params.weights;
+    % contrast.matlabbatch{1}.spm.stats.con.consess{1}.tcon.sessrep = 'none';
+    % delete
+    contrast.matlabbatch{1}.spm.stats.con.delete = 0;
+    % RUN BATCH JOB
+    spm_jobman('run', contrast.matlabbatch);

@@ -9,18 +9,18 @@ template_echo = 2;
 % Input params
 bids_dir = '/Volumes/Stephan_WD/NEUFEPME_data_BIDS';
 sub = '001';
-%ses = '';
-%task = '';
-%run = 1;
-%echo = 2;
+% ses = '';
+% task = '';
+% run = 1;
+% echo = 2;
 % BIDS structure values
 BIDS = spm_BIDS(bids_dir);
-subjects = spm_BIDS(BIDS,'subjects');
-sessions = spm_BIDS(BIDS,'sessions');
-runs = spm_BIDS(BIDS,'runs');
-tasks = spm_BIDS(BIDS,'tasks');
-types = spm_BIDS(BIDS,'types');
-modalities = spm_BIDS(BIDS,'modalities');
+subjects = spm_BIDS(BIDS, 'subjects');
+sessions = spm_BIDS(BIDS, 'sessions');
+runs = spm_BIDS(BIDS, 'runs');
+tasks = spm_BIDS(BIDS, 'tasks');
+types = spm_BIDS(BIDS, 'types');
+modalities = spm_BIDS(BIDS, 'modalities');
 
 %%
 % Step 0.1: create necessary directory structure and copy required files
@@ -30,27 +30,27 @@ qc_dir = fullfile(deriv_dir, 'fmrwhy-qc');
 sub_dir_preproc = fullfile(preproc_dir, ['sub-' sub]);
 sub_dir_qc = fullfile(qc_dir, ['sub-' sub]);
 if ~exist(sub_dir_preproc, 'dir')
-    mkdir(sub_dir_preproc)
+    mkdir(sub_dir_preproc);
     sub_dir_BIDS = fullfile(bids_dir, ['sub-' sub]);
-    copyfile(sub_dir_BIDS, sub_dir_preproc)
+    copyfile(sub_dir_BIDS, sub_dir_preproc);
 end
 if ~exist(sub_dir_qc, 'dir')
-    mkdir(sub_dir)
+    mkdir(sub_dir);
 end
 
 %%
 % Step 0.2: create template functional volume nifti
-template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' num2str(template_run) '_space-individual_bold.nii'])
+template_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' num2str(template_run) '_space-individual_bold.nii']);
 
-files = spm_BIDS(BIDS,'data', 'sub', sub ,'task', template_task, 'run', num2str(template_run), 'echo', num2str(template_echo),'type','bold')
+files = spm_BIDS(BIDS, 'data', 'sub', sub, 'task', template_task, 'run', num2str(template_run), 'echo', num2str(template_echo), 'type', 'bold');
 if numel(files) ~= 1
-    warning(['Expected a cell array with a single file, founc a cell array with ' numel(files) ' files.'])
+    warning(['Expected a cell array with a single file, founc a cell array with ' numel(files) ' files.']);
 else
     functional0_fn = [files{1} ',1'];
 end
-functional0_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' num2str(template_run) '_echo-' num2str(template_echo) '_bold.nii,1'])
+functional0_fn = fullfile(sub_dir_preproc, 'func', ['sub-' sub '_task-' template_task '_run-' num2str(template_run) '_echo-' num2str(template_echo) '_bold.nii,1']);
 
-fmrwhy_util_saveNifti(template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn)
+fmrwhy_util_saveNifti(template_fn, spm_read_vols(spm_vol(functional0_fn)), functional0_fn);
 
 %%
 % Step 1: structural-functional-preproc:    - rtme_preproc_structFunc.m
@@ -71,33 +71,22 @@ fmrwhy_preproc_anatLocaliser(sub, defaults);
 
 % Step X: quality-preproc - rtme_preproc_qualityControl.m
 
-
 for t = 1:numel(defaults.tasks)
-%    disp(['Performing 3D volume realignment for: ' sub '_task-' tasks(t) '_run-' num2str(template_run)])
-    rtme_preproc_funcLocaliser(sub, task, template_run, template_echo, defaults)
+    %    disp(['Performing 3D volume realignment for: ' sub '_task-' tasks(t) '_run-' num2str(template_run)])
+    rtme_preproc_funcLocaliser(sub, task, template_run, template_echo, defaults);
 end
-
 
 % Step 4: calculate-prior-measures-preproc - rtme_preproc_estimateParams.m
 rtme_preproc_estimateParams(sub, defaults);
 
-
-
-
-
-
-
-
-
-
-%### Pre-processing: peripheral data (RUN 1)
+% ### Pre-processing: peripheral data (RUN 1)
 %
-%1. Generate RETROICOR regressors from cardiac and respiratory traces of both runs (run 2 data to be used later) - PhysIO + Matlab
+% 1. Generate RETROICOR regressors from cardiac and respiratory traces of both runs (run 2 data to be used later) - PhysIO + Matlab
 %
 %
-%### Pre-processing: functional (RUN 1)
+% ### Pre-processing: functional (RUN 1)
 %
-%1. Task region localisation (using only middle echo [TE=28ms] timeseries):
+% 1. Task region localisation (using only middle echo [TE=28ms] timeseries):
 %    1. Slice time correction
 %    2. 3D volume realignment
 %    3. Calculate framewise displacement from realignment params, select outliers using FD threshold (*which value or percentage?*)
@@ -112,7 +101,7 @@ rtme_preproc_estimateParams(sub, defaults);
 %    6. Select t-stat peak within anatomically bound mask (from anatomy toolbox ROI)
 %    7. Select N amount of voxels neighbouring peak voxel ==> ROI for real-time use
 %
-%2. T2*, S0, tSNR calculation from `run1_BOLD_rest` dataset (*is this sensible, as opposed to using RUN 1 task data?*):
+% 2. T2*, S0, tSNR calculation from `run1_BOLD_rest` dataset (*is this sensible, as opposed to using RUN 1 task data?*):
 %    1. Slice time correction on all three echo timeseries
 %    2. 3D volume realignment on middle echo timeseries
 %    3. Apply rigid body transformations from middle echo realignment parameters to echo 1 and echo 3 timeseries
@@ -126,17 +115,6 @@ rtme_preproc_estimateParams(sub, defaults);
 %        1. *How to mask?*
 %        2. Mean / stddev
 
-
-
-
-
-
-
-
-
-
-
-
 % Now, this step is executed once all settings are completed. We first
 % check if the data has been preprocessed already. If so, we just load and
 % name the variables. If not we run the standard preprocesing pipeline.
@@ -146,7 +124,7 @@ rtme_preproc_estimateParams(sub, defaults);
 % resliced grey matter segmentation image)
 if exist([d filesep 'rc1' fn ext], 'file')
     % Just load file/variable names, don't redo preprocessing
-    disp('Preprocessing already done - loading variables')
+    disp('Preprocessing already done - loading variables');
     preproc_data = struct;
     [d, fn, ext] = fileparts(structural_fn);
     preproc_data.forward_transformation = [d filesep 'y_' fn ext];
@@ -173,7 +151,7 @@ if exist([d filesep 'rc1' fn ext], 'file')
     else
         % This part was hardcoded for testing purposes, it doesnt actually
         % call the warping functionality here, which it should do. TODO
-        for roi = 1:(N_ROIs-N_RNOIs)
+        for roi = 1:(N_ROIs - N_RNOIs)
             [droi, fnroi, extroi] = fileparts(ROI_fns{roi});
             preproc_data.wROI_fns{roi} = [droi filesep 'w' fnroi extroi];
             preproc_data.rwROI_fns{roi} = [droi filesep 'rw' fnroi extroi];
@@ -191,13 +169,13 @@ else
     else
         % ROIs are in MNI space, warping and reslicing necessary
         % Warp MNI space rois to functional space,...
-        spm_normalizeWrite_jsh(preproc_data.inverse_transformation, ROI_fns(1:(end-N_RNOIs)));
-        for roi = 1:(N_ROIs-N_RNOIs)
+        spm_normalizeWrite_jsh(preproc_data.inverse_transformation, ROI_fns(1:(end - N_RNOIs)));
+        for roi = 1:(N_ROIs - N_RNOIs)
             [droi, fnroi, extroi] = fileparts(ROI_fns{roi});
             preproc_data.wROI_fns{roi} = [droi filesep 'w' fnroi extroi];
         end
         % ... then reslice
-        spm('defaults','fmri');
+        spm('defaults', 'fmri');
         spm_jobman('initcfg');
         reslice = struct;
         % Ref
@@ -211,8 +189,8 @@ else
         reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = 0;
         reslice.matlabbatch{1}.spm.spatial.coreg.write.roptions.prefix = 'r';
         % Run
-        spm_jobman('run',reslice.matlabbatch);
-        for roi = 1:(N_ROIs-N_RNOIs)
+        spm_jobman('run', reslice.matlabbatch);
+        for roi = 1:(N_ROIs - N_RNOIs)
             [droi, fnroi, extroi] = fileparts(ROI_fns{roi});
             preproc_data.rwROI_fns{roi} = [droi filesep 'rw' fnroi extroi];
         end

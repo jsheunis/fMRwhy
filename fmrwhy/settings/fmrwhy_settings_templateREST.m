@@ -26,25 +26,25 @@ options.TE = []; % assume for all functional runs
 
 % Settings for anatLocaliser processing
 options.map_rois = 0;
-%options.roi_orig_dir = '/Volumes/Stephan_WD/NEUFEPME_data_templates';
+% options.roi_orig_dir = '/Volumes/Stephan_WD/NEUFEPME_data_templates';
 options.roi_orig_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_templates';
 options.roi = struct;
 % IMPORTANT: structure has to be named using the task name as in options.tasks: options.roi.(task).orig_fn
-options.roi.motor.orig_fn = {fullfile(options.roi_orig_dir, 'Left_Motor_4a_4p.nii'),
-                                fullfile(options.roi_orig_dir, 'Right_Motor_4a_4p.nii')}; % Raw ROI filenames
+options.roi.motor.orig_fn = {fullfile(options.roi_orig_dir, 'Left_Motor_4a_4p.nii')
+                             fullfile(options.roi_orig_dir, 'Right_Motor_4a_4p.nii')}; % Raw ROI filenames
 
 options.roi.motor.name = {'Left Motor', 'Right Motor'}; % For plots and strings
 options.roi.motor.desc = {'leftMotor', 'rightMotor'}; % For BIDS file naming (after normalisation  to functional space)
 
-options.roi.emotion.orig_fn = {fullfile(options.roi_orig_dir, 'Bilateral_Amygdala_allregions.nii'),
-                                fullfile(options.roi_orig_dir, 'Left_Amygdala_allregions.nii'),
-                                fullfile(options.roi_orig_dir, 'Right_Amygdala_allregions.nii')}; % Raw ROI filenames
+options.roi.emotion.orig_fn = {fullfile(options.roi_orig_dir, 'Bilateral_Amygdala_allregions.nii')
+                               fullfile(options.roi_orig_dir, 'Left_Amygdala_allregions.nii')
+                               fullfile(options.roi_orig_dir, 'Right_Amygdala_allregions.nii')}; % Raw ROI filenames
 
 options.roi.emotion.name = {'Bilateral Amygdala', 'Left Amygdala', 'Right Amygdala'}; % For plots and strings
 options.roi.emotion.desc = {'bilateralAmygdala', 'leftAmygdala', 'rightAmygdala'}; % For BIDS file naming (after normalisation  to functional space)
 
-%options.roi.(task).roi_fn = ROIs in subject space (not resliced)
-%options.roi.(task).rroi_fn = resliced ROIs in subject space
+% options.roi.(task).roi_fn = ROIs in subject space (not resliced)
+% options.roi.(task).rroi_fn = resliced ROIs in subject space
 
 % Settings for basicFunc processing
 options.fwhm = 5;
@@ -139,7 +139,6 @@ options.firstlevel.glm_regressors.retroicor_cxr = 0; % interaction, max 4
 options.firstlevel.glm_regressors.hrv = false;
 options.firstlevel.glm_regressors.rvt = false;
 
-
 % Settings for first level analysis: task-motor
 options.firstlevel.motor.run1.contrast_params.consess{1}.tcon.name = 'FingerTapping';
 options.firstlevel.motor.run1.contrast_params.consess{1}.tcon.weights = [1];
@@ -162,6 +161,6 @@ options.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.name = 'MentalEm
 options.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.weights = [1];
 options.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.sessrep = 'none';
 
-%matlabbatch{1}.spm.stats.con.consess{2}.tcon.name = 'Patients > Control';
-%matlabbatch{1}.spm.stats.con.consess{2}.tcon.convec = [-1 1];
-%matlabbatch{1}.spm.stats.con.consess{2}.tcon.sessrep = 'none';
+% matlabbatch{1}.spm.stats.con.consess{2}.tcon.name = 'Patients > Control';
+% matlabbatch{1}.spm.stats.con.consess{2}.tcon.convec = [-1 1];
+% matlabbatch{1}.spm.stats.con.consess{2}.tcon.sessrep = 'none';
