@@ -101,6 +101,56 @@ To provide feedback, report errors, ask questions or suggest improvements, pleas
 If you have written code to solve an issue or add a feature/improvement, please fork the repository and submit a
 [pull request](https://github.com/jsheunis/fMRwhy/pulls) with the updates.
 
+
+### Code style guide and quality
+
+In most cases function names start with `fmrwhy_`.
+
+We use the [MISS_HIT linter](https://github.com/florianschanda/miss_hit/) to
+automatically enforce / fix some code style issues and check for code quality.
+
+The linter is a python package that can be installed with:
+
+```
+pip3 install -r requirements.txt
+```
+
+The rules followed by the miss_hit are in the
+[miss_hit configuration file](./miss_hit.cfg).
+
+To check the code style of the whole repository, you can can simply type:
+
+```
+mh_style .
+```
+
+Some styling issues can be automatically fixed by using the `--fix` flag. You
+might reuquire to rerun this command several times if there are a lot of issues.
+
+```
+mh_style . --fix
+```
+
+Code quality can be checked with:
+
+```
+mh_metric .
+```
+
+To see only the issues that "break" the code quality rules set in the
+configuration file, type:
+
+```
+mh_metric . --ci
+```
+
+The code style and quality is also checked during the
+[continuous integration](.github/workflows/miss_hit.yml).
+
+For more information about the miss_hit see its
+[documentation](https://florianschanda.github.io/miss_hit/).
+
+
 ## Background
 This toobox is a culmination of scripts and functions from
 [here](https://github.com/jsheunis/matlab-spm-scripts-jsh),
