@@ -150,6 +150,22 @@ The code style and quality is also checked during the
 For more information about the miss_hit see its
 [documentation](https://florianschanda.github.io/miss_hit/).
 
+### Pre-commit
+
+There is a [pre-commit hook](https://pre-commit.com/) that you can use to
+reformat files as you commit them.
+
+Install pre-commit by using our `requirements.txt` file 
+```bash
+pip install -r requirements.txt
+```
+
+Install the hook
+```bash
+pre-commit install
+```
+
+You're done. `mh_style --fix` will now be run every time you commit.
 
 ## Background
 This toobox is a culmination of scripts and functions from
