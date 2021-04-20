@@ -1,5 +1,5 @@
 bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
-sub = '001'
+sub = '001';
 ses = '';
 task = 'motor';
 run = '2';
@@ -21,26 +21,23 @@ options = fmrwhy_defaults_subAnat(bids_dir, sub, options);
 % Update workflow params with subject functional derivative filenames
 options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, options.template_echo, options);
 
-
 roi_fn = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-rleftMotor_roi.nii']);
-%anat_roi_fn{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-r' options.roi.(task).desc{1} '_roi.nii']);
-fn1 = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1_echo-2_noFWEp001e20/spmT_0001_binary_clusters.nii'
+% anat_roi_fn{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-r' options.roi.(task).desc{1} '_roi.nii']);
+fn1 = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS/derivatives/fmrwhy-stats/sub-001/task-motor_run-1_echo-2_noFWEp001e20/spmT_0001_binary_clusters.nii';
 
 output = fmrwhy_util_getBinaryOverlap({roi_fn, fn1});
 
-
-
 %
-%run_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run]);
-%consess = options.firstlevel.(task).(['run' run]).contrast_params.consess;
-%background_fn = options.rcoregest_anatomical_fn;
-%[p, frm, rg, dim] = fmrwhy_util_readOrientNifti(background_fn);
-%background_img = p.nii.img;
-%anat_roi_fn = {};
-%anat_roi_fn{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-r' options.roi.(task).desc{1} '_roi.nii']);
+% run_dir_stats = fullfile(options.sub_dir_stats, ['task-' task '_run-' run]);
+% consess = options.firstlevel.(task).(['run' run]).contrast_params.consess;
+% background_fn = options.rcoregest_anatomical_fn;
+% [p, frm, rg, dim] = fmrwhy_util_readOrientNifti(background_fn);
+% background_img = p.nii.img;
+% anat_roi_fn = {};
+% anat_roi_fn{1} = fullfile(options.anat_dir_preproc, ['sub-' sub '_space-individual_desc-r' options.roi.(task).desc{1} '_roi.nii']);
 %
 %% For each anatomical ROI:
-%for j = 1:numel(anat_roi_fn)
+% for j = 1:numel(anat_roi_fn)
 %    % Grab binary image of ROI, not yet for plotting
 %    nii = nii_tool('load', anat_roi_fn{j});
 %    anat_roi_img = fmrwhy_util_createBinaryImg(nii.img, 0.1);
@@ -79,4 +76,4 @@ output = fmrwhy_util_getBinaryOverlap({roi_fn, fn1});
 %        overlapmontage = fmrwhy_util_createStatsOverlayMontage(background_img, [], plot_overlap_img, 9, 1, '', 'gray', 'off', 'max', [], [], roi_rgbcolors, false, saveAs_fn);
 %
 %    end
-%end
+% end

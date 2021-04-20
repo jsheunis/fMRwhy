@@ -11,10 +11,6 @@
 %   -
 %   -
 
-
-
-
-
 % -----------------
 % -----------------
 % ISSUES TO ADDRESS
@@ -44,13 +40,11 @@
 % https://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=SPM;eb275f02.1908:
 %   - says spm.mat reflects sform rows, which spm gives precedence to. Look at spm.private.mat0 for qform.
 
-
 % Important note 21 March 2020:
 % nii = nifti(func_fn) gives the same info as func_spm.private; e.g. nii.hdr = func_spm.private.hdr.
 
 % Issue where qform and sform codes change after creating template 3d image from 4d timeseries:
 % https://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=ind1808&L=SPM&P=R42327&K=2&X=E96B8262A335059C28&Y=j.s.heunis%40tue.nl
-
 
 % func_spm.private:
 % NIFTI object: 1-by-1
@@ -62,7 +56,6 @@
 %         timing: [1×1 struct]
 %        descrip: 'Template functional volume'
 % Stephan interpretation: mat0 = qform rows; intent = code.
-
 
 % IMPORTANT: Decision on 23 March 2020: use code from https://github.com/xiangruili/dicm2nii in fmrwhy_util_readOrientNifti:
 % This reorients the nifti image in voxel space such that it is RAS+. For imagesc, this image then has to be
@@ -101,14 +94,11 @@
 % 2 - TODO: check unused functions
 % 2 - TODO: check fmrwhy_util_readNifti (shouldn'' be used anymore)
 
-
-
 % ---------------------------------------
 % 2. HOW DEPENDENCIES ARE HANDLED
 % ---------------------------------------
 
 % e.g. currently have dependencies folder with dicm2nii, while physio is not included
-
 
 % ---------------------------------------
 % 3. HTML REPORTS
@@ -125,14 +115,12 @@
 % - Core functions are faster. See where/if it makes sense to replace current batch functionality.
 % - E.g. slice_timing for real-time processing. Can we change spm function to make it faster?
 
-
 % ---------------------------------------
 % 5. FMRWHY DEFAULT FILENAMES AND HOW THEY ARE INITIALISED
 % ---------------------------------------
 
 % - The current setup with calling each function at the beginning of many functions is a but sluggish
 % - Specifically look at where motion_fn is used to see if it is initialised correctly each time (wrt template echo)
-
 
 % ---------------------------------------
 % 6. MULTI-ECHO STANDARD WORKFLOWS / PIPELINES
@@ -142,14 +130,12 @@
 % a copy of fmwrhy_preproc_basicFunc, excluding smoothing and generating multiple regressors. This is also very similar to
 % fmrwhy_preproc_ME. TODO: decide how to structure these funcitons/workflows, and which ones to include/exclude
 
-
 % ---------------------------
 % ---------------------------
 % INSTRUCTIONS FOR EVENTUAL USE
 % ---------------------------
 % ---------------------------
 % 1. Make sure to run tapas_physio_init() before using any PhysIO-matlab batch functionality
-
 
 % -------------------
 % -------------------
@@ -172,12 +158,9 @@
 % 4.  inv(X'X)X'Y = b_hat
 % 5. b_hat = estimate of b = same as least squares estimate
 % In Matlab:
-%Y = Xb + e
-%b_hat = pinv(X)*Y
-%Y_hat = Y - X*b_hat
-
-
-
+% Y = Xb + e
+% b_hat = pinv(X)*Y
+% Y_hat = Y - X*b_hat
 
 % FORMULA FOR ESTIMATING T2star AND SO:
 
@@ -196,11 +179,3 @@
 
 % b_hat = pinv(X)*Y ==> [log(S0)] = pinv([1 - TE]) * [log(S(TE))]
 %                       [R2star ]
-
-
-
-
-
-
-
-

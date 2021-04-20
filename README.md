@@ -101,6 +101,71 @@ To provide feedback, report errors, ask questions or suggest improvements, pleas
 If you have written code to solve an issue or add a feature/improvement, please fork the repository and submit a
 [pull request](https://github.com/jsheunis/fMRwhy/pulls) with the updates.
 
+
+### Code style guide and quality
+
+We use the [MISS_HIT linter](https://github.com/florianschanda/miss_hit/) to
+automatically detect programming and stylistic errors, to enforce styling and other rules, and to check for code quality.
+
+The linter is a Python package, which means that we use Python to check on MATLAB :smile:. This also implies that you need a local Python environment set up in order to make use of the linter. Once your Python environment is ready, MISS_HIT can be installed with:
+
+```
+pip3 install -r requirements.txt
+```
+
+where the `requirements.txt` file is located in the `fMRwhy` root directory.
+
+The rules followed by the MISS_HIT are already specified in the
+[MISS_HIT configuration file](./miss_hit.cfg).
+
+To check the code style of the whole repository, you can can simply type the following in the root directory:
+
+```
+mh_style .
+```
+
+Some styling issues can be automatically fixed by using the `--fix` flag. You
+might be required to rerun this command several times if multiple issues are flagged.
+
+```
+mh_style . --fix
+```
+
+Code quality can be checked with:
+
+```
+mh_metric .
+```
+
+To see only the issues that "break" the code quality rules (also specified in the
+configuration file) type:
+
+```
+mh_metric . --ci
+```
+
+Note that you do not have to have this linter installed locally in order for your contributions to be checked. The code style and quality are also checked during the
+[continuous integration](.github/workflows/miss_hit.yml) process, which runs automatically on all pushes to the `master` branch and on pull requests to all branches.
+
+For more information about MISS_HIT, please refer to its
+[documentation](https://florianschanda.github.io/miss_hit/).
+
+### Pre-commit
+
+Analogous to the continuous integration process running on GitHub, you can also automatically run the MISS_HIT linter on your local commits. We use [pre-commit hook](https://pre-commit.com/) for this purpose, because it can reformat files as you commit them locally.
+
+As with MISS_HIT, pre-commit is a Python package and needs to be installed in your local Python development environment. As with MISS_HIT, you can install pre-commit by using our `requirements.txt` file 
+```bash
+pip install -r requirements.txt
+```
+
+Then, install the hook:
+```bash
+pre-commit install
+```
+
+You're done. Now, `mh_style --fix` will run every time you commit a local change.
+
 ## Background
 This toobox is a culmination of scripts and functions from
 [here](https://github.com/jsheunis/matlab-spm-scripts-jsh),

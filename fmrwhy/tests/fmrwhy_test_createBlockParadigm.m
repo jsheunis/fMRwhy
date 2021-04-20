@@ -1,7 +1,6 @@
 % A custom workflow that does ...
 
-
-%--------------------------------------------------------------------------
+% --------------------------------------------------------------------------
 
 % Load/create required parameters
 bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
@@ -25,17 +24,15 @@ durations = cond(1).duration;
 precision = 0.01;
 Nvol = 210;
 
-
-
 [task_time_course, convolved_ttc, hrf] = fmrwhy_util_createBlockParadigm(Nvol, TR, onsets, durations, precision, timing_units);
 
-
 figure;
-ax = subplot(2,1,1);
-im_task = imagesc(ax, task_time_course'); colormap(gray);
-xlim(ax,[0 Nvol*TR/precision]);
-ylim(ax,[0.5 1.55]);
+ax = subplot(2, 1, 1);
+im_task = imagesc(ax, task_time_course');
+colormap(gray);
+xlim(ax, [0 Nvol * TR / precision]);
+ylim(ax, [0.5 1.55]);
 
-ax2 = subplot(2,1,2);
+ax2 = subplot(2, 1, 2);
 plot(convolved_ttc);
-xlim(ax2,[0 Nvol*TR/precision]);
+xlim(ax2, [0 Nvol * TR / precision]);

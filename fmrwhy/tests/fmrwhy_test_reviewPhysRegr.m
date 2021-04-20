@@ -25,7 +25,6 @@ echo = '2';
 %% Update workflow params with subject functional derivative filenames
 options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
 
-
 include_physio = true;
 % -------
 % STEP 3: Physiological regressors (Retroicor, HRV, RVT)
@@ -44,14 +43,14 @@ if include_physio
     % Run PhysIO if required
     [d, f, e] = fileparts(options.physio_regr_fn);
     if ~exist(options.physio_regr_fn, 'file')
-        disp('Physio regressors not calculated yet. Calculating now.')
+        disp('Physio regressors not calculated yet. Calculating now.');
         % Run batch process without generating figures (batch calls `tapas_physio_main_create_regressors`)
         phys_data = fmrwhy_batch_PhysIO(physio_options);
         temp_txt_fn = fullfile(d, [f '.txt']);
-        col_names = {'retroicor_c1','retroicor_c2','retroicor_c3','retroicor_c4','retroicor_c5','retroicor_c6','retroicor_r1','retroicor_r2','retroicor_r3','retroicor_r4','retroicor_r5','retroicor_r6','retroicor_r7','retroicor_r8','retroicor_cxr1','retroicor_cxr2','retroicor_cxr3','retroicor_cxr4','hrv','rvt'};
+        col_names = {'retroicor_c1', 'retroicor_c2', 'retroicor_c3', 'retroicor_c4', 'retroicor_c5', 'retroicor_c6', 'retroicor_r1', 'retroicor_r2', 'retroicor_r3', 'retroicor_r4', 'retroicor_r5', 'retroicor_r6', 'retroicor_r7', 'retroicor_r8', 'retroicor_cxr1', 'retroicor_cxr2', 'retroicor_cxr3', 'retroicor_cxr4', 'hrv', 'rvt'};
         data = load(phys_data.multiple_regressors_fn);
-        data_table = array2table(data,'VariableNames', col_names);
-        writetable(data_table, temp_txt_fn, 'Delimiter','\t');
+        data_table = array2table(data, 'VariableNames', col_names);
+        writetable(data_table, temp_txt_fn, 'Delimiter', '\t');
         [status, msg, msgID] = movefile(temp_txt_fn, options.physio_regr_fn);
         % Generate figures (by calling `tapas_physio_review` with updated physio options)
         phys_file = fullfile(physio_options.save_dir, 'physio.mat');
@@ -65,11 +64,10 @@ if include_physio
         phys_data_figures = tapas_physio_review(physmat.physio);
 
     else
-        disp('Physio regressors previously calculated. Loading now.')
+        disp('Physio regressors previously calculated. Loading now.');
         phys_data.physio_regr = struct2array(tdfread(options.physio_regr_fn));
     end
 end
-
 
 % TAPAS
 %% Run PhysIO if required

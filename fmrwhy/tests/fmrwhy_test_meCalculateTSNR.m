@@ -32,7 +32,6 @@ tasks = {'rest', 'motor', 'emotion'};
 runs = {'1', '2'};
 echo = '2';
 
-
 for t = 1:numel(tasks)
 
     task = tasks{t};
@@ -41,21 +40,20 @@ for t = 1:numel(tasks)
         run = runs{r};
 
         if strcmp(task, 'rest') == 1 && strcmp(run, '1') == 1
-            disp('------------')
-            disp(['... Skipping Task: ' task ';  Run: ' run ' ...'])
-            disp('------------')
-            continue;
+            disp('------------');
+            disp(['... Skipping Task: ' task ';  Run: ' run ' ...']);
+            disp('------------');
+            continue
         end
 
-        disp('------------')
-        disp('------------')
-        disp(['Task: ' task ';  Run: ' run])
-        disp('------------')
-        disp('------------')
+        disp('------------');
+        disp('------------');
+        disp(['Task: ' task ';  Run: ' run]);
+        disp('------------');
+        disp('------------');
 
         % Filenames
         options = fmrwhy_defaults_subFunc(bids_dir, sub, ses, task, run, echo, options);
-
 
         % Calculate tSNR for each timeseries
         rafunctional_fn = fullfile(options.func_dir_preproc, ['sub-' sub '_task-' task '_run-' run '_echo-2_desc-rapreproc_bold.nii']);
@@ -66,7 +64,7 @@ for t = 1:numel(tasks)
         tsnr_fns = {};
         tsnr_output = {};
         for i = 1:numel(main_fns)
-            tsnr_fns{i} = strrep(main_fns{i}, 'bold', 'tsnr')
+            tsnr_fns{i} = strrep(main_fns{i}, 'bold', 'tsnr');
             tsnr_output{i} = fmrwhy_util_calculateTSNR(main_fns{i}, mask_fn, tsnr_fns{i}, template_fn);
         end
     end

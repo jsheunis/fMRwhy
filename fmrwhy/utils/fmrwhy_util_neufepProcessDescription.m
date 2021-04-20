@@ -33,7 +33,6 @@
 % 6. Motor2
 % 7. Emotion2
 
-
 % ------------------------ %
 % ------------------------ %
 % STEP 0: Data preparation %
@@ -41,7 +40,6 @@
 % ------------------------ %
 
 % 1. Define template functional run, volume and echo
-
 
 % ----------------------------------- %
 % ----------------------------------- %
@@ -78,7 +76,6 @@
 %   - Left_Motor_4a_4p.nii
 %   - Right_Motor_4a_4p.nii
 % - consider splitting off ROI functionality into separate workflow step (i.e. not included in basicStruct)
-
 
 % ---------------------------------- %
 % ---------------------------------- %
@@ -130,8 +127,6 @@
 %   - FD and censoring: calculate using different radii and censor thresholds
 %   - PhysIO: use cardiac (3rd order, 6 terms), respiratory (4th order, 8 terms), interaction (4 terms), hrv and rvt regressors (as current)
 
-
-
 % ----------------------------------- %
 % ----------------------------------- %
 % STEP 3: QC: anatomical + functional %
@@ -162,8 +157,6 @@
 % - How to define exclusion criteria based on QC outputs? FD? DVARS
 % - Stil need to incorporate DVARS, stdDVARS, GCOR, (what else)?
 % - Which timeseries should be used for calculating statistical measures like tSNR, etc?
-
-
 
 % -------------------------------------- %
 % -------------------------------------- %
@@ -209,8 +202,6 @@
 % - need an intuitive way to automate generation of task design and contrast from defaults to GLM
 % - need an intuitive way of including/excluding nuisance regressors in task-specific analysis workflow
 
-
-
 % ---------------------------------------- %
 % ---------------------------------------- %
 % STEP x: Combine localisations and select %
@@ -222,9 +213,6 @@
 
 %   - Select t-stat peak within anatomically bound mask (from anatomy toolbox ROI)
 %   - Select N amount of voxels neighbouring peak voxel ==> ROI for real-time use
-
-
-
 
 % ------------------------------------------ %
 % ------------------------------------------ %
@@ -249,7 +237,6 @@
 %         1. *How to mask?*
 %         2. Which timeseries to use?
 %         3. Mean / stddev
-
 
 % ------------------------------------------ %
 % ------------------------------------------ %
@@ -286,14 +273,6 @@
 %    -
 % (10. tStats comparison)
 % REMEMBER BRAIN FLIP ISSUES
-
-
-
-
-
-
-
-
 
 % ------------------------------------------ %
 % ------------------------------------------ %

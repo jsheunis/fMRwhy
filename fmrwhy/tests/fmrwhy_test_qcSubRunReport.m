@@ -1,4 +1,3 @@
-
 options = fmrwhy_defaults;
 % Main input: BIDS root folder
 bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
@@ -6,7 +5,6 @@ bids_dir = '/Users/jheunis/Desktop/sample-data/NEUFEPME_data_BIDS';
 sub = '001';
 % Loop through sessions, tasks, runs, etc
 ses = '';
-
 
 % Setup fmrwhy BIDS-derivatuve directories on workflow level
 options = fmrwhy_defaults_setupDerivDirs(bids_dir, options);
@@ -37,7 +35,6 @@ for t = 1:numel(tasks)
         run = runs{r};
         % Update workflow params with subject functional derivative filenames
         options = fmrwhy_defaults_subFunc(bids_dir, sub, '', task, run, echo, options);
-        fmrwhy_qc_generateSubRunReport(bids_dir, sub, task, run, options)
+        fmrwhy_qc_generateSubRunReport(bids_dir, sub, task, run, options);
     end
 end
-
