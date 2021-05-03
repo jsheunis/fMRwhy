@@ -27,15 +27,14 @@ function fmrwhy_batch_realignEstResl(functional_fn, template_fn, saveAs_fn, vara
     template_fn = params.template_fn;
     saveAs_fn = params.saveAs_fn;
 
-    % -------------------
-    % Set up functional_fn
-    % -------------------
+    % ------------------------------------------
+    % Set up functional filenames for processing
+    % ------------------------------------------
 
     % Could be a single filename, or cell array of filenames
     if iscell(functional_fn)
         N_runs = numel(functional_fn);
         func_files = functional_fn;
-
         if ~iscell(saveAs_fn) || numel(saveAs_fn)~=N_runs
             % Add error message TODO
             disp('Error: saveAs_fn should have the same data type and number of indices as functional_fn')
@@ -45,6 +44,7 @@ function fmrwhy_batch_realignEstResl(functional_fn, template_fn, saveAs_fn, vara
         fn_charstring = true;
         N_runs = 1;
         func_files = {functional_fn};
+        saveAs_fn = {saveAs_fn}; % TODO first test if the save fn is also a single string/chararray
     else
         % Add error message TODO
         disp('Error: functional file input is not cell array, nor char/string')
@@ -86,21 +86,30 @@ function fmrwhy_batch_realignEstResl(functional_fn, template_fn, saveAs_fn, vara
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = params.quality;
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.sep = params.sep;
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.fwhm = params.fwhm;
-    realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.rtm = params.rtm; % register to first
+    realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.rtm = params.rtm; % Default = register to first
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.interp = params.einterp;
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.wrap = params.ewrap;
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.weight = params.weight;
     % Roptions
-    realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.roptions.which = params.which; % images [2..n]
+    realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.roptions.which = params.which; % Refault = images [2..n]
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.roptions.interp = params.rinterp;
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.roptions.wrap = params.rwrap;
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.roptions.mask = params.mask;
     realign_estimate_reslice.matlabbatch{1}.spm.spatial.realign.estwrite.roptions.prefix = params.prefix;
-    % Run
+
+    % -------------------
+    % Run SPM12 job
+    % -------------------
     spm_jobman('run', realign_estimate_reslice.matlabbatch);
-    % Output
+    
+    % -------------
+    % Format output
+    % -------------
     output = struct;
-    [d, f, e] = fileparts(temp_functional_fn);
-    rtemp_functional_fn = fullfile(d, ['r' f e]);
-    [status, msg, msgID] = movefile(rtemp_functional_fn, saveAs_fn);
-    delete(temp_functional_fn);
+    for r = 1:N_runs
+        [d, f, e] = fileparts(temp_functional_fn{r});
+        rtemp_functional_fn = fullfile(d, ['r' f e]);
+        [status, msg, msgID] = movefile(rtemp_functional_fn, saveAs_fn{r});
+        delete(temp_functional_fn{r});
+    end
+    
