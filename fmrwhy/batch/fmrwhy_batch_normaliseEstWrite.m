@@ -45,8 +45,8 @@ function fmrwhy_batch_normaliseEstWrite(reference_fn, toTransform_fns, tpm_fn, s
     spm_jobman('run', normalize_estwrite.matlabbatch);
 
     % Save resliced filenames
-    for i = 1:numel(toTransform_fns)
-        [d, fn, ext] = fileparts(toTransform_fns{i});
+    for i = 1:numel(temp_fn)
+        [d, fn, ext] = fileparts(temp_fn{i});
         wfn = fullfile(d, ['w' fn ext]);
         [status, msg, msgID] = movefile(wfn, saveAs_fns{i});
     end
