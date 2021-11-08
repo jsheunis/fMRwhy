@@ -20,7 +20,7 @@ function options = fmrwhy_util_checkDependencies(options)
     bidsmatlab_url = 'https://github.com/bids-standard/bids-matlab';
     dicm2nii_url = 'https://github.com/jsheunis/dicm2nii/releases/tag/v0.2';
     tapasphysio_url = 'https://github.com/translationalneuromodeling/tapas/releases/tag/v4.0.0';
-    raincoud_url = 'https://github.com/RainCloudPlots/RainCloudPlots/releases/tag/v1.1';
+    raincloud_url = 'https://github.com/RainCloudPlots/RainCloudPlots/releases/tag/v1.1';
 
     % Check and add SPM path
     spm_installed = exist('spm');

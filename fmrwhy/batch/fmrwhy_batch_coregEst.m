@@ -24,4 +24,3 @@ function fmrwhy_batch_coregEst(anatomical_fn, template_fn, saveAs_fn)
     % Run
     spm_jobman('run', coreg_estimate.matlabbatch);
     [status, msg, msgID] = movefile(temp_anatomical_fn, saveAs_fn);
-    delete(temp_anatomical_fn);
