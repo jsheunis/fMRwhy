@@ -1,15 +1,32 @@
-function options = fmrwhy_bids_getAnatDerivs(bids_dir, sub, options)
+function options = fmrwhy_bids_getAnatDerivs(bids_dir, sub, options, varargin)
 
-    if isempty(options)
-        options = fmrwhy_bids_setupQcSubDirs(bids_dir, sub, options);
+    % minimal required arguments:
+    %  - positional arguments
+    %  - options.preproc_dir
+    %  - options.qc_dir
+
+    filetypes = {'anat'};
+    descriptions = {'Session', 'Acquisition', 'Reconstruction', 'Run', 'Description'};
+    entities = {'ses', 'acq', 'rec', 'run', 'desc'}; % these entities are optional for anat data
+    formats = {'label', 'label', 'label', 'index', 'label'};
+
+    validChar = @(x) ischar(x);
+    validType = @(x) any(validatestring(x, filetypes));
+
+    p = inputParser;
+    addRequired(p, 'bids_dir', validChar);
+    addRequired(p, 'sub', validChar);
+    addRequired(p, 'options');
+    for i = 1:numel(entities)
+        addParameter(p, entities{i}, '', validChar);
     end
+    parse(p, bids_dir, sub, options, varargin{:});
+    params = p.Results;
+    options = params.options;
 
     % T1w filename
-    if isempty(options.anat_template_session)
-        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ext', '_T1w.nii');
-    else
-        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
-    end
+    [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', params.sub, 'ses', params.ses, 'ext', '_T1w.nii');
+
     options.anatomical_fn = fullfile(options.preproc_dir, filepath, filename);
     % Outputs after coregistering T1w image
     options.coregest_anatomical_fn = fullfile(options.preproc_dir, filepath, fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', 'coregEst', 'ext', '_T1w.nii'));
@@ -41,7 +58,7 @@ function options = fmrwhy_bids_getAnatDerivs(bids_dir, sub, options)
     options.brain_mask_fn = fullfile(options.preproc_dir, filepath, fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', 'brain', 'ext', '_mask.nii'));
     options.mask_fns = {options.gm_mask_fn, options.wm_mask_fn, options.csf_mask_fn, options.brain_mask_fn};
     % Outputs after anatomical localisation
-    if options.map_rois == 1
+    if isfield(options, 'map_rois') && options.map_rois == 1
         for i = 1:numel(options.tasks)
             % Ignore the 'rest' task (assume there is no task ROI for this; have to change in future if RSnetworks available to be normalised or something)
             if strcmp(options.tasks{i}, 'rest') ~= 1

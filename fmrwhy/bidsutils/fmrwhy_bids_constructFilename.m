@@ -1,5 +1,6 @@
 function [filename, filepath] = fmrwhy_bids_constructFilename(filetype, varargin)
-    % BIDS 1.4.0 - This does not yet take into account whether an entity is OPTIONAL or REQUIRED for a specific file modality/type (e.g. 'func', 'anat', 'meg', etc). It assumes all parameters are optional and just constructs the filename given the input also, file extension is passed as parameter ==> should be automatically determined from file modality/type
+    % BIDS 1.4.0 - This does not yet take into account whether an entity is OPTIONAL or REQUIRED for a specific file modality/type (e.g. 'func', 'anat', 'meg', etc).
+    % It assumes all parameters are optional and just constructs the filename given the input also, file extension is passed as parameter ==> should be automatically determined from file modality/type
     %
     % :param filetype: something x
     % :param varargin: something y

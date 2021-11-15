@@ -1,5 +1,10 @@
 function options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, varargin)
 
+    % minimal required arguments:
+    %  - positional arguments
+    %  - options.preproc_dir
+    %  - options.qc_dir
+    
     % -------------
     % Parse inputs
     % -------------
