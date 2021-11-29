@@ -162,7 +162,7 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
             disp(['Calculating tissue compartment signal averages: ' options.tissue_regr_fn]);
             disp('---');
             % Get anatomical tissue compartment masks in individual functional space
-            masks = fmrwhy_util_loadMasks(bids_dir, sub, options);
+            masks = fmrwhy_util_loadMasks(bids_dir, sub, options, 'ses', params.ses, 'task', task);
             % Get timeseries data from realigned (and slice time corrected, if done)
             if options.include_stc
                 nii = nii_tool('load', options.rafunctional_fn);

@@ -1,4 +1,4 @@
-function masks = fmrwhy_util_loadMasks(bids_dir, sub, options)
+function masks = fmrwhy_util_loadMasks(bids_dir, sub, options, varargin)
     % Load data for masks that were already calculated;
     % assumes standard fmrwhy-preproc directory structure
     % assumes fmrwhy_preproc_structFunc.m has been run successfully
@@ -6,10 +6,27 @@ function masks = fmrwhy_util_loadMasks(bids_dir, sub, options)
     % This function loads mask data (using nii_tools from dicm2nii) purely for calculation purposes, NOT FOR PLOTTING.
     % If plotting is required, use fmrwhy_util_loadOrientMasks, which includes reorientation for RAS+ display.
 
+    descriptions = {'Session', 'Acquisition', 'Reconstruction', 'Run', 'Description', 'Task'};
+    entities = {'ses', 'acq', 'rec', 'run', 'desc', 'task'}; % these entities are optional for anat data
+    formats = {'label', 'label', 'label', 'index', 'label', 'label'};
+
+    validChar = @(x) ischar(x);
+
+    p = inputParser;
+    addRequired(p, 'bids_dir', validChar);
+    addRequired(p, 'sub', validChar);
+    addRequired(p, 'options');
+    for i = 1:numel(entities)
+        addParameter(p, entities{i}, '', validChar);
+    end
+    parse(p, bids_dir, sub, options, varargin{:});
+    params = p.Results;
+    options = params.options;
+
     if isempty(options.anat_template_session)
-        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ext', '_T1w.nii');
+        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', params.ses, 'task', params.task, 'ext', '_T1w.nii');
     else
-        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
+        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'task', params.task, 'ext', '_T1w.nii');
     end
 
     masks = struct;
