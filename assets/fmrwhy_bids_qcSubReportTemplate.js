@@ -60,11 +60,14 @@ function setupReportStructure() {
   // Create options for sessionselector
   var sel = document.getElementById('sessionselector');
   bids_dataset['report_sestasks'].forEach(function(txt, index) {
+    if (txt.indexOf('rest') >= 0 ) {
+      return;
+    }
     var opt = document.createElement('option');
     // create text node to add to option element (opt)
     opt.appendChild(document.createTextNode(txt) );
     // set value property of opt
-    opt.value = allrunsKeys[txt]; 
+    opt.value = txt;
     // add opt to end of select box (sel)
     sel.appendChild(opt);
   });
@@ -198,7 +201,7 @@ $(document).ready(function() {
     };
     // sub-mcc000701_ses-w01lab_task-snat_space-individual_desc-brain_mask_montage
 
-    var sestask = $(this).val();
+    var sestask = $('#sessionselector :selected').text();
     var s = sestask.indexOf('ses-');
     if (s >= 0) {
       session = sestask.slice(s+4).split('_')[0];
