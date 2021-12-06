@@ -14,6 +14,47 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
     % .. seealso:: This workflow is called by :func:`fmrwhy_workflow_qc`
 
     % ------------------------------------
+    % STEP 0 -- Get BIDS info
+    % ------------------------------------
+    qc_report_runs = {};
+    qc_report_sestasks = {};
+    BIDS = bids.layout(options.bids_dir);
+    sessions = bids.query(BIDS, 'sessions', 'sub', sub);
+    if ~isempty(sessions)
+        for s = 1:numel(sessions)
+            ses = sessions{s};
+            tasks = bids.query(BIDS, 'tasks', 'sub', sub, 'ses', ses);
+            % tasks should not be empty
+            for t = 1:numel(tasks)
+                task = tasks{t};
+                qc_report_sestasks = [qc_report_sestasks {['ses-' ses '_task-' task]}];
+                runs = bids.query(BIDS, 'runs', 'sub', sub, 'ses', ses, 'task', task);
+                for r = 1:numel(runs)
+                    rn = runs{r};
+                    run_name = ['ses-' ses '_task-' task '_run-' rn];
+                    qc_report_runs = [qc_report_runs {run_name}];
+                end
+            end
+        end
+    else
+        tasks = bids.query(BIDS, 'tasks', 'sub', sub);
+        % tasks should not be empty
+        for t = 1:numel(tasks)
+            task = tasks{t};
+            runs = bids.query(BIDS, 'runs', 'sub', sub, 'ses', ses, 'task', task);
+            for r = 1:numel(runs)
+                rn = runs{r};
+                run_name = ['task-' task '_run-' rn];
+                qc_report_runs = [qc_report_runs {run_name}];
+            end
+        end
+    end
+    options.qc_report_runs = qc_report_runs;
+    options.qc_report_sestasks = qc_report_sestasks;
+    
+    
+
+    % ------------------------------------
     % STEP 1 -- Load default filenames etc
     % ------------------------------------
 
@@ -76,6 +117,10 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
     report.param_func_acq = options.qc_func_acq;
     report.param_func_runs = options.qc_func_runs;
     report.param_first_run = options.qc_report_runs{1};
+    report.param_first_sestask = '';
+    if ~isempty(options.qc_report_sestasks)
+        report.param_first_sestask = options.qc_report_sestasks{1};
+    end
 
     % Populate bids_dataset structure with existing variables
     bids_dataset.sub = ['sub-' sub];
@@ -100,17 +145,29 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
     end
     bids_dataset.physio_str = '_physioQC_03.jpg';
 
-    % Anatomical montage image locations - all anatomical QC outputs should be located in the 'anat' dir (in QC derivatives) of the template session; if no sessions ==> template session is the main 'anat' dir
-    [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
 
-    brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_brain_mask_montage.png']);
-    gm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_GM_mask_montage.png']);
-    wm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_WM_mask_montage.png']);
-    csf_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_CSF_mask_montage.png']);
-    report.param_brain_mask = fullfile('img', ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
-    report.param_gm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
-    report.param_wm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
-    report.param_csf_mask = fullfile('img', ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
+    % Copy all PNG files recursively to report image directory
+    sub_qc_dir = fullfile(options.qc_dir, ['sub-' sub]);
+    png_list = dir(fullfile(sub_qc_dir, '**/*.png'));  % get list of png files and folders in all subfolder
+    png_list = png_list(~[png_list.isdir]);  %remove folders from list
+
+    for i = 1:numel(png_list)
+        % If sessions exist
+        fn = fullfile(png_list(i).folder, png_list(i).name);
+        to_fn = fullfile(report_img_dir, png_list(i).name);
+        copyfile(fn, to_fn);
+    end
+
+    % [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ext', '_T1w.nii');
+    % Anatomical montage image locations - all anatomical QC outputs should be located in the 'anat' dir (in QC derivatives) of the template session; if no sessions ==> template session is the main 'anat' dir
+    % brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_brain_mask_montage.png']);
+    % gm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_GM_mask_montage.png']);
+    % wm_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_WM_mask_montage.png']);
+    % csf_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_CSF_mask_montage.png']);
+    % report.param_brain_mask = fullfile('img', ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
+    % report.param_gm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
+    % report.param_wm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
+    % report.param_csf_mask = fullfile('img', ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
 
     % TODO: this is the intended code for the correct version of the report, the code above is used for rt-me-fMRI dataset (beta version, v0.0.1)
     % brain_mask = fullfile(options.qc_dir, filepath, ['sub-' sub '_space-individual_desc-brain_mask_montage.png']);
@@ -121,10 +178,10 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
     % report.param_gm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-GM_mask_montage.png']);
     % report.param_wm_mask = fullfile('img', ['sub-' sub '_space-individual_desc-WM_mask_montage.png']);
     % report.param_csf_mask = fullfile('img', ['sub-' sub '_space-individual_desc-CSF_mask_montage.png']);
-    copyfile(brain_mask, fullfile(report_dir, report.param_brain_mask));
-    copyfile(gm_mask, fullfile(report_dir, report.param_gm_mask));
-    copyfile(wm_mask, fullfile(report_dir, report.param_wm_mask));
-    copyfile(csf_mask, fullfile(report_dir, report.param_csf_mask));
+    % copyfile(brain_mask, fullfile(report_dir, report.param_brain_mask));
+    % copyfile(gm_mask, fullfile(report_dir, report.param_gm_mask));
+    % copyfile(wm_mask, fullfile(report_dir, report.param_wm_mask));
+    % copyfile(csf_mask, fullfile(report_dir, report.param_csf_mask));
 
     % ROI montage image locations - not working yet
     if options.map_rois
@@ -151,15 +208,26 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
 
     % Stats summary data for each specific functional run, specified in settings file
     bids_dataset.report_runs = options.qc_report_runs;
+    bids_dataset.report_sestasks = options.qc_report_sestasks;
     tasks_runs = options.qc_report_runs;
     bids_dataset.all_runs_stats = cell(1, numel(tasks_runs));
-    [func_filename, func_filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'task', options.template_task, 'run', options.template_run, 'space', 'individual', 'ext', '_bold.nii');
+    % [func_filename, func_filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', 'task', options.template_task, 'run', options.template_run, 'space', 'individual', 'ext', '_bold.nii');
     for i = 1:numel(tasks_runs)
+        if contains(tasks_runs{i}, 'ses-')
+            ses_arr = extractBetween(tasks_runs{i},'ses-','_');
+            ses = ses_arr{1};
+            f_path_qc = fullfile(options.qc_dir, ['sub-' sub], ['ses-' ses], 'func')
+            f_path_preproc = fullfile(options.preproc_dir, ['sub-' sub], ['ses-' ses], 'func')
+        else
+            f_path_qc = fullfile(options.qc_dir, ['sub-' sub], 'func')
+            f_path_preproc = fullfile(options.preproc_dir, ['sub-' sub], 'func')
+            
+        end
 
         % write summary metrics
-        stats_summary_fn = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-stats_summary.tsv']);
+        stats_summary_fn = fullfile(f_path_qc, ['sub-' sub '_' tasks_runs{i} '_desc-stats_summary.tsv']);
         stats = tdfread(stats_summary_fn);
-        framewise_displacement_fn = fullfile(options.preproc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-confounds_fd.tsv']);
+        framewise_displacement_fn = fullfile(f_path_preproc, ['sub-' sub '_' tasks_runs{i} '_desc-confounds_fd.tsv']);
         fd = tdfread(framewise_displacement_fn);
 
         bids_dataset.all_runs_stats{i}.mean_fd = sprintf('%0.2f', mean(fd.framewise_displacement));
@@ -173,39 +241,43 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
         bids_dataset.all_runs_stats{i}.tsnr_csf = sprintf('%0.2f', stats.tSNR_mean_CSF);
         bids_dataset.all_runs_stats{i}.tsnr_brain = sprintf('%0.2f', stats.tSNR_mean_brain);
 
-        % copy functional qc images
-        to_copy.mean_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_mean.png']);
-        to_copy.tsnr_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_tsnr.png']);
-        to_copy.var_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_var.png']);
-        to_copy.std_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_std.png']);
-        % Functional timeseries image locations
-        if options.is_multiecho
-            to_copy.rograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-RO_grayplot.png']);
-            to_copy.gsograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-GSO_grayplot.png']);
-        else
-            to_copy.rograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-RO_grayplot.png']);
-            to_copy.gsograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-GSO_grayplot.png']);
-        end
+        % % copy functional qc images
+        % to_copy.mean_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_mean.png']);
+        % to_copy.tsnr_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_tsnr.png']);
+        % to_copy.var_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_var.png']);
+        % to_copy.std_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_space-individual_std.png']);
+        % % Functional timeseries image locations
+        % if options.is_multiecho
+        %     to_copy.rograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-RO_grayplot.png']);
+        %     to_copy.gsograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-GSO_grayplot.png']);
+        % else
+        %     to_copy.rograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-RO_grayplot.png']);
+        %     to_copy.gsograyplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_desc-GSO_grayplot.png']);
+        % end
 
-        % TODO: this is hardcoded for this study, need to generalise it
-        if options.map_rois
-            to_copy.leftMotorgrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-leftMotor_grayplot.png']);
-            to_copy.rightMotorgrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-rightMotor_grayplot.png']);
-            to_copy.leftAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-leftAmygdala_grayplot.png']);
-            to_copy.rightAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-rightAmygdala_grayplot.png']);
-            to_copy.biAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-bilateralAmygdala_grayplot.png']);
-        end
-        % PhysIO QC image locations
-        to_copy.physioqc_img = fullfile(options.qc_dir, func_filepath, ['PhysIO_' tasks_runs{i}], ['sub-' sub '_' tasks_runs{i} '_physioQC_03.jpg']);
+        % % TODO: this is hardcoded for this study, need to generalise it
+        % if options.map_rois
+        %     to_copy.leftMotorgrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-leftMotor_grayplot.png']);
+        %     to_copy.rightMotorgrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-rightMotor_grayplot.png']);
+        %     to_copy.leftAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-leftAmygdala_grayplot.png']);
+        %     to_copy.rightAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-rightAmygdala_grayplot.png']);
+        %     to_copy.biAmygrayplot_img = fullfile(options.qc_dir, func_filepath, ['sub-' sub '_' tasks_runs{i} '_echo-' options.template_echo '_desc-bilateralAmygdala_grayplot.png']);
+        % end
+
+        % if options.confounds.include_physio
+        %     % PhysIO QC image locations
+        %     to_copy.physioqc_img = fullfile(options.qc_dir, func_filepath, ['PhysIO_' tasks_runs{i}], ['sub-' sub '_' tasks_runs{i} '_physioQC_03.jpg']);
+        % end
+        
         % Copy all images if they exist
-        cp_fields = fieldnames(to_copy);
-        for x = 1:numel(cp_fields)
-            if exist(to_copy.(cp_fields{x}), 'file')
-                copyfile(to_copy.(cp_fields{x}), report_img_dir);
-            else
-                disp(['File does not exist: ' to_copy.(cp_fields{x})]);
-            end
-        end
+        % cp_fields = fieldnames(to_copy);
+        % for x = 1:numel(cp_fields)
+        %     if exist(to_copy.(cp_fields{x}), 'file')
+        %         copyfile(to_copy.(cp_fields{x}), report_img_dir);
+        %     else
+        %         disp(['File does not exist: ' to_copy.(cp_fields{x})]);
+        %     end
+        % end
 
     end
 

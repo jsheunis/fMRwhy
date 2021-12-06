@@ -50,7 +50,7 @@ function stats = fmrwhy_bids_qcCreateStatsOutput(bids_dir, sub, task, options, v
         else
             func_fn = options.rfunctional_fn;
         end
-        stats = fmrwhy_qc_calculateStats(bids_dir, sub, func_fn, options); % TODO: decide which timeseries to use, processed or not, Aug 4 2020 note: changed this from rfunctional to rafunctional when redoing QC output. Reasoning = to be consistent with multi-echo use.
+        stats = fmrwhy_qc_calculateStats(bids_dir, sub, func_fn, options, 'ses', params.ses, 'task', task, 'run', params.run, 'echo', params.echo, 'acq', params.acq, 'rec', params.rec); % TODO: decide which timeseries to use, processed or not, Aug 4 2020 note: changed this from rfunctional to rafunctional when redoing QC output. Reasoning = to be consistent with multi-echo use.
         % save images to file: fmrwhy_util_saveNifti(template_fn, img, new_fn)
         no_scaling = 1;
         fmrwhy_util_saveNifti(options.mean_fn, double(stats.data_3D_mean), options.template_fn, no_scaling);
@@ -91,7 +91,7 @@ function stats = fmrwhy_bids_qcCreateStatsOutput(bids_dir, sub, task, options, v
         use_rgb = {rgb_ongray, rgb_onparula, rgb_onparula, rgb_onhot};
 
         % Mask settings
-        masks_oriented = fmrwhy_util_loadOrientMasks(bids_dir, sub, options);
+        masks_oriented = fmrwhy_util_loadOrientMasks(bids_dir, sub, options,  'ses', params.ses, 'task', params.task);
         mask_img_oriented = masks_oriented.brain_mask_3D;
 
         for i = 1:numel(stats_image_fns)

@@ -1,6 +1,28 @@
-function stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional_fn, options)
+function stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional_fn, options, varargin)
     % function stats = fmrwhy_qc_calculateStats(bids_dir, sub, ses, task, run)
     % Function to calculate multiple statistical measures from single run of (masked) fMRI timeseries data
+
+    descriptions = {'Subject', 'Session', 'Task', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Echo'};
+    entities = {'ses', 'task', 'acq', 'rec', 'run', 'echo'}; % these entities are required/optional for func bold data specifically (not other types!)
+    formats = {'label', 'label', 'label', 'label', 'label', 'label', 'label', 'index', 'index'};
+
+    validChar = @(x) ischar(x);
+
+    p = inputParser;
+    addRequired(p, 'bids_dir', validChar);
+    addRequired(p, 'sub', validChar);
+    addRequired(p, 'functional_fn', validChar);
+    addRequired(p, 'options');
+    for i = 1:numel(entities)
+        addParameter(p, entities{i}, '', validChar);
+    end
+
+    parse(p, bids_dir, sub, functional_fn, options, varargin{:});
+    params = p.Results;
+    bids_dir = params.bids_dir;
+    sub = params.sub;
+    functional_fn = params.functional_fn;
+    options = params.options;
 
     % First access and reshape the functional data: 4D to 2D
     nii = nii_tool('load', functional_fn);
@@ -10,7 +32,7 @@ function stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional_fn, options)
     data_2D = data_2D'; % [time, voxels]
 
     % Get masks
-    masks = fmrwhy_util_loadMasks(bids_dir, sub, options);
+    masks = fmrwhy_util_loadMasks(bids_dir, sub, options, 'ses', params.ses, 'task', params.task);
 
     % Remove linear and quadratic trend per voxel
     data_2D_detrended = fmrwhy_util_detrend(data_2D, 2); % [time, voxels]

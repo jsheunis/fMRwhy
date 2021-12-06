@@ -17,6 +17,8 @@
       document.getElementById("button2").click();
       document.getElementById("button3").click();
       // document.getElementById("button4").click();
+      document.getElementById('sessionselector').value = "param_first_sestask";
+      $('#sessionselector').trigger('change');
       document.getElementById('runselector').value = "param_first_run";
       $('#runselector').trigger('change');
       // alert('head')
@@ -109,6 +111,22 @@
       normalisation quality.
 
     </p>
+
+    <hr>
+    <div style="text-align:center;">
+      <h3>Select a session</h3>
+      <h6><i>This will update all anatomical images displayed below to those of the selected session</i></h6>
+      <br>
+      <div>
+        <select id="sessionselector" style="width:30%; height:40px">
+        </select>
+      </div>
+    </div>
+
+    <br>
+    <hr>
+    <br>
+
     <h4>T1w coregistration and segmentation</h4>
     <div class="tab3">
       <button id="button3" class="tablinks3 active" onclick="openTab3(event, 'brain')">Brain mask</button>
@@ -119,19 +137,19 @@
     <!-- Tab content -->
     <div id="brain" class="tabcontent3">
       <br>
-      <img src="param_brain_mask" alt="no picture" style="width:95%;">
+      <img id="brain_mask" src="param_brain_mask" alt="no picture" style="width:95%;">
     </div>
     <div id="gm" class="tabcontent3">
       <br>
-      <img src="param_gm_mask" alt="no picture" style="width:95%;">
+      <img id="gm_mask" src="param_gm_mask" alt="no picture" style="width:95%;">
     </div>
     <div id="wm" class="tabcontent3">
       <br>
-      <img src="param_wm_mask" alt="no picture" style="width:95%;">
+      <img id="wm_mask" src="param_wm_mask" alt="no picture" style="width:95%;">
     </div>
     <div id="csf" class="tabcontent3">
       <br>
-      <img src="param_csf_mask" alt="no picture" style="width:95%;">
+      <img id="csf_mask" src="param_csf_mask" alt="no picture" style="width:95%;">
     </div>
 
     <br>
