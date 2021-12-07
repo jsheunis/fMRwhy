@@ -1,34 +1,57 @@
+% ------------------------
 % fmrwhy_settings_template
-% Template settings file for the fmrwhy_bids_workflowQC pipeline
+% ------------------------
 
 % ----------
 % Section 01
 % ----------
 
 % Main data source: BIDS root folder
-options.bids_dir = '/Volumes/JSH/rt-me-fMRI';
+options.bids_dir = '';
 
 % ----------
 % Section 02
 % ----------
 
-% Subjects to run. If all ==> 'all'. If a subset, include the subject numbers/codes as a cell array.
-options.subjects_output = 'all'; % options.subjects_output = {'001', '003', '021'};
+% Subjects to run. If all ==> 'all'. If a subset, include the subject identifier as a cell array.
+options.subjects_output = 'all'; % e.g.: options.subjects_output = {'001', '003', '021'};
 
 % ----------
 % Section 03
 % ----------
+% Set to which reference the coregistration should be done. Options:
+% per_task (i.e. multiple coregistrations):
+% - coregistration is done to each task
+% - the functional template is either specified by options.template_run (mean image)
+%   or it is taken as the mean image of all runs of the same task (and session)
+% per_run (i.e. multiple coregistrations):
+% - coregistration is done to each run
+% - the functional template is taken as the mean image of the specific run (options.template_run is ignored)
+% to_template (i.e. a single coregistration):
 
-% Set the template T1w image if more than one was collected.
-% This image will be used for anatomical-to-functional registration steps
-% Set to '' if a single T1w image was collected, which is often the default
+
+% per_run: coregistration is done to each run of each task
+options.coreg_type = 'per_task'; % per_task / per_run / to_template
+
+% Set the template for functional data, used for realignment and coregistration
+options.template_session = '';
+options.template_task = '';
+options.template_run = '';
+options.template_echo = '';
+% (if not needed, set to '')
+
+% Set the T1w image that will be used for anatomical-to-functional registration steps
+% Default behaviour is that session-specific T1w images are used for coregistration of functional
+% data in the same session (options.anat_template_session = '')
+% Custom behaviour is introduced if a template session is selected (e.g. options.anat_template_session = '1')
+% In the latter case the template session T1w image is copied to other sessions (and renamed accordingly)
+% in order to simplify processing steps and avoid duplication+overwriting of results. This
+% is then followed by the same procedure as session-specific coregistration.
+% Copying is only done in the derivatives directory, BIDS dataset data are left untouched.
+% This has obvious (possible bad) implications for interpreting the preprocessed data,
+% but it is deemed fine if we remain aware of this.
 options.anat_template_session = '';
 
-% Set the template for functional realignment purposes (if not needed, set to '')
-options.template_task = 'rest';
-options.template_session = '';
-options.template_run = '1';
-options.template_echo = '2';
 
 % ----------
 % Section 04
