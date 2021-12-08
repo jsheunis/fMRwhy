@@ -64,6 +64,9 @@ options.coreg_template_echo = '';
 options.anat_template_session = '';
 
 
+options.normalise_to_MNI = false;
+
+
 % ----------
 % Section 04
 % ----------
