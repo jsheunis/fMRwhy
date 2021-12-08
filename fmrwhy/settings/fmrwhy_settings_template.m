@@ -19,6 +19,21 @@ options.subjects_output = 'all'; % e.g.: options.subjects_output = {'001', '003'
 % ----------
 % Section 03
 % ----------
+% Realignment uses the SPM12 2step procedure: realignment to first, followed by realignment to mean
+% You can select the level at which realignment occurs. Options:
+% per_task:
+% - all runs of a task are included (in order) in the realignment procedure
+% per_run:
+% - a single run is included in the realignment procedure; this is repeated for all runs.
+% to_template:
+% - a single run is included in the realignment procedure; it is realigned to a template specified below. this is repeated for all runs.
+options.realignment_type = 'per_task'; % per_task / per_run / to_template
+options.realignment_template_session = '';
+options.realignment_template_task = '';
+options.realignment_template_run = '';
+options.realignment_template_echo = '';
+% (if not needed, set to '')
+
 % Set to which reference the coregistration should be done. Options:
 % per_task (i.e. multiple coregistrations):
 % - coregistration is done to each task
@@ -28,16 +43,12 @@ options.subjects_output = 'all'; % e.g.: options.subjects_output = {'001', '003'
 % - coregistration is done to each run
 % - the functional template is taken as the mean image of the specific run (options.template_run is ignored)
 % to_template (i.e. a single coregistration):
-
-
-% per_run: coregistration is done to each run of each task
 options.coreg_type = 'per_task'; % per_task / per_run / to_template
-
-% Set the template for functional data, used for realignment and coregistration
-options.template_session = '';
-options.template_task = '';
-options.template_run = '';
-options.template_echo = '';
+% Set the template for functional data, used for coregistration
+options.coreg_template_session = '';
+options.coreg_template_task = '';
+options.coreg_template_run = '';
+options.coreg_template_echo = '';
 % (if not needed, set to '')
 
 % Set the T1w image that will be used for anatomical-to-functional registration steps

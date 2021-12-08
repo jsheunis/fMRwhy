@@ -125,7 +125,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             disp('---------------------');
 
             % -------
-            % STEP 0 -- Calculate realignment parameters per run (important before slice timing correction)
+            % STEP 0 -- Calculate realignment parameters per run (important: before slice timing correction)
             % -------
             for r = 1:numel(runs)
                 rn = runs{r};
@@ -181,29 +181,39 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             % -------
             % STEP 2 -- Realignment
             % -------
-            % TODO: THIS SHOULD BE DIFFERENT BASED ON options.coreg_type: per_task / per_run / to_template
-            afunctional_fns = {};
-            saveAs_fns = {};
-            for r = 1:numel(runs)
-                rn = runs{r};
-                options = fmrwhy_bids_getFuncDerivs(options.bids_dir, sub, task, options, 'ses', ses, 'task', task, 'run', rn);
-                if exist(options.functional_fn, 'file')
-                    afunctional_fns = [afunctional_fns {options.afunctional_fn}];
-                    saveAs_fns = [saveAs_fns {options.rafunctional_fn}];
-                else
-                    disp(['Functional file not available: ' options.functional_fn])
-                end
+            switch options.realignment_type
+                case 'per_task' 
+                    % All runs of a task are included (in order) in the realignment procedure; a two step procedure is applied.
+                    afunctional_fns = {};
+                    saveAs_fns = {};
+                    for r = 1:numel(runs)
+                        rn = runs{r};
+                        options = fmrwhy_bids_getFuncDerivs(options.bids_dir, sub, task, options, 'ses', ses, 'task', task, 'run', rn);
+                        if exist(options.functional_fn, 'file')
+                            afunctional_fns = [afunctional_fns {options.afunctional_fn}];
+                            saveAs_fns = [saveAs_fns {options.rafunctional_fn}];
+                        else
+                            disp(['Functional file not available: ' options.functional_fn])
+                        end
+                    end
+                    disp('---');
+                    disp(['STEP 2) 3D Volume Realignment: sub-' sub '_ses-' ses '_task-' task '_run-all']);
+                    disp('---');
+                    if exist(saveAs_fns{1}, 'file')
+                        disp(['3D volume realignment already completed...']);
+                        disp('---');
+                    else
+                        fmrwhy_batch_realignEstResl(afunctional_fns, 0, saveAs_fns, 'fwhm', 6, 'rtm', 1, 'which', [2 1]);
+                        % TODO, this does not handle the mean image output renaming in any standard way yet. Standardise.
+                    end
+                case 'per_run'
+                    disp('per_run')
+                case 'to_template'
+                    disp('to_template')
+                otherwise
+                    warning('Unexpected realignmet type. realignment skipped.')
             end
-            disp('---');
-            disp(['STEP 2) 3D Volume Realignment: sub-' sub '_ses-' ses '_task-' task '_run-all']);
-            disp('---');
-            if exist(saveAs_fns{1}, 'file')
-                disp(['3D volume realignment already completed...']);
-                disp('---');
-            else
-                fmrwhy_batch_realignEstResl(afunctional_fns, 0, saveAs_fns, 'fwhm', 6, 'rtm', 1, 'which', [2 1]);
-                % TODO, this does not handle the mean image output in any standard way yet. Standardise.
-            end
+            
             
             
             % -------
@@ -215,53 +225,42 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             % - Reslice all to functional space grid (SPM reslice)
             % - Create tissue compartment and whole brain masks
             % -------
-            % Get anatomical derivative filenames
             disp('---');
             disp(['STEP 3) Structural-functional preprocessing: sub-' sub '_ses-' ses]);
             disp('---');
-            options = fmrwhy_bids_getAnatDerivs(options.bids_dir, sub, options, 'ses', ses, 'task', task);
-            % Add template filename (mean image from realignment)
-            [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', ses, 'task', task, 'run', runs{1}, 'desc', 'apreproc', 'ext', '_bold.nii');
-            options.template_fn = fullfile(options.preproc_dir, filepath, ['meantemp_' filename]);
-            % Loop through all standard structFunc output filenames and see if these files exist
-            struct_func_out_fns = [{options.coregest_anatomical_fn} options.probseg_fns options.transform_fns options.rall_fns options.mask_fns];
-            run_structFunc = 0;
-            for i = 1:numel(struct_func_out_fns)
-                if ~exist(struct_func_out_fns{i}, 'file')
-                    disp(['Structural-funcional preprocessing output file does not exist yet: ' struct_func_out_fns{i}]);
-                    run_structFunc = 1;
-                end
+            switch options.coreg_type
+                case 'per_task'
+                    % Get anatomical derivative filenames
+                    options = fmrwhy_bids_getAnatDerivs(options.bids_dir, sub, options, 'ses', ses, 'task', task);
+                    % Add template filename (mean image from realignment)
+                    [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', ses, 'task', task, 'run', runs{1}, 'desc', 'apreproc', 'ext', '_bold.nii');
+                    options.template_fn = fullfile(options.preproc_dir, filepath, ['meantemp_' filename]);
+                    % Loop through all standard structFunc output filenames and see if these files exist
+                    struct_func_out_fns = [{options.coregest_anatomical_fn} options.probseg_fns options.transform_fns options.rall_fns options.mask_fns];
+                    run_structFunc = 0;
+                    for i = 1:numel(struct_func_out_fns)
+                        if ~exist(struct_func_out_fns{i}, 'file')
+                            disp(['Structural-funcional preprocessing output file does not exist yet: ' struct_func_out_fns{i}]);
+                            run_structFunc = 1;
+                        end
+                    end
+                    % If some of the files do not exist, run the fmrwhy_preproc_structFunc processing pipeline
+                    if run_structFunc
+                        disp('Running complete structural-funcional preprocessing pipeline');
+                        fmrwhy_preproc_structFunc(options);
+                        disp('Complete!');
+                        disp('---');
+                    else
+                        disp('Structural-funcional preprocessing already completed.');
+                        disp('---');
+                    end
+                case 'per_run'
+                    disp('per_run')
+                case 'to_template'
+                    disp('to_template')
+                otherwise
+                    warning('Unexpected coregistration type. Coregistration skipped.')
             end
-            % If some of the files do not exist, run the fmrwhy_preproc_structFunc processing pipeline
-            if run_structFunc
-                disp('Running complete structural-funcional preprocessing pipeline');
-                fmrwhy_preproc_structFunc(options);
-                disp('Complete!');
-                disp('---');
-            else
-                disp('Structural-funcional preprocessing already completed.');
-                disp('---');
-            end
-
-            % % Get anatomical filename
-            % [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', ses, 'ext', '_T1w.nii');
-            % anatomical_fn = fullfile(options.preproc_dir, filepath, filename);
-            % % NOTE: not using fmrwhy_bids_getAnatDerivs at the moment because this does not yet incorporate sessions into the filename and directory structure.
-            % % TODO: options = fmrwhy_bids_getAnatDerivs(options.bids_dir, sub, options);
-            
-            % % Get coregistered anatomical filename
-            % [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', ses, 'space', 'individual', 'desc', 'coregEst', 'ext', '_T1w.nii');
-            % coregest_anatomical_fn = fullfile(options.preproc_dir, filepath, filename);
-            % % Run coregistration
-            % disp('---');
-            % disp(['STEP 3) Coregistration structural to functional: sub-' sub '_ses-' ses '_task-' task]);
-            % disp('---');
-            % if exist(coregest_anatomical_fn, 'file')
-            %     disp(['coregistration already completed...']);
-            %     disp('---');
-            % else
-            %     fmrwhy_batch_coregEst(anatomical_fn, template_fn, coregest_anatomical_fn);
-            % end
 
 
             % -------
