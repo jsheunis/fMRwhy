@@ -136,3 +136,6 @@ ignorefolder/
 # vscode
 .vscode
 .vscode/
+
+# dependencies
+dependencies/
