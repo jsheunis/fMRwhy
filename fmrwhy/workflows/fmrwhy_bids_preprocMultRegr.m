@@ -162,7 +162,7 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
             disp(['Calculating tissue compartment signal averages: ' options.tissue_regr_fn]);
             disp('---');
             % Get anatomical tissue compartment masks in individual functional space
-            masks = fmrwhy_util_loadMasks(bids_dir, sub, options);
+            masks = fmrwhy_util_loadMasks(bids_dir, sub, options, 'ses', params.ses, 'task', task);
             % Get timeseries data from realigned (and slice time corrected, if done)
             if options.include_stc
                 nii = nii_tool('load', options.rafunctional_fn);
@@ -201,11 +201,20 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
     % -------
     if include_physio
         % Grab physio log-file, e.g. sub-001_task-rest_run-1_physio.tsv.gz
-        log_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_task-' task '_run-' run '_physio.tsv.gz']);
+        if (1 == isempty(params.ses))
+            log_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physio.log']);
+        else
+            log_fn = fullfile(options.sub_dir_preproc, ['ses-' params.ses], 'func', ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physio.log']);
+        end
 
+            
         % Create struct with options for PhysIO
         physio_options = options.physio.options;
-        physio_options.save_dir = fullfile(options.sub_dir_qc, 'func', ['PhysIO_task-' task '_run-' run]);
+        if (1 == isempty(params.ses))
+            physio_options.save_dir = fullfile(options.sub_dir_qc, 'func',['PhysIO_task-' task '_run-' params.run]);
+        else
+            physio_options.save_dir = fullfile(options.sub_dir_qc, ['ses-' params.ses], 'func',['PhysIO_task-' task '_run-' params.run]);
+        end
         physio_options.cardiac_fn = log_fn;
         physio_options.respiration_fn = log_fn;
         physio_options.level = 0; % verbose.level = 0 ==> do not generate figure outputs during batch process
@@ -226,7 +235,11 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
             phys_file = fullfile(physio_options.save_dir, 'physio.mat');
             physmat = load(phys_file);
             physmat.physio.verbose.level = 2;
-            physmat.physio.verbose.fig_output_file = ['sub-' sub '_task-' task '_run-' run '_physioQC.jpg'];
+            if (1 == isempty(params.ses))
+                physmat.physio.verbose.fig_output_file = ['sub-' sub '_task-' task '_run-' params.run '_physioQC.jpg'];
+            else
+                physmat.physio.verbose.fig_output_file = ['sub-' sub 'ses' params.ses '_task-' task '_run-' params.run '_physioQC.jpg'];
+            end
             physmat.physio.verbose.show_figs = false;
             physmat.physio.verbose.save_figs = true;
             physmat.physio.verbose.close_figs = true;

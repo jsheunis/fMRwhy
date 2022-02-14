@@ -41,10 +41,10 @@ function output = fmrwhy_batch_realignEst(functional_fn, template_fn)
     % Output
     output = struct;
     [d, f, e] = fileparts(temp_functional_fn);
-    [dref, fref, eref] = fileparts(template_fn);
     if template_fn == 0
         output.mp_fn = fullfile(d, ['rp_' f '.txt']);
     else
+        [dref, fref, eref] = fileparts(template_fn);
         output.mp_fn = [dref filesep 'rp_' fref '.txt'];
     end
     output.MP = load(output.mp_fn);

@@ -56,7 +56,7 @@ function fmrwhy_bids_qcRun(bids_dir, sub, task, options, varargin)
     % SECTION A: ANATOMICAL QC
     % ------------------------
 
-    options = fmrwhy_bids_getAnatDerivs(bids_dir, sub, options);
+    options = fmrwhy_bids_getAnatDerivs(bids_dir, sub, options, 'ses', params.ses, 'task', params.task);
 
     % -------
     % STEP 1: Contours of tissue masks on mean EPI / template EPI (/ anatomical image?)
@@ -65,9 +65,9 @@ function fmrwhy_bids_qcRun(bids_dir, sub, task, options, varargin)
     mask_desc = {'GM', 'WM', 'CSF', 'brain'};
     for i = 1:numel(mask_desc)
         if isempty(options.anat_template_session)
-            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', mask_desc{i}, 'ext', '_mask_montage.png');
+            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', params.ses, 'task', params.task, 'space', 'individual', 'desc', mask_desc{i}, 'ext', '_mask_montage.png');
         else
-            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'space', 'individual', 'desc', mask_desc{i}, 'ext', '_mask_montage.png');
+            [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'task', params.task, 'space', 'individual', 'desc', mask_desc{i}, 'ext', '_mask_montage.png');
         end
         mask_montage_fns{i} = fullfile(options.qc_dir, filepath, filename);
     end
@@ -80,7 +80,7 @@ function fmrwhy_bids_qcRun(bids_dir, sub, task, options, varargin)
     end
     if run_montage || options.qc_overwrite_tissuecontours
         disp('Creating mask overlay montages');
-        montage_data = fmrwhy_bids_qcCreateMaskMontages(bids_dir, sub, 1, options);
+        montage_data = fmrwhy_bids_qcCreateMaskMontages(bids_dir, sub, 1, options, 'ses', params.ses, 'task', params.task);
         disp('Complete!');
         disp('---');
     else
@@ -104,9 +104,9 @@ function fmrwhy_bids_qcRun(bids_dir, sub, task, options, varargin)
                     overlay_img = fmrwhy_util_createBinaryImg(p2.nii.img, 0.1);
                     title = options.roi.(options.tasks{i}).name{j};
                     if isempty(options.anat_template_session)
-                        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi_montage.png');
+                        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', params.ses, 'task', params.task, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi_montage.png');
                     else
-                        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi_montage.png');
+                        [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'task', params.task, 'space', 'individual', 'desc', options.roi.(options.tasks{i}).desc{j}, 'ext', '_roi_montage.png');
                     end
                     saveAs_fn = fullfile(options.qc_dir, filepath, filename);
                     if ~exist(saveAs_fn, 'file') || options.qc_overwrite_ROIcontours

@@ -1,0 +1,25 @@
+[submodule "RainCloudPlots"]
+	path = dependencies/RainCloudPlots
+	url = https://github.com/RainCloudPlots/RainCloudPlots
+[submodule "dependencies/RainCloudPlots"]
+	branch = v1.1
+[submodule "spm12"]
+	path = dependencies/spm12
+	url = https://github.com/spm/spm12
+[submodule "dependencies/spm12"]
+	branch = r7771
+[submodule "bids-matlab"]
+	path = dependencies/bids-matlab
+	url = https://github.com/jsheunis/bids-matlab
+[submodule "dependencies/bids-matlab"]
+	branch = v0.0.2
+[submodule "dicm2nii"]
+	path = dependencies/dicm2nii
+	url = https://github.com/jsheunis/dicm2nii
+[submodule "dependencies/dicm2nii"]
+	branch = v0.2
+[submodule "tapas"]
+	path = dependencies/tapas
+	url = https://github.com/translationalneuromodeling/tapas
+[submodule "dependencies/tapas"]
+	branch = v4.0.0

@@ -73,10 +73,10 @@ function fmrwhy_bids_qcCreateThePlot(bids_dir, sub, task, options, varargin)
     confounds_mat = struct2array(confounds_struct);
 
     % Load mask data
-    masks = fmrwhy_util_loadMasks(bids_dir, sub, options);
+    masks = fmrwhy_util_loadMasks(bids_dir, sub, options, 'ses', params.ses, 'task', params.task);
 
     % Calculate stats data (including BOLD percentage signal change)
-    stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional4D_fn, options);
+    stats = fmrwhy_qc_calculateStats(bids_dir, sub, functional4D_fn, options , 'ses', params.ses, 'task', params.task);
 
     % Load data
     F_2D_psc = reshape(stats.data_4D_psc, Ni * Nj * Nk, Nt); % [voxels, time]

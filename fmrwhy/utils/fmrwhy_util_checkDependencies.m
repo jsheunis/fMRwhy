@@ -17,20 +17,20 @@ function options = fmrwhy_util_checkDependencies(options)
     end
 
     spm_url = 'https://github.com/spm/spm12/releases/tag/r7771';
-    bidsmatlab_url = 'https://github.com/bids-standard/bids-matlab';
+    bidsmatlab_url = 'https://github.com/jsheunis/bids-matlab/releases/tag/v0.0.2';
     dicm2nii_url = 'https://github.com/jsheunis/dicm2nii/releases/tag/v0.2';
     tapasphysio_url = 'https://github.com/translationalneuromodeling/tapas/releases/tag/v4.0.0';
     raincloud_url = 'https://github.com/RainCloudPlots/RainCloudPlots/releases/tag/v1.1';
 
     % Check and add SPM path
-    spm_installed = exist('spm');
+    spm_installed = exist('spm12');
     if ~spm_installed
         msg = 'SPM12 cannot be found on your MATLABPATH. Please add the top-level SPM12 directory to the path using e.g. `addpath(/path/to/your/spm12/directory)`';
         errorStruct.identifier = 'checkDependencies:missingDependency';
         errorStruct.message = sprintf('%s \n%s  \n%s', ...
                                       'SPM12 cannot be found on your MATLABPATH.', ...
                                       'Please add the top-level SPM12 directory to the path using e.g. `addpath(/path/to/your/spm12/directory)`.', ...
-                                      'You can download the required release of SP12 here: %s', spm_url);
+                                      'You can download the required release of SP12 here: ', spm_url);
         error(errorStruct);
     else
         pathSpm = spm('Dir');
@@ -61,7 +61,7 @@ function options = fmrwhy_util_checkDependencies(options)
     end
 
     % Check TAPAS physio
-    tapasphysio_installed = which('tapas_init');
+    tapasphysio_installed = which('tapas_physio_init');
     if isempty(tapasphysio_installed)
         createErrorMsg('TAPAS', tapasphysio_url);
     else
@@ -91,3 +91,15 @@ function createErrorMsg(name, url)
                                   ['Please add the top-level ' name ' directory and all subdirectories to the path using e.g. `addpath(genpath(/path/to/your/' name '/directory))`.'], ...
                                   ['You can download the required release of ' name ' here: ' url]);
     error(errorStruct);
+
+
+% git submodule add --name spm12 https://github.com/spm/spm12 dependencies/spm12
+% git submodule set-branch -b r7771 dependencies/spm12
+% git submodule add --name bids-matlab https://github.com/jsheunis/bids-matlab dependencies/bids-matlab
+% git submodule set-branch -b v0.0.2 dependencies/bids-matlab
+% git submodule add --name dicm2nii https://github.com/jsheunis/dicm2nii dependencies/dicm2nii
+% git submodule set-branch -b v0.2 dependencies/dicm2nii
+% git submodule add --name tapas https://github.com/translationalneuromodeling/tapas dependencies/tapas
+% git submodule set-branch -b v4.0.0 dependencies/tapas
+% git submodule add --name RainCloudPlots https://github.com/RainCloudPlots/RainCloudPlots dependencies/RainCloudPlots
+% git submodule set-branch -b v1.1 dependencies/RainCloudPlots

@@ -57,6 +57,21 @@ function setupReportStructure() {
     document.getElementById('physqcplots_img').remove();
   }
 
+  // Create options for sessionselector
+  var sel = document.getElementById('sessionselector');
+  bids_dataset['report_sestasks'].forEach(function(txt, index) {
+    if (txt.indexOf('rest') >= 0 ) {
+      return;
+    }
+    var opt = document.createElement('option');
+    // create text node to add to option element (opt)
+    opt.appendChild(document.createTextNode(txt) );
+    // set value property of opt
+    opt.value = txt;
+    // add opt to end of select box (sel)
+    sel.appendChild(opt);
+  });
+
   // Create options for runselector from allruns array, and create objects to access sessions/tasks/runs from
   allrunsObj = {};
   allrunsSessionsObj = {};
@@ -175,6 +190,49 @@ $(document).ready(function() {
     $("#physqcplots").html("PhysIO QC plots: " + allrunsObj[$(this).val()] );
 
   });
+
+  $('#sessionselector').change(function(){ 
+
+    var imgArrayDesc = {
+      "brain_mask": "brain_mask_montage",
+      "gm_mask": "GM_mask_montage",
+      "wm_mask": "WM_mask_montage",
+      "csf_mask": "CSF_mask_montage",
+    };
+    // sub-mcc000701_ses-w01lab_task-snat_space-individual_desc-brain_mask_montage
+
+    var sestask = $('#sessionselector :selected').text();
+    var s = sestask.indexOf('ses-');
+    if (s >= 0) {
+      session = sestask.slice(s+4).split('_')[0];
+    } else {
+      session = '';
+    };
+    var t = sestask.indexOf('task-')
+    if (t >= 0) {
+      task = sestask.slice(t+5).split('_')[0]
+    } else {
+      task = '';
+    };
+
+    for (var key in imgArrayDesc) {
+
+      fn = fmrwhy_bidsjs_constructFilename({
+        filetype:'anat',
+        sub:bids_dataset['sub'],
+        ses:session,
+        task:task,
+        acq:'', rec:'',
+        run:'',
+        echo:'',
+        space:'individual',
+        desc:imgArrayDesc[key],
+        ext:'.png'});
+      $("#" + key).attr("src", "img/" + fn);
+    }
+
+  });
+
 });
 
 
