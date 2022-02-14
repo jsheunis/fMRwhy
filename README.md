@@ -32,29 +32,7 @@ Several helper functions are also available (*for which documentation is pending
 
 ## Installation
 
-To run `fMRwhy` on your local machine, you will need Matlab 2016b (or a more recent version) installed on your system.
-
-To install `fMRwhy`, clone this GitHub repository to your machine:
-
-```
-git clone https://github.com/jsheunis/fMRwhy.git
-```
-
-Or download and extract the zipped code base from the green `Code` button on this page.
-
-`fMRwhy` also has several software dependencies, which you are required to install. When running `fmrwhy_workflow_qc`, these dependencies will be checked and you will be notified if they are not installed or not on your Matlab path.
-
-To add `fMRwhy` to your Matlab path, run the following from the Matlab command window:
-
-```
-addpath(genpath('path/to/your/fMRwhy/directory'))
-```
-
-This will add `fMRwhy` and all subdirectories to the Matlab path.
-
-## Dependencies
-
-`fMRwhy` requires installation of the following toolboxes:
+To run `fMRwhy` on your local machine, you will need MATLAB 2016b or a more recent version installed on your system. Installing `fMRwhy` requires downloading the toolbox along with a list of required dependencies:
 
 - [SPM12](https://github.com/spm/spm12/releases/tag/r7771)
 - [bids-matlab](https://github.com/bids-standard/bids-matlab)
@@ -62,7 +40,47 @@ This will add `fMRwhy` and all subdirectories to the Matlab path.
 - [TAPAS (PhysIO)](https://github.com/translationalneuromodeling/tapas/releases/tag/v4.0.0)
 - [RainCloudPlots](https://github.com/RainCloudPlots/RainCloudPlots/releases/tag/v1.1)
 
-After installing each toolbox (for which the process should be very similar to the one for `fMRwhy`), please remember to add each directory to the Matlab path.
+### To install `fMRwhy` using git
+
+First clone this GitHub repository to your machine once located in your preferred directory:
+
+```bash
+git clone https://github.com/jsheunis/fMRwhy.git
+```
+
+and then install all dependencies (for reference, see the list below):
+
+```bash
+cd fMRwhy
+git submodule update --init
+```
+
+This could take several minutes, because the dependencies are all downloaded and saved to your local `fMRwhy/dependencies` directory.
+
+Lastly, open MATLAB, add theccode directory (`fMRwhy/fmrwhy`) to the MATLAB path, and run `fmrwhy_init.m`:
+
+```matlab
+addpath('your/path/to/fMRwhy/fmrwhy')
+fmrwhy_init()
+```
+
+This adds `fMRwhy` and all required dependencies to the MATLAB path.
+
+### To install `fMRwhy` manually
+
+Download and extract the zipped code base from the green `Code` button on this page. Once extracted, rename the folder to `fMRwhy` (exact case match and remove any extra text, e.g. `-master`).
+
+Next, following the same process, download+extract (+rename where applicable) all dependencies listed above.
+
+Then, importantly, move all dependencies into the `fMRwhy/dependencies` directory. The toolbox will search this location to see if all required dependencies are available.
+
+Lastly, open MATLAB, add theccode directory (`fMRwhy/fmrwhy`) to the MATLAB path, and run `fmrwhy_init.m`:
+
+```matlab
+addpath('your/path/to/fMRwhy/fmrwhy')
+fmrwhy_init()
+```
+This adds `fMRwhy` and all required dependencies to the MATLAB path.
 
 ## Usage
 
