@@ -23,14 +23,14 @@ function options = fmrwhy_util_checkDependencies(options)
     raincloud_url = 'https://github.com/RainCloudPlots/RainCloudPlots/releases/tag/v1.1';
 
     % Check and add SPM path
-    spm_installed = exist('spm');
+    spm_installed = exist('spm12');
     if ~spm_installed
         msg = 'SPM12 cannot be found on your MATLABPATH. Please add the top-level SPM12 directory to the path using e.g. `addpath(/path/to/your/spm12/directory)`';
         errorStruct.identifier = 'checkDependencies:missingDependency';
         errorStruct.message = sprintf('%s \n%s  \n%s', ...
                                       'SPM12 cannot be found on your MATLABPATH.', ...
                                       'Please add the top-level SPM12 directory to the path using e.g. `addpath(/path/to/your/spm12/directory)`.', ...
-                                      'You can download the required release of SP12 here: %s', spm_url);
+                                      'You can download the required release of SP12 here: ', spm_url);
         error(errorStruct);
     else
         pathSpm = spm('Dir');
@@ -61,7 +61,7 @@ function options = fmrwhy_util_checkDependencies(options)
     end
 
     % Check TAPAS physio
-    tapasphysio_installed = which('tapas_init');
+    tapasphysio_installed = which('tapas_physio_init');
     if isempty(tapasphysio_installed)
         createErrorMsg('TAPAS', tapasphysio_url);
     else

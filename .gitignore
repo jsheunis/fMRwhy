@@ -139,3 +139,5 @@ ignorefolder/
 
 # dependencies
 dependencies/
+
+.DS_store
