@@ -202,9 +202,9 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
     if include_physio
         % Grab physio log-file, e.g. sub-001_task-rest_run-1_physio.tsv.gz
         if (1 == isempty(params.ses))
-            log_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physio.tsv.gz']);
+            log_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physio.log']);
         else
-            log_fn = fullfile(options.sub_dir_preproc, ['ses-' params.ses], 'func', ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physio.tsv.gz']);
+            log_fn = fullfile(options.sub_dir_preproc, ['ses-' params.ses], 'func', ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physio.log']);
         end
 
             
