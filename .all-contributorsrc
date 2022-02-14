@@ -71,6 +71,19 @@
         "question",
         "userTesting"
       ]
+    },
+    {
+      "login": "lydiatgit",
+      "name": "lydiatgit",
+      "avatar_url": "https://avatars.githubusercontent.com/u/453067?v=4",
+      "profile": "https://github.com/lydiatgit",
+      "contributions": [
+        "bug",
+        "ideas",
+        "code",
+        "question",
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
