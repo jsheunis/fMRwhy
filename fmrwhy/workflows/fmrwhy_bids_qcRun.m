@@ -62,6 +62,12 @@ function fmrwhy_bids_qcRun(bids_dir, sub, task, options, varargin)
     % STEP 1: Contours of tissue masks on mean EPI / template EPI (/ anatomical image?)
     % -------
     % TODO: this should hide figures and only print them to png. currently figures are popping up.
+    [~, anat_filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', params.ses);
+    
+    if (0 == exist(fullfile(options.qc_dir, anat_filepath),'dir'))
+        mkdir(fullfile(options.qc_dir, anat_filepath));
+    end
+        
     mask_desc = {'GM', 'WM', 'CSF', 'brain'};
     for i = 1:numel(mask_desc)
         if isempty(options.anat_template_session)

@@ -40,7 +40,8 @@ function output = fmrwhy_batch_PhysIO(options)
     % phys.matlabbatch{1}.spm.tools.physio.scan_timing.sync.gradient_log.slice = 1800;
     % phys.matlabbatch{1}.spm.tools.physio.scan_timing.sync.gradient_log.vol = [];
     % phys.matlabbatch{1}.spm.tools.physio.scan_timing.sync.gradient_log.vol_spacing = [];
-    phys.matlabbatch{1}.spm.tools.physio.preproc.cardiac.modality = 'PPU';
+    
+    phys.matlabbatch{1}.spm.tools.physio.preproc.cardiac.modality = options.cardiac_modality;
     phys.matlabbatch{1}.spm.tools.physio.preproc.cardiac.initial_cpulse_select.auto_matched.min = 0.4;
     phys.matlabbatch{1}.spm.tools.physio.preproc.cardiac.initial_cpulse_select.auto_matched.file = 'initial_cpulse_kRpeakfile.mat';
     phys.matlabbatch{1}.spm.tools.physio.preproc.cardiac.initial_cpulse_select.auto_matched.max_heart_rate_bpm = 90;
