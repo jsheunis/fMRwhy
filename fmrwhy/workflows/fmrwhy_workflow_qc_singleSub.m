@@ -98,11 +98,14 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
         % If a template session is specified and it is not equal to the current session,
         % copy the template data to current session
         options = fmrwhy_bids_getAnatDerivs(options.bids_dir, sub, options, 'ses', ses);
-        if isempty(options.anat_template_session) && (ses ~= options.anat_template_session)
+        if (0 == isempty(options.anat_template_session)) && (ses ~= options.anat_template_session)
             [fn, fp] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', options.anat_template_session, 'ext', '_T1w.nii');
             anatomical_fn = fullfile(options.preproc_dir, fp, fn);
             [fn_new, fp_new] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', ses, 'ext', '_T1w.nii');
             new_anatomical_fn = fullfile(options.preproc_dir, fp_new, fn_new);
+            if (0 == exist(fullfile(options.preproc_dir, fp_new), 'dir'))
+                mkdir(fullfile(options.preproc_dir, fp_new));
+            end
             copyfile(anatomical_fn, new_anatomical_fn)
             options.anat_template_session = '';
         end
