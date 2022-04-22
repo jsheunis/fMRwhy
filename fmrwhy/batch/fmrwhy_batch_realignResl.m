@@ -3,7 +3,6 @@ function fmrwhy_batch_realignResl(reslice_scans)
     %% ---------
     %% ---------
     %% ---------
-
     spm('defaults', 'fmri');
     spm_jobman('initcfg');
     reslice = struct;

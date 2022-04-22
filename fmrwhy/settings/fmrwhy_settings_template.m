@@ -73,7 +73,7 @@ options.normalise_to_MNI = false;
 
 % Define sequence parameters, this should be known to the user.
 % fMRwhy does not yet support deriving these parameters from the BIDS json files
-options.TR = 2;
+options.TR = 2.2;
 options.N_slices = 34;
 options.Ndummies = 5; % Specify number of dummies, even if they have already been excluded from the BOLD timeseries images. This is important for the TAPAS PhysIO steps when processing cardiac and respiratory data.
 options.Nscans = 210; % The number of scans in the BOLD timeseries images, excluding dummies.
@@ -157,25 +157,57 @@ options.qc_overwrite_tissuecontours = true;
 options.qc_overwrite_ROIcontours = true;
 options.qc_overwrite_theplot = false;
 options.qc_overwrite_statsoutput = true;
-options.qc_report_runs = {'task-rest_run-1', 'task-fingerTapping', 'task-emotionProcessing', 'task-rest_run-2', 'task-fingerTappingImagined', 'task-emotionProcessingImagined'};
+options.qc_report_runs = {};
 options.qc_dataset_name = 'rt-me-fMRI';
 options.qc_anat_res = '1x1x1 mm (100x100x100 voxels)';
 options.qc_func_res = '3.5x3.5x3.5 mm (64x64x34 voxels)';
 options.qc_func_acq = 'Multi-echo (TE = 14,28,42 ms), SENSE = 2.5';
-options.qc_func_runs = 'rest_run-1, fingerTapping, emotionProcessing, rest_run-2, fingerTappingImagined, emotionProcessingImagined';
+options.qc_func_runs = {};
 
-% ONLY FOR TASK DATA:
+
+
+
+
+
+
+% ONLY FOR TASK DATA: Settings for first level analysis
 
 % ----------
-% Section 09 - Settings for first level analysis
+% Section 09 - Steps to include in 1st level analysis
 % ----------
-
-% Settings for first level analysis: steps to include/exclude
 % No need to change these defaults unless for very specific and well-motivated reasons.
+options.firstlevel.type = 'per_task'; % per_task / per_run
 options.firstlevel.tmap_montages = true;
 options.firstlevel.anat_func_roi = true;
 
-% Settings for first level analysis: task-motor
+% ----------
+% Section 10 - Task conditions for first level analysis
+% ----------
+% Settings for first level analysis:    ADD TASK NAME
+options.firstlevel.task_name.timing_params.units = 'secs';
+options.firstlevel.task_name.timing_params.RT = options.TR;
+options.firstlevel.task_name.timing_params.fmri_t = 16;
+options.firstlevel.task_name.timing_params.fmri_t0 = 8;
+options.firstlevel.task_name.sess_params.timing_units = 'secs';
+options.firstlevel.task_name.sess_params.timing_RT = options.TR;
+options.firstlevel.task_name.sess_params.cond_names = {'Accept','Neutral','Reject','AcceptNoise','NeutralNoise','RejectNoise','INVALID'};
+options.firstlevel.task_name.cond_calcs.Accept.filter = {{'trial_type', 'social_feedback'}, {'condition', 'Accept'}};
+options.firstlevel.task_name.cond_calcs.Accept.calc = {{'duration=', 0}};
+options.firstlevel.task_name.cond_calcs.Neutral.filter = {{'trial_type', 'social_feedback'}, {'condition', 'Neutral'}};
+options.firstlevel.task_name.cond_calcs.Neutral.calc = {{'duration=', 0}};
+options.firstlevel.task_name.cond_calcs.Reject.filter = {{'trial_type', 'social_feedback'}, {'condition', 'Reject'}};
+options.firstlevel.task_name.cond_calcs.Reject.calc = {{'duration=', 0}};
+options.firstlevel.task_name.cond_calcs.AcceptNoise.filter = {{'trial_type', 'participant_response'}, {'condition', 'Accept'}};
+options.firstlevel.task_name.cond_calcs.AcceptNoise.calc = {{'onset=', {'onset+', 'response_time'}}, {'duration=', {'response/', 1000}} };
+options.firstlevel.task_name.cond_calcs.NeutralNoise.filter = {{'trial_type', 'participant_response'}, {'condition', 'Neutral'}};
+options.firstlevel.task_name.cond_calcs.NeutralNoise.calc = {{'onset=', {'onset+', 'response_time'}}, {'duration=', {'response/', 1000}} };
+options.firstlevel.task_name.cond_calcs.RejectNoise.filter = {{'trial_type', 'participant_response'}, {'condition', 'Reject'}};
+options.firstlevel.task_name.cond_calcs.RejectNoise.calc = {{'onset=', {'onset+', 'response_time'}}, {'duration=', {'response/', 1000}} };
+
+% options.firstlevel.motor.run1.sess_params.timing_units = 'secs';
+% options.firstlevel.motor.run1.sess_params.timing_RT = 2;
+% options.firstlevel.motor.run1.sess_params.cond_names = {''};
+
 options.firstlevel.motor.run1.sess_params.timing_units = 'secs';
 options.firstlevel.motor.run1.sess_params.timing_RT = 2;
 options.firstlevel.motor.run1.sess_params.cond_names = {'FingerTapping'};
@@ -191,19 +223,9 @@ options.firstlevel.emotion.run2.sess_params.timing_units = 'secs';
 options.firstlevel.emotion.run2.sess_params.timing_RT = 2;
 options.firstlevel.emotion.run2.sess_params.cond_names = {'MentalEmotion'};
 
-% Settings for plotting task conditions
-onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
-duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
-options.firstlevel.motor.run1.plot_params.cond_onset = onset;
-options.firstlevel.motor.run1.plot_params.cond_duration = duration;
-options.firstlevel.motor.run2.plot_params.cond_onset = onset;
-options.firstlevel.motor.run2.plot_params.cond_duration = duration;
-options.firstlevel.emotion.run2.plot_params.cond_onset = onset;
-options.firstlevel.emotion.run2.plot_params.cond_duration = duration;
-onset = [12; 32; 52; 72; 92; 112; 132; 152; 172; 192];
-duration = [9; 9; 9; 9; 9; 9; 9; 9; 9; 9];
-options.firstlevel.emotion.run1.plot_params.cond_onset = onset;
-options.firstlevel.emotion.run1.plot_params.cond_duration = duration;
+% ----------
+% Section 11 - Regressors for first level analysis
+% ----------
 
 % Settings for first level analysis: glm regressors to include
 options.firstlevel.glm_regressors.trans_rot = true;
@@ -224,7 +246,18 @@ options.firstlevel.glm_regressors.retroicor_r = 2; % respiratory, max 8
 options.firstlevel.glm_regressors.retroicor_cxr = 0; % interaction, max 4
 options.firstlevel.glm_regressors.hrv = false;
 options.firstlevel.glm_regressors.rvt = false;
+options.firstlevel.glm_regressors.run_number = false; % used to model specific run in multirun, time-concatenated design matrices
 
+% ----------
+% Section 12 - Review parameters for first level analysis GLM
+% ----------
+options.firstlevel.review.review_params.print = 'jpg';
+options.firstlevel.review.display_options = {'matrix', 'covariance', 'orth'};
+options.firstlevel.review.output_filenames = {'matrix', 'covariance', 'orthogonality'};
+
+% ----------
+% Section 13 - Contrasts for first level analysis
+% ----------
 % Settings for first level analysis: task-motor
 options.firstlevel.motor.run1.contrast_params.consess{1}.tcon.name = 'FingerTapping';
 options.firstlevel.motor.run1.contrast_params.consess{1}.tcon.weights = [1];
@@ -247,6 +280,31 @@ options.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.name = 'MentalEm
 options.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.weights = [1];
 options.firstlevel.emotion.run2.contrast_params.consess{1}.tcon.sessrep = 'none';
 
-% matlabbatch{1}.spm.stats.con.consess{2}.tcon.name = 'Patients > Control';
-% matlabbatch{1}.spm.stats.con.consess{2}.tcon.convec = [-1 1];
-% matlabbatch{1}.spm.stats.con.consess{2}.tcon.sessrep = 'none';
+
+% ----------
+% Section 14 - Thresholding parameters for the contrasts of 1st level analysis
+% ----------
+options.firstlevel.conspec_params.threshdesc = 'FWE';
+options.firstlevel.conspec_params.thresh = 0.0500;
+options.firstlevel.conspec_params.extent = 0;
+options.firstlevel.conspec_params.conjunction = 1;
+options.firstlevel.conspec_params.mask.none = 1;
+
+% ----------
+% Section 15 - Task plot parameters for The Plot (need to automate this)
+% ----------
+
+% NOTE: this needs to be updated if required for LCID
+% Settings for plotting task conditions
+onset = [11; 31; 51; 71; 91; 111; 131; 151; 171; 191];
+duration = [10; 10; 10; 10; 10; 10; 10; 10; 10; 10];
+options.firstlevel.motor.run1.plot_params.cond_onset = onset;
+options.firstlevel.motor.run1.plot_params.cond_duration = duration;
+options.firstlevel.motor.run2.plot_params.cond_onset = onset;
+options.firstlevel.motor.run2.plot_params.cond_duration = duration;
+options.firstlevel.emotion.run2.plot_params.cond_onset = onset;
+options.firstlevel.emotion.run2.plot_params.cond_duration = duration;
+onset = [12; 32; 52; 72; 92; 112; 132; 152; 172; 192];
+duration = [9; 9; 9; 9; 9; 9; 9; 9; 9; 9];
+options.firstlevel.emotion.run1.plot_params.cond_onset = onset;
+options.firstlevel.emotion.run1.plot_params.cond_duration = duration;

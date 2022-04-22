@@ -24,33 +24,36 @@ function options = fmrwhy_settings_validate(options)
     options.Ntasks = numel(options.tasks);
     options.Nruns = numel(options.runs);
 
-    % Derive template flags from BIDS structure
-    options.has_sessions = ~isempty(options.sessions);
-    options.has_runs = ~isempty(options.runs);
-    if options.has_sessions
-        if options.has_runs
-            filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'sess', options.template_session, 'run', options.template_run, 'type', 'bold');
-        else
-            filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'sess', options.template_session, 'type', 'bold');
-        end
-    else
-        if options.has_runs
-            filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'run', options.template_run, 'type', 'bold');
-        else
-            filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'type', 'bold');
-        end
-    end
-    options.N_echoes = numel(filenames);
-    options.is_multiecho = false;
-    if options.N_echoes > 1
-        options.is_multiecho = true;
-    end
+    % TODO: this is commented out because of error: Reference to non-existent field 'template_task'.
+    % It is not actually needed and should be replaced by checking whether data is multi-echo on a case-by-case basis
 
-    % Sequence parameters
-    options.Ne = numel(options.TE);
+    % % Derive template flags from BIDS structure
+    % options.has_sessions = ~isempty(options.sessions);
+    % options.has_runs = ~isempty(options.runs);
+    % if options.has_sessions
+    %     if options.has_runs
+    %         filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'sess', options.template_session, 'run', options.template_run, 'type', 'bold');
+    %     else
+    %         filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'sess', options.template_session, 'type', 'bold');
+    %     end
+    % else
+    %     if options.has_runs
+    %         filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'run', options.template_run, 'type', 'bold');
+    %     else
+    %         filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'type', 'bold');
+    %     end
+    % end
+    % options.N_echoes = numel(filenames);
+    % options.is_multiecho = false;
+    % if options.N_echoes > 1
+    %     options.is_multiecho = true;
+    % end
 
-    if options.is_multiecho
-        if options.N_echoes ~= options.Ne
-            disp('ERROR: number of echoes derived from BIDS dataset (using bids-matlab) do not match the number of echo times specified in settings file. FIX!');
-        end
-    end
+    % % Sequence parameters
+    % options.Ne = numel(options.TE);
+
+    % if options.is_multiecho
+    %     if options.N_echoes ~= options.Ne
+    %         disp('ERROR: number of echoes derived from BIDS dataset (using bids-matlab) do not match the number of echo times specified in settings file. FIX!');
+    %     end
+    % end

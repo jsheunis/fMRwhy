@@ -77,7 +77,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
         ses = sessions{ss};
 
         % Skip session loop if current session does not exist
-    ses_dir = fullfile(options.preproc_dir, ['sub-' sub], ['ses-' ses])
+        ses_dir = fullfile(options.preproc_dir, ['sub-' sub], ['ses-' ses])
         if ~exist(ses_dir, 'dir')
             disp('---');
             disp(['No session ses-', ses, ' for sub-', sub]);
@@ -104,6 +104,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             [fn_new, fp_new] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', ses, 'ext', '_T1w.nii');
             new_anatomical_fn = fullfile(options.preproc_dir, fp_new, fn_new);
             copyfile(anatomical_fn, new_anatomical_fn)
+            % TODO: should this be here?? dont think so:
             options.anat_template_session = '';
         end
 
