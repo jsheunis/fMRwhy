@@ -7,6 +7,7 @@ function fmrwhy_init(dependency_dir)
 
     if nargin<1
         dependency_dir = [current_path(1:ind + 5) filesep 'dependencies'];
+    end
 
     addpath([dependency_dir filesep 'spm12']);
     addpath(genpath([dependency_dir filesep 'bids-matlab']));
