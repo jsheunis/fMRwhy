@@ -82,6 +82,25 @@ fmrwhy_init()
 ```
 This adds `fMRwhy` and all required dependencies to the MATLAB path.
 
+### Creating a library folder
+
+For the light dependencies (all but SPM12), you can download all of them into the lib folder by using the following code.
+
+```bash
+mkdir lib
+cd lib
+git clone https://github.com/bids-standard/bids-matlab
+git clone https://github.com/jsheunis/dicm2nii
+cd dicm2nii/
+git checkout v0.2
+cd ..
+git clone https://github.com/translationalneuromodeling/tapas
+cd tapas/
+git checkout v4.0.0 
+cd ..
+git clone https://github.com/RainCloudPlots/RainCloudPlots
+```
+
 ## Usage
 
 In order to run `fmrwhy_workflow_qc` on a BIDS-validated dataset, please follow these steps:
