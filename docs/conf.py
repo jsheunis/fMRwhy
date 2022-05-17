@@ -12,22 +12,23 @@
 #
 import os
 import sys
+
 # sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('sphinxext'))
+sys.path.insert(0, os.path.abspath("sphinxext"))
 sys.path.insert(0, os.path.abspath(os.path.pardir))
 this_dir = os.path.dirname(os.path.abspath(__file__))
-matlab_src_dir = os.path.abspath(os.path.join(this_dir, '..'))
-primary_domain = 'mat'
+matlab_src_dir = os.path.abspath(os.path.join(this_dir, ".."))
+primary_domain = "mat"
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'fMRwhy'
-copyright = '2020, J.S. Heunis'
-author = 'J.S. Heunis'
+project = "fMRwhy"
+copyright = "2020, J.S. Heunis"
+author = "J.S. Heunis"
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.0.1'
+release = "v0.0.1"
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,20 +41,21 @@ release = 'v0.0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.viewcode',
-    'sphinxcontrib.matlab',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.todo']
+    "sphinx.ext.viewcode",
+    "sphinxcontrib.matlab",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.todo",
+]
 
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -62,14 +64,14 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # a list of builtin themes.
 #
 # installing theme package
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 
 html_theme_options = {
-    'includehidden': False,
+    "includehidden": False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
