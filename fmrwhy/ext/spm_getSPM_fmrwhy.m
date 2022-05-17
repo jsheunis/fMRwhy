@@ -221,7 +221,7 @@ function [SPM, xSPM] = spm_getSPM_fmrwhy(spmmatfile)
         SPM.xVol.S;
     catch
         spm('alert*', {'This model has not been estimated.', '', ...
-                      fullfile(swd, 'SPM.mat')}, mfilename, [], ~spm('CmdLine'));
+                       fullfile(swd, 'SPM.mat')}, mfilename, [], ~spm('CmdLine'));
         SPM = [];
         xSPM = [];
         return
@@ -250,7 +250,7 @@ function [SPM, xSPM] = spm_getSPM_fmrwhy(spmmatfile)
         Ic        = xSPM.Ic;
     catch
         [Ic, xCon] = spm_conman(SPM, 'T&F', Inf, ...
-                               '    Select contrasts...', ' for conjunction', 1);
+                                '    Select contrasts...', ' for conjunction', 1);
     end
     if isempty(xCon)
         % figure out whether new contrasts were defined, but not selected
@@ -315,7 +315,9 @@ function [SPM, xSPM] = spm_getSPM_fmrwhy(spmmatfile)
         %     on orthogonalisation (i.e. if there are colinearities)
         % ----------------------------------------------------------------------
         i = 1;
-        while i < nc i = i + 1;
+        while i < nc
+
+            i = i + 1;
 
             % -Orthogonalise (subspace spanned by) contrast i w.r.t. previous
             % ------------------------------------------------------------------
@@ -379,7 +381,7 @@ function [SPM, xSPM] = spm_getSPM_fmrwhy(spmmatfile)
             Im = xSPM.Im;
         catch
             [Im, xCon] = spm_conman(SPM, 'T&F', -Inf, ...
-                                   'Select contrasts for masking...', ' for masking', 1);
+                                    'Select contrasts for masking...', ' for masking', 1);
         end
 
         % -Threshold for mask (uncorrected p-value)
