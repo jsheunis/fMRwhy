@@ -8,7 +8,7 @@ addpath([dependency_dir filesep 'spm12']);
 addpath(genpath([dependency_dir filesep 'bids-matlab']));
 addpath(genpath([dependency_dir filesep 'dicm2nii']));
 addpath(genpath([dependency_dir filesep 'tapas' filesep 'physio' filesep 'code']));
-tapas_physio_init()
+tapas_physio_init();
 addpath(genpath([dependency_dir filesep 'RainCloudPlots']));
 
 % check if dependencies are installed and throw warnings if not

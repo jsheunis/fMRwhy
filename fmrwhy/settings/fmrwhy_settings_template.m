@@ -63,9 +63,7 @@ options.coreg_template_echo = '';
 % but it is deemed fine if we remain aware of this.
 options.anat_template_session = '';
 
-
 options.normalise_to_MNI = false;
-
 
 % ----------
 % Section 04

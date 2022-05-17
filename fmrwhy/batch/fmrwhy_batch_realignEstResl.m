@@ -1,5 +1,5 @@
 function fmrwhy_batch_realignEstResl(functional_fn, template_fn, saveAs_fn, varargin)
-    
+
     % -------------
     % Parse inputs
     % -------------
@@ -35,9 +35,9 @@ function fmrwhy_batch_realignEstResl(functional_fn, template_fn, saveAs_fn, vara
     if iscell(functional_fn)
         N_runs = numel(functional_fn);
         func_files = functional_fn;
-        if ~iscell(saveAs_fn) || numel(saveAs_fn)~=N_runs
+        if ~iscell(saveAs_fn) || numel(saveAs_fn) ~= N_runs
             % Add error message TODO
-            disp('Error: saveAs_fn should have the same data type and number of indices as functional_fn')
+            disp('Error: saveAs_fn should have the same data type and number of indices as functional_fn');
         end
 
     elseif isstring(functional_fn) || ischar(functional_fn)
@@ -47,11 +47,11 @@ function fmrwhy_batch_realignEstResl(functional_fn, template_fn, saveAs_fn, vara
         saveAs_fn = {saveAs_fn}; % TODO first test if the save fn is also a single string/chararray
     else
         % Add error message TODO
-        disp('Error: functional file input is not cell array, nor char/string')
+        disp('Error: functional file input is not cell array, nor char/string');
     end
 
-    data = cell(1,N_runs);
-    temp_functional_fn = cell(1,N_runs);
+    data = cell(1, N_runs);
+    temp_functional_fn = cell(1, N_runs);
     for r = 1:N_runs
         [d, f, e] = fileparts(func_files{r});
         temp_functional_fn{r} = fullfile(d, ['temp_' f e]);
@@ -101,7 +101,7 @@ function fmrwhy_batch_realignEstResl(functional_fn, template_fn, saveAs_fn, vara
     % Run SPM12 job
     % -------------------
     spm_jobman('run', realign_estimate_reslice.matlabbatch);
-    
+
     % -------------
     % Format output
     % -------------
@@ -112,4 +112,3 @@ function fmrwhy_batch_realignEstResl(functional_fn, template_fn, saveAs_fn, vara
         [status, msg, msgID] = movefile(rtemp_functional_fn, saveAs_fn{r});
         delete(temp_functional_fn{r});
     end
-    

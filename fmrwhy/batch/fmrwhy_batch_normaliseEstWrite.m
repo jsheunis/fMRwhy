@@ -12,11 +12,11 @@ function fmrwhy_batch_normaliseEstWrite(reference_fn, toTransform_fns, tpm_fn, s
         Nt = numel(func_spm);
         if Nt > 1
             for n = 1:Nt
-                j = j+1;
+                j = j + 1;
                 resample_fns{j} = [temp_fn{i} ',' num2str(n)];
             end
         else
-            j = j+1;
+            j = j + 1;
             resample_fns{j} = [temp_fn{i} ',1'];
         end
     end
