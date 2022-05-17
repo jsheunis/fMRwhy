@@ -1,4 +1,4 @@
-function output = rtme_preproc_realignME(sub, task, run, reference_echo, prefix, previous_steps_prefix, defaults)
+function output = fmrwhy_preproc_realignME(sub, task, run, reference_echo, prefix, previous_steps_prefix, defaults)
 
     % Load required defaults
     TR = defaults.TR;

@@ -1,4 +1,4 @@
-function options = fmrwhy_workflow_qc(settings_fn)
+function options = fmrwhy_workflow_qc_original(settings_fn)
     % A custom workflow that does anatomical and functional data quality control for all subjects in a BIDS directory.
     % Steps include anatomical-to-functional processing, basic functional time series preprocessing,
     % generating a range of QC metrics and images, and compiling an HTML-report per subject.

@@ -1,4 +1,4 @@
-function [dataOut] = arRegr(a, dataIn)
+function [dataOut] = arRegr_opennft(a, dataIn)
     % Function for AR(1) filtering.
     %
     % input:
