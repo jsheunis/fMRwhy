@@ -33,6 +33,7 @@ Several setup steps are required before using ``fmrwhy_workflow_qc``:
 1. First, create a ``scripts`` directory in a location of your choice (and with a name of your choice) in which to save ``fMRwhy``-related scripts.
 2. Create a copy of the settings file ``fMRwhy/settings/fmrwhy_settings_template.m`` and put it in our ``scripts`` directory. You can rename the settings file to make it more unique to and recognisable for your dataset or analysis.
 3. Update your new settings file with information derived from your BIDS dataset and based on your preferences for processing steps. The comments in the settings file provides guidance on the required changes, which includes (but is not limited to) aspects like:
+
   - The BIDS dataset directory location
   - The list of subjects for which you want to run the workflow
   - The template task/session/run/volume for realignment steps

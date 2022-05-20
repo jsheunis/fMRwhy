@@ -57,7 +57,7 @@ function options = fmrwhy_workflow_qc(settings_fn)
         % -------
         % STEP 1 -- Preprocessing and QC steps
         % -------
-        fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, options.spm_dir)
+        fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, options.spm_dir);
 
         % -------
         % STEP 2 -- QC report: fmrwhy_workflow_qcSubReport.m

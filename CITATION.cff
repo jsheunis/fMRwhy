@@ -1,0 +1,70 @@
+# See URL below for more information about CITATION.CFF
+#
+# CITATION.cff website: https://citation-file-format.github.io/
+# CITATION.cff schema: https://github.com/citation-file-format/citation-file-format/blob/main/schema-guide.md
+#
+# run the python CLI for validation:
+#
+#   cffconvert --validate
+# 
+
+cff-version: 1.2.0
+
+title: "fMRwhy"
+
+version: 0.0.2dev
+
+abstract: "Facilitating BIDS-compatible multi-echo fMRI analysis and quality control with SPM12 and Matlab" 
+
+message: "If you use this software, please cite it as below."
+
+repository-code: "https://github.com/jsheunis/fMRwhy.git"
+
+identifiers:
+  - description: "This is the collection of archived snapshots of all releases of fMRwhy"
+    type: doi
+    value: "10.5281/zenodo.4527532"
+
+contact:
+  - family-names: "Heunis"
+    given-names: "Stephan"
+    affiliation: "FIXME"
+    email: FIXME@FIXME.com
+
+authors:
+
+  - family-names: "Heunis"
+    given-names: "Stephan"
+    affiliation: FIXME
+
+  - family-names: "Gau"
+    given-names: "Rémi"
+    orcid: "https://orcid.org/0000-0002-1535-9767"
+    affiliation: "Université catholique de Louvain"
+
+  - family-names: "Pilmeyer"
+    given-names: "Jesper"
+    affiliation: "FIXME"
+
+  - family-names: "Eudave"
+    given-names: "Luis"
+    affiliation: "FIXME"
+
+  - family-names: "Huijbers"
+    given-names: "Willem"
+    affiliation: "FIXME"
+
+  - alias: "lydiatgit"
+    family-names: "FIXME"
+    given-names: "FIXME"
+    affiliation: "FIXME"       
+
+license: GPL-2.0+
+
+keywords:
+  - brain imaging data structure
+  - neuroimaging
+  - automated pipeline
+  - MRI
+  - MATLAB
+  - SPM

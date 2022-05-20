@@ -1,4 +1,4 @@
-function fmrwhy_util_compareTSNR(tsnr_fns, mask_fn, roi_fns, compare_roi_txt, tsnr_saveAs_fns, perc_saveAs_fns, distr_saveAs_fn)
+function fmrwhy_util_compareTSNRrt(tsnr_fns, mask_fn, roi_fns, compare_roi_txt, tsnr_saveAs_fns, perc_saveAs_fns, distr_saveAs_fn)
 
     % Settings
     percentage_threshold = 160;

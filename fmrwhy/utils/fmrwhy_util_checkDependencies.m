@@ -92,14 +92,13 @@ function createErrorMsg(name, url)
                                   ['You can download the required release of ' name ' here: ' url]);
     error(errorStruct);
 
-
-% git submodule add --name spm12 https://github.com/spm/spm12 dependencies/spm12
-% git submodule set-branch -b r7771 dependencies/spm12
-% git submodule add --name bids-matlab https://github.com/jsheunis/bids-matlab dependencies/bids-matlab
-% git submodule set-branch -b v0.0.2 dependencies/bids-matlab
-% git submodule add --name dicm2nii https://github.com/jsheunis/dicm2nii dependencies/dicm2nii
-% git submodule set-branch -b v0.2 dependencies/dicm2nii
-% git submodule add --name tapas https://github.com/translationalneuromodeling/tapas dependencies/tapas
-% git submodule set-branch -b v4.0.0 dependencies/tapas
-% git submodule add --name RainCloudPlots https://github.com/RainCloudPlots/RainCloudPlots dependencies/RainCloudPlots
-% git submodule set-branch -b v1.1 dependencies/RainCloudPlots
+    % git submodule add --name spm12 https://github.com/spm/spm12 dependencies/spm12
+    % git submodule set-branch -b r7771 dependencies/spm12
+    % git submodule add --name bids-matlab https://github.com/jsheunis/bids-matlab dependencies/bids-matlab
+    % git submodule set-branch -b v0.0.2 dependencies/bids-matlab
+    % git submodule add --name dicm2nii https://github.com/jsheunis/dicm2nii dependencies/dicm2nii
+    % git submodule set-branch -b v0.2 dependencies/dicm2nii
+    % git submodule add --name tapas https://github.com/translationalneuromodeling/tapas dependencies/tapas
+    % git submodule set-branch -b v4.0.0 dependencies/tapas
+    % git submodule add --name RainCloudPlots https://github.com/RainCloudPlots/RainCloudPlots dependencies/RainCloudPlots
+    % git submodule set-branch -b v1.1 dependencies/RainCloudPlots

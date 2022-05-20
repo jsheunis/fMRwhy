@@ -48,12 +48,12 @@
 
 % func_spm.private:
 % NIFTI object: 1-by-1
-%            dat: [64×64×34 file_array]
-%            mat: [4×4 double]
+%            dat: [64x64x34 file_array]
+%            mat: [4x4 double]
 %     mat_intent: 'Aligned'
-%           mat0: [4×4 double]
+%           mat0: [4x4 double]
 %    mat0_intent: 'Aligned'
-%         timing: [1×1 struct]
+%         timing: [1x1 struct]
 %        descrip: 'Template functional volume'
 % Stephan interpretation: mat0 = qform rows; intent = code.
 

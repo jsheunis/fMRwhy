@@ -43,7 +43,6 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
     % Validate settings
     options = fmrwhy_settings_validate(options);
 
-
     % -------------------------------------------
     % SUBJECTS, SESSIONS, TASKS, RUNS (DO NOT EDIT THIS, unless you specifically want to override defaults)
     % -------------------------------------------
@@ -59,7 +58,6 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
     % and we do a check to see if the corresponding files actually exist before starting the run-specific pipeline.
     % If it doesn't exist, we write a notification to the command line and then continue with the next iteration.
     % There are smarter ways of building this logic, but this is the easiest for now. TODO.
-
 
     % ----------------------
     % PREPROCESSING PIPELINE
@@ -77,12 +75,12 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
         ses = sessions{ss};
 
         % Skip session loop if current session does not exist
-    ses_dir = fullfile(options.preproc_dir, ['sub-' sub], ['ses-' ses])
+        ses_dir = fullfile(options.preproc_dir, ['sub-' sub], ['ses-' ses]);
         if ~exist(ses_dir, 'dir')
             disp('---');
             disp(['No session ses-', ses, ' for sub-', sub]);
             disp('---');
-            continue;
+            continue
         end
 
         % Skip session loop if there is no functional data for the current session
@@ -91,7 +89,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             disp('---');
             disp(['No functional data for sub-', sub, '_ses-', ses]);
             disp('---');
-            continue;
+            continue
         end
 
         % Set up anatomical data for coregistration
@@ -103,7 +101,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             anatomical_fn = fullfile(options.preproc_dir, fp, fn);
             [fn_new, fp_new] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ses', ses, 'ext', '_T1w.nii');
             new_anatomical_fn = fullfile(options.preproc_dir, fp_new, fn_new);
-            copyfile(anatomical_fn, new_anatomical_fn)
+            copyfile(anatomical_fn, new_anatomical_fn);
             options.anat_template_session = '';
         end
 
@@ -112,12 +110,12 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             task = tasks{t};
 
             % Check if files with current task are available; if not, skip iteration
-            fnames = dir([func_dir filesep '*' task '*' ]);
+            fnames = dir([func_dir filesep '*' task '*']);
             if isempty(fnames)
                 disp('---');
                 disp(['No task files for sub-', sub, '_ses-', ses, '_task-', task]);
                 disp('---');
-                continue;
+                continue
             end
 
             disp('---------------------');
@@ -151,10 +149,9 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                         disp('---');
                     end
                 else
-                    disp(['Functional file not available: ' options.functional_fn])
+                    disp(['Functional file not available: ' options.functional_fn]);
                 end
             end
-
 
             % -------
             % STEP 1 -- Slice timing correction
@@ -173,16 +170,15 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                         fmrwhy_batch_sliceTiming(options.functional_fn, options.afunctional_fn, options);
                     end
                 else
-                    disp(['Functional file not available: ' options.functional_fn])
+                    disp(['Functional file not available: ' options.functional_fn]);
                 end
             end
-
 
             % -------
             % STEP 2 -- Realignment
             % -------
             switch options.realignment_type
-                case 'per_task' 
+                case 'per_task'
                     % All runs of a task are included (in order) in the realignment procedure; a two step procedure is applied.
                     afunctional_fns = {};
                     saveAs_fns = {};
@@ -193,7 +189,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                             afunctional_fns = [afunctional_fns {options.afunctional_fn}];
                             saveAs_fns = [saveAs_fns {options.rafunctional_fn}];
                         else
-                            disp(['Functional file not available: ' options.functional_fn])
+                            disp(['Functional file not available: ' options.functional_fn]);
                         end
                     end
                     disp('---');
@@ -207,15 +203,13 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                         % TODO, this does not handle the mean image output renaming in any standard way yet. Standardise.
                     end
                 case 'per_run'
-                    disp('per_run')
+                    disp('per_run');
                 case 'to_template'
-                    disp('to_template')
+                    disp('to_template');
                 otherwise
-                    warning('Unexpected realignmet type. realignment skipped.')
+                    warning('Unexpected realignmet type. realignment skipped.');
             end
-            
-            
-            
+
             % -------
             % STEP 3 -- Structural-functional preprocessing
             % Including:
@@ -255,16 +249,15 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                         disp('---');
                     end
                 case 'per_run'
-                    disp('per_run')
+                    disp('per_run');
                 case 'to_template'
-                    disp('to_template')
+                    disp('to_template');
                 otherwise
-                    warning('Unexpected coregistration type. Coregistration skipped.')
+                    warning('Unexpected coregistration type. Coregistration skipped.');
             end
 
-
             % -------
-            % STEP 4 -- Normalise (estimate+write) all 
+            % STEP 4 -- Normalise (estimate+write) all
             % -------
             toTransform_fns = {};
             saveAs_fns = {};
@@ -278,7 +271,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                     % Probably with fmrwhy_bids_constructFilename
                     saveAs_fns = [saveAs_fns {fullfile(options.preproc_dir, filepath, filename)}];
                 else
-                    disp(['WARNING -- Realigned and slice-timing-corrected functional file not found: ' options.rafunctional_fn])
+                    disp(['WARNING -- Realigned and slice-timing-corrected functional file not found: ' options.rafunctional_fn]);
                 end
             end
             disp('---');
@@ -292,7 +285,6 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             else
                 fmrwhy_batch_normaliseEstWrite(reference_fn, toTransform_fns, tpm_fn, saveAs_fns);
             end
-            
 
             % -------
             % STEP 5 -- Spatial smoothing
@@ -306,7 +298,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                 wrafunctional_fn = fullfile(options.preproc_dir, filepath, filename);
                 [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', ses, 'task', task, 'run', rn, 'desc', 'swrapreproc', 'ext', '_bold.nii');
                 swrafunctional_fn = fullfile(options.preproc_dir, filepath, filename);
-                if exist(wrafunctional_fn , 'file')
+                if exist(wrafunctional_fn, 'file')
                     if exist(swrafunctional_fn, 'file')
                         disp(['spatial smoothing already completed...']);
                         disp('---');
@@ -315,7 +307,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                         fmrwhy_batch_smooth(wrafunctional_fn, swrafunctional_fn, options.fwhm);
                     end
                 else
-                    disp(['WARNING -- Warped, realigned and slice-timing-corrected functional file not found: ' wrafunctional_fn])
+                    disp(['WARNING -- Warped, realigned and slice-timing-corrected functional file not found: ' wrafunctional_fn]);
                 end
             end
 
@@ -333,7 +325,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                 rn = runs{r};
                 options = fmrwhy_bids_getFuncDerivs(options.bids_dir, sub, task, options, 'ses', ses, 'task', task, 'run', rn);
                 % Smooth raw timeseries data
-                if exist(options.functional_fn , 'file')
+                if exist(options.functional_fn, 'file')
                     if ~exist(options.sfunctional_fn, 'file')
                         disp(['Performing spatial smoothing on raw timeseries: ' options.current_functional_filename]);
                         fmrwhy_batch_smooth(options.functional_fn, options.sfunctional_fn, options.fwhm);
@@ -344,9 +336,9 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                         disp('---');
                     end
                 else
-                    disp(['WARNING -- Raw functional file not found for run: ' options.functional_fn])
+                    disp(['WARNING -- Raw functional file not found for run: ' options.functional_fn]);
                 end
-            end            
+            end
 
             % -------
             % B - Generate multiple regressors for GLM analysis and QC
@@ -361,7 +353,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             for r = 1:numel(runs)
                 rn = runs{r};
                 options = fmrwhy_bids_getFuncDerivs(options.bids_dir, sub, task, options, 'ses', ses, 'task', task, 'run', rn);
-                if exist(options.functional_fn , 'file')
+                if exist(options.functional_fn, 'file')
                     if ~exist(options.confounds_fn, 'file')
                         disp(['Generating multiple regressors for GLM analysis and QC']);
                         fmrwhy_bids_preprocMultRegr(options.bids_dir, sub, task, options, 'ses', ses, 'task', task, 'run', rn);
@@ -372,7 +364,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                         disp('---');
                     end
                 else
-                    disp(['WARNING -- Functional file not found for run: ' options.functional_fn])
+                    disp(['WARNING -- Functional file not found for run: ' options.functional_fn]);
                 end
             end
 
@@ -384,14 +376,14 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             for r = 1:numel(runs)
                 rn = runs{r};
                 options = fmrwhy_bids_getFuncDerivs(options.bids_dir, sub, task, options, 'ses', ses, 'task', task, 'run', rn);
-                if exist(options.functional_fn , 'file')
+                if exist(options.functional_fn, 'file')
                     fmrwhy_bids_qcRun(options.bids_dir, sub, task, options, 'ses', ses, 'run', rn);
                 else
-                    disp(['WARNING -- Functional file not found for run: ' options.functional_fn])
+                    disp(['WARNING -- Functional file not found for run: ' options.functional_fn]);
                 end
             end
 
-        end  
+        end
     end
 
     % D - Generate subject report

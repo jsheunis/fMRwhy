@@ -1,4 +1,4 @@
-function [tfunctional_spm, reslVol] = fmrwhy_util_applyTransformRT(toTransform_fn, motion_params, template_fn, saveAs_fn, TR)
+function [tfunctional_spm, reslVol] = fmrwhy_util_applyTransformRT2(toTransform_fn, motion_params, template_fn, saveAs_fn, TR)
 
     [Ni, Nj] = size(motion_params);
     functional_spm = spm_vol(toTransform_fn);

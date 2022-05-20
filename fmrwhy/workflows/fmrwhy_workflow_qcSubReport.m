@@ -51,8 +51,6 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
     end
     options.qc_report_runs = qc_report_runs;
     options.qc_report_sestasks = qc_report_sestasks;
-    
-    
 
     % ------------------------------------
     % STEP 1 -- Load default filenames etc
@@ -145,11 +143,10 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
     end
     bids_dataset.physio_str = '_physioQC_03.jpg';
 
-
     % Copy all PNG files recursively to report image directory
     sub_qc_dir = fullfile(options.qc_dir, ['sub-' sub]);
     png_list = dir(fullfile(sub_qc_dir, '**/*.png'));  % get list of png files and folders in all subfolder
-    png_list = png_list(~[png_list.isdir]);  %remove folders from list
+    png_list = png_list(~[png_list.isdir]);  % remove folders from list
 
     for i = 1:numel(png_list)
         % If sessions exist
@@ -214,14 +211,14 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
     % [func_filename, func_filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', 'task', options.template_task, 'run', options.template_run, 'space', 'individual', 'ext', '_bold.nii');
     for i = 1:numel(tasks_runs)
         if contains(tasks_runs{i}, 'ses-')
-            ses_arr = extractBetween(tasks_runs{i},'ses-','_');
+            ses_arr = extractBetween(tasks_runs{i}, 'ses-', '_');
             ses = ses_arr{1};
-            f_path_qc = fullfile(options.qc_dir, ['sub-' sub], ['ses-' ses], 'func')
-            f_path_preproc = fullfile(options.preproc_dir, ['sub-' sub], ['ses-' ses], 'func')
+            f_path_qc = fullfile(options.qc_dir, ['sub-' sub], ['ses-' ses], 'func');
+            f_path_preproc = fullfile(options.preproc_dir, ['sub-' sub], ['ses-' ses], 'func');
         else
-            f_path_qc = fullfile(options.qc_dir, ['sub-' sub], 'func')
-            f_path_preproc = fullfile(options.preproc_dir, ['sub-' sub], 'func')
-            
+            f_path_qc = fullfile(options.qc_dir, ['sub-' sub], 'func');
+            f_path_preproc = fullfile(options.preproc_dir, ['sub-' sub], 'func');
+
         end
 
         % write summary metrics
@@ -268,7 +265,7 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
         %     % PhysIO QC image locations
         %     to_copy.physioqc_img = fullfile(options.qc_dir, func_filepath, ['PhysIO_' tasks_runs{i}], ['sub-' sub '_' tasks_runs{i} '_physioQC_03.jpg']);
         % end
-        
+
         % Copy all images if they exist
         % cp_fields = fieldnames(to_copy);
         % for x = 1:numel(cp_fields)

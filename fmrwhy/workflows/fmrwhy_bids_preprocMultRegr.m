@@ -201,19 +201,18 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
     % -------
     if include_physio
         % Grab physio log-file, e.g. sub-001_task-rest_run-1_physio.tsv.gz
-        if (1 == isempty(params.ses))
+        if 1 == isempty(params.ses)
             log_fn = fullfile(options.sub_dir_preproc, 'func', ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physio.log']);
         else
             log_fn = fullfile(options.sub_dir_preproc, ['ses-' params.ses], 'func', ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physio.log']);
         end
 
-            
         % Create struct with options for PhysIO
         physio_options = options.physio.options;
-        if (1 == isempty(params.ses))
-            physio_options.save_dir = fullfile(options.sub_dir_qc, 'func',['PhysIO_task-' task '_run-' params.run]);
+        if 1 == isempty(params.ses)
+            physio_options.save_dir = fullfile(options.sub_dir_qc, 'func', ['PhysIO_task-' task '_run-' params.run]);
         else
-            physio_options.save_dir = fullfile(options.sub_dir_qc, ['ses-' params.ses], 'func',['PhysIO_task-' task '_run-' params.run]);
+            physio_options.save_dir = fullfile(options.sub_dir_qc, ['ses-' params.ses], 'func', ['PhysIO_task-' task '_run-' params.run]);
         end
         physio_options.cardiac_fn = log_fn;
         physio_options.respiration_fn = log_fn;
@@ -235,7 +234,7 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
             phys_file = fullfile(physio_options.save_dir, 'physio.mat');
             physmat = load(phys_file);
             physmat.physio.verbose.level = 2;
-            if (1 == isempty(params.ses))
+            if 1 == isempty(params.ses)
                 physmat.physio.verbose.fig_output_file = ['sub-' sub '_task-' task '_run-' params.run '_physioQC.jpg'];
             else
                 physmat.physio.verbose.fig_output_file = ['sub-' sub 'ses' params.ses '_task-' task '_run-' params.run '_physioQC.jpg'];

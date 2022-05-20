@@ -23,7 +23,7 @@ function fmrwhy_batch_sliceTiming(functional_fn, saveAs_fn, options)
     slice_timing.matlabbatch{1}.spm.temporal.st.nslices = N_slices;
     slice_timing.matlabbatch{1}.spm.temporal.st.tr = TR;
     slice_timing.matlabbatch{1}.spm.temporal.st.ta = TR - TR / N_slices; % if 'to' is provided as array of slice times, this is ignored ==> set to zero
-    slice_timing.matlabbatch{1}.spm.temporal.st.so = options.st.so; %1:N_slices; % can also pass array of slice times in ms
+    slice_timing.matlabbatch{1}.spm.temporal.st.so = options.st.so; % 1:N_slices; % can also pass array of slice times in ms
     slice_timing.matlabbatch{1}.spm.temporal.st.refslice = options.st.refslice; % if 'to' is provided as array of slice times, refslice should be given in ms
     slice_timing.matlabbatch{1}.spm.temporal.st.prefix = options.st.prefix;
     % Run
