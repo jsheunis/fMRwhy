@@ -208,7 +208,7 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
         end
         
         metadata = bids.query(options.bids_dataset,'metadata','sub',sub,'ses',params.ses,'run',params.run,'task',task,'type','bold');
-        options.physio.options.Nscans = metadata.MaxDynamics;
+        options.physio.options.Nscans = max(metadata.DynamicScanNumber);
    
         % Create struct with options for PhysIO
         physio_options = options.physio.options;
@@ -240,7 +240,7 @@ function confounds_tsv = fmrwhy_bids_preprocMultRegr(bids_dir, sub, task, option
             if (1 == isempty(params.ses))
                 physmat.physio.verbose.fig_output_file = ['sub-' sub '_task-' task '_run-' params.run '_physioQC.jpg'];
             else
-                physmat.physio.verbose.fig_output_file = ['sub-' sub 'ses' params.ses '_task-' task '_run-' params.run '_physioQC.jpg'];
+                physmat.physio.verbose.fig_output_file = ['sub-' sub '_ses-' params.ses '_task-' task '_run-' params.run '_physioQC.jpg'];
             end
             physmat.physio.verbose.show_figs = false;
             physmat.physio.verbose.save_figs = true;

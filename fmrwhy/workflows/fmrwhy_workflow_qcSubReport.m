@@ -157,6 +157,17 @@ function [report, js_string] = fmrwhy_workflow_qcSubReport(sub, options)
         to_fn = fullfile(report_img_dir, png_list(i).name);
         copyfile(fn, to_fn);
     end
+    
+    % Copy all JPG files recursively to report image directory
+    jpg_list = dir(fullfile(sub_qc_dir, '**/*.jpg'));  % get list of png files and folders in all subfolder
+    jpg_list = jpg_list(~[jpg_list.isdir]);  %remove folders from list
+
+    for i = 1:numel(jpg_list)
+        % If sessions exist
+        fn = fullfile(jpg_list(i).folder, jpg_list(i).name);
+        to_fn = fullfile(report_img_dir, jpg_list(i).name);
+        copyfile(fn, to_fn);
+    end
 
     % [filename, filepath] = fmrwhy_bids_constructFilename('anat', 'sub', sub, 'ext', '_T1w.nii');
     % Anatomical montage image locations - all anatomical QC outputs should be located in the 'anat' dir (in QC derivatives) of the template session; if no sessions ==> template session is the main 'anat' dir
