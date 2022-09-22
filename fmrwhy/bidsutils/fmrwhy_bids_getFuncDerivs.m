@@ -38,9 +38,9 @@ function options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, varar
 
     % Outputs from basicFunc processing
 
-    fields_w_echo = {'motion_fn', 'functional_fn', 'afunctional_fn', 'rfunctional_fn', 'rafunctional_fn', 'sfunctional_fn', 'srfunctional_fn', 'srafunctional_fn'};
-    fields_w_echo_desc = {'confounds', '', 'apreproc', 'rpreproc', 'rapreproc', 'spreproc', 'srpreproc', 'srapreproc'};
-    fields_w_echo_ext = {'_motion.tsv', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii'};
+    fields_w_echo = {'motion_fn', 'functional_fn', 'afunctional_fn', 'rfunctional_fn', 'rafunctional_fn', 'urafunctional_fn', 'sfunctional_fn', 'srfunctional_fn', 'srafunctional_fn'};
+    fields_w_echo_desc = {'confounds', '', 'apreproc', 'rpreproc', 'rapreproc', 'urapreproc', 'spreproc', 'srpreproc', 'srapreproc'};
+    fields_w_echo_ext = {'_motion.tsv', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii', '_bold.nii'};
 
     fields_wo_echo = {'framewise_displacement_fn', 'tissue_regr_fn', 'physio_regr_fn', 'confounds_fn'};
     fields_wo_echo_ext = {'_fd.tsv', '_tissue.tsv', '_physio.tsv', '_regressors.tsv'};
@@ -78,5 +78,5 @@ function options = fmrwhy_bids_getFuncDerivs(bids_dir, sub, task, options, varar
         options.(fields_statsqc_tsv{i}) = fullfile(options.qc_dir, filepath, filename);
     end
 
-    options.basic_func_out_fns = {options.motion_fn, options.afunctional_fn, options.rfunctional_fn, options.rafunctional_fn, options.sfunctional_fn, options.srfunctional_fn, options.srafunctional_fn, options.confounds_fn};
+    options.basic_func_out_fns = {options.motion_fn, options.afunctional_fn, options.rfunctional_fn, options.rafunctional_fn, options.urafunctional_fn, options.sfunctional_fn, options.srfunctional_fn, options.srafunctional_fn, options.confounds_fn};
     options.stats_qc_out_fns = {options.mean_fn, options.std_fn, options.tsnr_fn, options.var_fn, options.stats_timeseries_fn, options.stats_summary_fn};

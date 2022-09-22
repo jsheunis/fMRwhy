@@ -41,7 +41,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
     % Setup fmrwhy derivative directories on workflow level
     options = fmrwhy_bids_setupQcDerivDirs(options.bids_dir, options);
     % Validate settings
-    options = fmrwhy_settings_validate(options);
+    options = 	(options);
 
 
     % -------------------------------------------
@@ -218,9 +218,81 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             end
             
             
+            %##############
+            % ### WIP #####
+            % -------
+            % STEP 3 -- VDM calculation and application
+            % -------
+            disp('---');
+            disp(['STEP 3) VDM calculation and applciation: sub-' sub '_ses-' ses]);
+            disp('---');
+            switch options.realignment_type
+                case 'per_task' 
+                    % All runs of a task are included (in order) in the realignment procedure; a two step procedure is applied.
+                    rafunctional_fns = {};
+                    functional_fns = {};
+                    saveAs_u_fns = {};
+                    saveAs_vdm_fns = {};
+                    phase1_fmaps = {};
+                    phase2_fmaps = {};
+                    magnitude1_fmaps = {};
+                    magnitude2_fmaps = {};
+                    for r = 1:numel(runs)
+                        rn = runs{r};
+                        options = fmrwhy_bids_getFuncDerivs(options.bids_dir, sub, task, options, 'ses', ses, 'task', task, 'run', rn);
+                        
+                        %######
+                        %Get fmap files
+                        % TODO: FIX FMAP FILENAMES!!!!!!!!!!!!!!
+                        %[filename, filepath] = fmrwhy_bids_constructFilename('fmap', 'sub', sub, 'ses', ses, 'run', rn, 'task', task, 'ext', '_phase1.nii');
+                        fn = fullfile(options.sub_dir_preproc, ['ses-' ses],'fmap', ['sub-' sub '_ses-' ses  '_run-' rn '_task-' task '_phase1.nii']); 
+                        phase1_fmaps = [phase1_fmaps {fn}];
+                        %[filename, filepath] = fmrwhy_bids_constructFilename('fmap', 'sub', sub, 'ses', ses, 'run', rn,'task', task, 'ext', '_magnitude1.nii');
+                        %magnitude1_fmaps = [magnitude1_fmaps {fullfile(options.preproc_dir, filepath, filename)}];
+                        fn = fullfile(options.sub_dir_preproc, ['ses-' ses],'fmap', ['sub-' sub '_ses-' ses '_run-' rn '_task-' task '_phase2.nii']); 
+                        phase2_fmaps = [phase2_fmaps {fn}];
+                        %[filename, filepath] = fmrwhy_bids_constructFilename('fmap', 'sub', sub, 'ses', ses, 'run', rn,'task', task, 'ext', '_phase2.nii');
+                        %phase2_fmaps = [phase2_fmaps {fullfile(options.preproc_dir, filepath, filename)}];
+                        fn = fullfile(options.sub_dir_preproc, ['ses-' ses],'fmap', ['sub-' sub '_ses-' ses '_run-' rn '_task-' task '_magnitude1.nii']); 
+                        magnitude1_fmaps = [magnitude1_fmaps {fn}];
+                        %[filename, filepath] = fmrwhy_bids_constructFilename('fmap', 'sub', sub, 'ses', ses, 'run', rn,'task', task, 'ext', '_magnitude2.nii');
+                        %magnitude2_fmaps = [magnitude2_fmaps {fullfile(options.preproc_dir, filepath, filename)}];
+                        fn = fullfile(options.sub_dir_preproc, ['ses-' ses],'fmap', ['sub-' sub '_ses-' ses '_run-' rn '_task-' task '_magnitude2.nii']); 
+                        magnitude2_fmaps = [magnitude2_fmaps {fn}];
+                        
+                        %######
+                        if exist(options.functional_fn, 'file')
+                            functional_fns = [functional_fns {options.functional_fn}];
+                            rafunctional_fns = [rafunctional_fns {options.rafunctional_fn}];
+                            saveAs_u_fns = [saveAs_u_fns {options.urafunctional_fn}];
+                            [filename, filepath] = fmrwhy_bids_constructFilename('fmap', 'sub', sub, 'ses', ses, 'run', rn,'task', task, 'ext', '_vdm.nii');
+                            saveAs_vdm_fns = [saveAs_vdm_fns {fullfile(options.preproc_dir, filepath, filename)}];
+                            
+                        else
+                            disp(['Functional file not available: ' options.functional_fn])
+                        end
+                        
+                    end
+                    if exist(saveAs_u_fns{1}, 'file')
+                        disp(['VDM correction already completed...']);
+                        disp('---');
+                    else
+                        fmrwhy_batch_VDMcalc(functional_fns, saveAs_vdm_fns, phase1_fmaps, magnitude1_fmaps, phase2_fmaps, magnitude2_fmaps);
+                        fmrwhy_batch_VDMApply(rafunctional_fns,saveAs_vdm_fns,saveAs_u_fns);
+                        % 
+                    end
+                case 'per_run'
+                    disp('per_run')
+                case 'to_template'
+                    disp('to_template')
+                otherwise
+                    warning('Unexpected realignmet type. realignment skipped.')
+            end
+            % ### /WIP #####
+            %##############
             
             % -------
-            % STEP 3 -- Structural-functional preprocessing
+            % STEP 4 -- Structural-functional preprocessing
             % Including:
             % - Anatomical to functional space coregistration - SPM12 coregister estimate
             % - Segment coregistered anatomical image into tissue components - SPM12 unified segmentation
@@ -229,7 +301,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             % - Create tissue compartment and whole brain masks
             % -------
             disp('---');
-            disp(['STEP 3) Structural-functional preprocessing: sub-' sub '_ses-' ses]);
+            disp(['STEP 4) Structural-functional preprocessing: sub-' sub '_ses-' ses]);
             disp('---');
             switch options.coreg_type
                 case 'per_task'
@@ -267,7 +339,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
 
 
             % -------
-            % STEP 4 -- Normalise (estimate+write) all 
+            % STEP 5 -- Normalise (estimate+write) all 
             % -------
             toTransform_fns = {};
             saveAs_fns = {};
@@ -275,7 +347,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                 rn = runs{r};
                 options = fmrwhy_bids_getFuncDerivs(options.bids_dir, sub, task, options, 'ses', ses, 'task', task, 'run', rn);
                 if exist(options.rafunctional_fn, 'file')
-                    toTransform_fns = [toTransform_fns {options.rafunctional_fn}];
+                    toTransform_fns = [toTransform_fns {options.urafunctional_fn}];
                     % TODO check/get name of warped file in MNI space
                     [filename, filepath] = fmrwhy_bids_constructFilename('func', 'sub', sub, 'ses', ses, 'task', task, 'run', rn, 'desc', 'wrapreproc', 'ext', '_bold.nii');
                     % Probably with fmrwhy_bids_constructFilename
@@ -285,7 +357,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
                 end
             end
             disp('---');
-            disp(['STEP 4) Normalise to MNI space: sub-' sub '_ses-' ses '_task-' task '_run-all']);
+            disp(['STEP 5) Normalise to MNI space: sub-' sub '_ses-' ses '_task-' task '_run-all']);
             disp('---');
             reference_fn = options.coregest_anatomical_fn;
             tpm_fn = fullfile(spm_dir, 'tpm/TPM.nii');
@@ -298,10 +370,10 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             
 
             % -------
-            % STEP 5 -- Spatial smoothing
+            % STEP 6 -- Spatial smoothing
             % -------
             disp('---');
-            disp('STEP 5) Spatial Smoothing');
+            disp('STEP 6) Spatial Smoothing');
             disp('---');
             for r = 1:numel(runs)
                 rn = runs{r};
@@ -326,11 +398,11 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             % QUALITY CONTROL STEPS
             % -------
             disp('---');
-            disp('STEP 6) Quality control processing');
+            disp('STEP 7) Quality control processing');
             disp('---');
             % -------
             % A - smooth raw functional data for the plot;
-            disp('STEP 6-A) Smooth raw functional data for the plot');
+            disp('STEP 7-A) Smooth raw functional data for the plot');
             disp('---');
             for r = 1:numel(runs)
                 rn = runs{r};
@@ -359,7 +431,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             % - FD censoring
             % - tissue compartment signals
             % -------
-            disp('STEP 6-B) Generate multiple regressors for GLM analysis and QC');
+            disp('STEP 7-B) Generate multiple regressors for GLM analysis and QC');
             disp('---');
             for r = 1:numel(runs)
                 rn = runs{r};
@@ -382,7 +454,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
             % -------
             % C - Calculate QC metrics and generate plots
             % -------
-            disp('STEP 6-C) Calculate QC metrics and generate plots');
+            disp('STEP 7-C) Calculate QC metrics and generate plots');
             disp('---');
             for r = 1:numel(runs)
                 rn = runs{r};
@@ -398,7 +470,7 @@ function fmrwhy_workflow_qc_singleSub(sub, sessions, tasks, runs, settings_fn, s
     end
 
     % D - Generate subject report
-    disp('STEP 7) Generate subject QC report');
+    disp('STEP 8) Generate subject QC report');
     disp('---');
     fmrwhy_workflow_qcSubReport(sub, options);
     disp('Complete!');

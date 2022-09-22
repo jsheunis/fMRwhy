@@ -22,7 +22,7 @@ function options = fmrwhy_bids_setupQcSubDirs(bids_dir, sub, options)
         dir_contents = dir(options.sub_dir_BIDS);
         % Loop through files/folders
         % If session, loop through session folder contents, and:
-        %   - if anat or func, loop through content and copy or gunzip (nii.gz)
+        %   - if anat or func or fmap, loop through content and copy or gunzip (nii.gz)
         %   - if other, don't copy
         % If anat or func (i.e. no session), loop through folder contents, and:
         %   - copy or gunzip (nii.gz) all
@@ -32,8 +32,8 @@ function options = fmrwhy_bids_setupQcSubDirs(bids_dir, sub, options)
                 sesdir_contents = dir(fullfile(dir_contents(i).folder, dir_contents(i).name));
                 % Loop through session dir
                 for j = 1:numel(sesdir_contents)
-                    % if there are anat or func directories, copy/gunzip files accordingly
-                    if (sesdir_contents(j).isdir == 1) && (contains(sesdir_contents(j).name, 'anat') || contains(sesdir_contents(j).name, 'func'))
+                    % if there are anat or func or fmap directories, copy/gunzip files accordingly
+                    if (sesdir_contents(j).isdir == 1) && (contains(sesdir_contents(j).name, 'anat') || contains(sesdir_contents(j).name, 'func') || contains(sesdir_contents(j).name, 'fmap'))
                         anatfunc_dir = fullfile(sesdir_contents(j).folder, sesdir_contents(j).name);
                         deriv_subdir = fullfile(options.sub_dir_preproc, dir_contents(i).name, sesdir_contents(j).name);
                         copyGunzipDirContents(anatfunc_dir, deriv_subdir);

@@ -6,7 +6,7 @@ function [filename, filepath] = fmrwhy_bids_constructFilename(filetype, varargin
     % :param varargin: something y
     % :returns: filename
 
-    filetypes = {'anat', 'func'}; % currently supported in fMRwhy
+    filetypes = {'anat', 'func', 'fmap'}; % currently supported in fMRwhy
     descriptions = {'Subject', 'Session', 'Task', 'Acquisition', 'Contrast Enhancing Agent', 'Reconstruction', 'Phase-Encoding Direction', 'Run', 'Corresponding modality', 'Echo', 'Recording', 'Processed (on device)', 'Space', 'Split', 'Description', 'File extension'};
     entities = {'sub', 'ses', 'task', 'acq', 'ce', 'rec', 'dir', 'run', 'mod', 'echo', 'recording', 'proc', 'space', 'split', 'desc', 'ext'};
     formats = {'label', 'label', 'label', 'label', 'label', 'label', 'label', 'index', 'label', 'index', 'label', 'label', 'label', 'index', 'label', 'label'};
