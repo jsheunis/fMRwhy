@@ -15,6 +15,17 @@ function options = fmrwhy_settings_validate(options)
     if strcmp(options.subjects_output, 'all')
         options.subjects_output = options.subjects;
     end
+    
+    % If options.analyze_tasks is set to 'all' (default), take the list from the bids.query output, otherwise the ones set in settings
+    if (0 == strcmp(options.analyze_tasks, 'all'))
+        options.tasks = options.analyze_tasks;
+    end
+
+    % If options.analyze_sessions is set to 'all' (default), take the list from the bids.query output, otherwise the ones set in settings
+    if (0 == strcmp(options.analyze_sessions, 'all'))
+        options.sessions = options.analyze_sessions;
+    end
+
 
     % Set template for functional realignment purposes (if not needed, set to [])
     options.template_sub = options.subjects{1};
@@ -29,9 +40,9 @@ function options = fmrwhy_settings_validate(options)
     options.has_runs = ~isempty(options.runs);
     if options.has_sessions
         if options.has_runs
-            filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'sess', options.template_session, 'run', options.template_run, 'type', 'bold');
+            filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'ses', options.template_session, 'run', options.template_run, 'type', 'bold');
         else
-            filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'sess', options.template_session, 'type', 'bold');
+            filenames = bids.query(options.bids_dataset, 'data', 'sub', options.template_sub, 'task', options.template_task, 'ses', options.template_session, 'type', 'bold');
         end
     else
         if options.has_runs

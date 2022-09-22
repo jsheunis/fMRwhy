@@ -15,6 +15,11 @@ options.bids_dir = '';
 
 % Subjects to run. If all ==> 'all'. If a subset, include the subject identifier as a cell array.
 options.subjects_output = 'all'; % e.g.: options.subjects_output = {'001', '003', '021'};
+% take 'all' for all tasks in BIDS dir or specific ones by their names
+options.analyze_tasks = 'all';
+% take 'all' for all sessions in BIDS dir or specific ones by their names
+options.analyze_sessions = 'all';
+
 
 % ----------
 % Section 03
