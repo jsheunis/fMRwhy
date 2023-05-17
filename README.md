@@ -1,3 +1,5 @@
+_[Note: this repository is not actively maintained, although notifications are monitored]_
+
 # fMRwhy - Facilitating BIDS-compatible fMRI analysis with SPM12 and Matlab
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
